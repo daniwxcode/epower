@@ -40,6 +40,10 @@
                 return $"all-{entityFullName}-extended-attributes-{entityId}";
             }
         }
+        public static class BuildingsCache
+        {
+            public const string GetAll = "AllBuildings";
+        }
 
         public static class MimeTypes
         {
