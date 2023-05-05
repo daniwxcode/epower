@@ -13,7 +13,7 @@ namespace BlazorHero.CleanArchitecture.Domain.Entities.Bail
 
         [Required(ErrorMessage = "La référence interne du paiement est requise.")]
         public string InternalReference { get; set; }
-        public double Credits { get; set; }
+        public double Credits { get; set; } = 0;
 
     }
 

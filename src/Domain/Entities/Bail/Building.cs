@@ -16,6 +16,7 @@ namespace BlazorHero.CleanArchitecture.Domain.Entities.Bail
         public string Address { get; set; }
 
         public List<Shop> Shops { get; set; } = new();
+        public List<Meter> Meters { get; set; } = new();
     }
 
 }

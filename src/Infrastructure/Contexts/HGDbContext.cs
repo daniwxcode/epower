@@ -16,7 +16,6 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Contexts
         public DbSet<Shop> Shops { get; set; }
         public DbSet<ShopTenant> ShopTenants { get; set; }
         public DbSet<Meter> Meters { get; set; }
-        public DbSet<InternalMeter> InternalMeters { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<InternalPayement> InternalPayements { get; set; }        
         public DbSet<RentalAgreement> RentalAgreements { get; set; }
