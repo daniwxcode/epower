@@ -47,6 +47,8 @@
         public static class BuildingsCache
         {
             public const string GetAll = "AllBuildings";
+            public const string Shops = "AllShops";
+
         }
 
         public static class MimeTypes

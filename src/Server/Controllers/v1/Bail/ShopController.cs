@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Bail
 {
-    public class BuildingController:BaseApiController<BuildingController>
+    public class ShopController:BaseApiController<ShopController>
     {
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -16,10 +16,9 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Bail
             return Ok(data);
         }
         [HttpPost]
-        public async Task<IActionResult> AddBuilding(AddEditBuildingCommand command)
+        public async Task<IActionResult> AddStore(AddEditStoreCommand command)
         {
             return Ok(await _mediator.Send(command));
         }
-
     }
 }

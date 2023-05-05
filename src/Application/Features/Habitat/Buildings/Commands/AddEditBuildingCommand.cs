@@ -55,7 +55,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                 building.Name = request.Name ?? building.Name;
                 building.Address = request.Address??building.Address;
                 await _unitOfWork.Repository<Building>().UpdateAsync(building);
-                await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.Cache.GetAllBrandsCacheKey);
+                await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.Cache.AllBuildingCacheKey);
                 return await Result<int>.SuccessAsync(building.Id, _localizer["Building Updated"]);
             }
         }
