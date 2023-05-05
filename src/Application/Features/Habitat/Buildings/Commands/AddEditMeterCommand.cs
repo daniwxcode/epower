@@ -24,9 +24,9 @@ public class AddEditMeterCommand : IRequest<Result<int>>
     public List<int> Stores { get; set; } = new();
 
 
-    public InternalMeter GetInternalMeter()
+    public Meter GetInternalMeter()
     {
-        return new InternalMeter()
+        return new Meter()
         {
             Id = Id,
             SerialNumber = SerialNumber,
@@ -69,9 +69,9 @@ public class AddEditMeterCommand : IRequest<Result<int>>
 
         }
 
-        private async Task<Result<int>> SaveInternalMeter(InternalMeter meter, CancellationToken cancellationToken)
+        private async Task<Result<int>> SaveInternalMeter(Meter meter, CancellationToken cancellationToken)
         {
-            var repository = _unitOfWork.Repository<InternalMeter>();
+            var repository = _unitOfWork.Repository<Meter>();
             if (meter.Id == 0)
             {
                 await repository.AddAsync(meter);

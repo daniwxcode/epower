@@ -2,13 +2,14 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorHero.CleanArchitecture.Domain.Entities.Bail
 {
     public class Shop : AuditableEntity<int>
     {
         public int BuildingId { get; set; }
-
+        [ForeignKey(nameof(BuildingId))]
         public Building Building { get; set; }
 
         [Required(ErrorMessage = "Le nom du magasin est requis.")]
