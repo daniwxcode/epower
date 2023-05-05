@@ -27,6 +27,10 @@
         }
         public static class Cache
         {
+            #region Building
+            public const string AllBuildingCacheKey = "all-buildings";
+            #endregion
+
             public const string GetAllBrandsCacheKey = "all-brands";
             public const string GetAllDocumentTypesCacheKey = "all-document-types";
 
