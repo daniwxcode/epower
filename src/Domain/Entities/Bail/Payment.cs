@@ -7,6 +7,7 @@ namespace BlazorHero.CleanArchitecture.Domain.Entities.Bail
     public abstract class Payment : AuditableEntity<int>
     {
         public decimal Amount { get; set; }
+        public string SerialNumber { get; set; }
         [Required(ErrorMessage = "La référence externe du paiement est requise.")]
         public string ExternalReference { get; set; }
 
