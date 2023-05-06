@@ -29,6 +29,7 @@
         {
             #region Building
             public const string AllBuildingCacheKey = "all-buildings";
+            public const string AllMeterCacheKey = "all-meters";
             #endregion
 
             public const string GetAllBrandsCacheKey = "all-brands";
