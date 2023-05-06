@@ -1,6 +1,5 @@
 ﻿using BlazorHero.CleanArchitecture.Application.Interfaces.Repositories;
 using BlazorHero.CleanArchitecture.Domain.Entities.Bail;
-using BlazorHero.CleanArchitecture.Domain.Entities.Catalog;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
 
@@ -11,10 +10,11 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Meter = BlazorHero.CleanArchitecture.Domain.Entities.Bail.Meter;
 
 namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
 
@@ -22,8 +22,10 @@ public class AddEditStoreCommand : IRequest<Result<int>>
 {
     public int Id { get; set; } = 0;
     public int BuildingId { get; set; }
+    public int? MeterId { get; set; }
     public string Name { get; set; }
-    public string MeterSerialNumber { get; set; }
+    public string? MeterSerialNumber { get; set; }
+    public string? Code { get; set; }
 
 }
 
@@ -45,6 +47,26 @@ internal class AddEditStoreCommandHandler : IRequestHandler<AddEditStoreCommand,
     {
         _unitOfWork = unitOfWork;
     }
+    private async Task<Meter> getExistingMeter(AddEditStoreCommand command)
+    {
+        var meterRepos = _unitOfWork.Repository<Meter>();
+        if (command.MeterId != null)
+        {
+            return await meterRepos.GetByIdAsync(command.MeterId.Value);
+        }
+
+        if (command.MeterSerialNumber != null)
+        {
+            return await meterRepos.Entities.FirstOrDefaultAsync(_ => _.SerialNumber == command.MeterSerialNumber);
+        }
+
+        if (command.Code != null)
+        {
+            return await meterRepos.Entities.FirstOrDefaultAsync(_ => _.Code == command.Code);
+        }
+
+        return null;
+    }
     public async Task<Result<int>> Handle(AddEditStoreCommand command, CancellationToken cancellationToken)
     {
         var shopRepos = _unitOfWork.Repository<Shop>();
@@ -53,30 +75,44 @@ internal class AddEditStoreCommandHandler : IRequestHandler<AddEditStoreCommand,
         {
             return await Result<int>.FailAsync("Boutique déjà Existante.");
         }
-        var meter = await _unitOfWork.Repository<Meter>().Entities.FirstOrDefaultAsync(_ => _.SerialNumber == command.MeterSerialNumber, cancellationToken);
-        if (meter is null)
+        Meter dbMeter = await getExistingMeter(command);
 
-            if (command.Id == 0)
+        if (dbMeter is null)
+        {
+            return await Result<int>.FailAsync("Le compteur est inexistant");
+        }
+        if (dbMeter.BuildingId != command.BuildingId)
+        {
+            return await Result<int>.FailAsync("Le compteur et la Boutique ne sont pas dans le même Immeuble");
+        }
+
+        if (command.Id == 0)
+        {
+            Shop shop = new Shop()
             {
-                Shop shop = new Shop()
-                {
-                    Id = command.Id,
-                    Name = command.Name,
-                    BuildingId = command.BuildingId,
-                    
-                };
-                await shopRepos.AddAsync(shop);
-                await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.Shops);
-                return await Result<int>.SuccessAsync(shop.Id, "Boutique Enregistré avec Succès");
-            }
+                Id = command.Id,
+                Name = command.Name,
+                BuildingId = command.BuildingId,
+                MeterId = command.MeterId.Value,
+
+            };
+            await shopRepos.AddAsync(shop);
+            await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.Shops);
+            return await Result<int>.SuccessAsync(shop.Id, "Boutique Enregistrée avec Succès");
+        }
+
 
         var dbItem = await shopRepos.GetByIdAsync(command.Id);
         if (dbItem == null)
         {
             return await Result<int>.FailAsync("Immeuble Inexistant");
         }
+
+        if (dbMeter.BuildingId != dbItem.BuildingId)
+        {
+            return await Result<int>.FailAsync("Le compteur et la Boutique ne sont pas dans le même Immeuble");
+        }
         dbItem.Name = command.Name;
-        dbItem.BuildingId = command.BuildingId;
         await shopRepos.UpdateAsync(dbItem);
         await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.Shops);
         return await Result<int>.SuccessAsync(dbItem.Id, "Boutique Mise à jour avec Succès");

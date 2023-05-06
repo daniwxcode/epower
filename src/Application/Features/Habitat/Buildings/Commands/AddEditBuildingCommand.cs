@@ -51,12 +51,12 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
             {
                 var building = await _unitOfWork.Repository<Building>().GetByIdAsync(request.Id);
                 if(building == null)
-                    return await Result<int>.FailAsync(_localizer["Building Not Found!"]);
+                    return await Result<int>.FailAsync(_localizer["L'immeuble n'existe pas!"]);
                 building.Name = request.Name ?? building.Name;
                 building.Address = request.Address??building.Address;
                 await _unitOfWork.Repository<Building>().UpdateAsync(building);
                 await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.Cache.AllBuildingCacheKey);
-                return await Result<int>.SuccessAsync(building.Id, _localizer["Building Updated"]);
+                return await Result<int>.SuccessAsync(building.Id, _localizer["Immeuble Mis à jour avec succès"]);
             }
         }
     }
