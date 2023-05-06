@@ -31,7 +31,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Qu
         public async Task<Result<List<BuildingResponseBase>>> Handle(GetAllBuildingsRequest request, CancellationToken cancellationToken)
         {
             Func<Task<List<Building>>> getAll = () => _unitOfWork.Repository<Building>().GetAllAsync();
-            var dataList = await _cache.GetOrAddAsync(ApplicationConstants.Cache.AllBuildingCacheKey, getAll);
+            var dataList = await _cache.GetOrAddAsync(ApplicationConstants.BuildingsCache.AllBuildingCacheKey, getAll);
             var mappedData = dataList.Select(_ => _.GetBuildingsResponse()).ToList();
             return await Result<List<BuildingResponseBase>>.SuccessAsync(mappedData);
         }

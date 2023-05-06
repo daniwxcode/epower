@@ -21,12 +21,12 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands
 {
-    public class AddEditBuildingCommand: IRequest<Result<int>>
+    public class AddEditBuildingCommand : IRequest<Result<int>>
     {
         public int Id { get; set; } = 0;
         public string Name { get; set; }
         public string Address { get; set; }
-        public Building CreateBuilding()=> new Building{ Name = Name, Address = Address };
+        public Building CreateBuilding() => new Building { Name = Name, Address = Address };
 
     }
     internal class AddEditBuildingCommandHandler : IRequestHandler<AddEditBuildingCommand, Result<int>>
@@ -40,22 +40,22 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
         }
         public async Task<Result<int>> Handle(AddEditBuildingCommand request, CancellationToken cancellationToken)
         {
-            if(request.Id == 0)
+            if (request.Id == 0)
             {
                 var building = request.CreateBuilding();
                 await _unitOfWork.Repository<Building>().AddAsync(building);
-                await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.GetAll);
+                await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.AllBuildingCacheKey);
                 return await Result<int>.SuccessAsync(building.Id, _localizer["Building Saved"]);
             }
             else
             {
                 var building = await _unitOfWork.Repository<Building>().GetByIdAsync(request.Id);
-                if(building == null)
+                if (building == null)
                     return await Result<int>.FailAsync(_localizer["L'immeuble n'existe pas!"]);
                 building.Name = request.Name ?? building.Name;
-                building.Address = request.Address??building.Address;
+                building.Address = request.Address ?? building.Address;
                 await _unitOfWork.Repository<Building>().UpdateAsync(building);
-                await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.Cache.AllBuildingCacheKey);
+                await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.AllBuildingCacheKey);
                 return await Result<int>.SuccessAsync(building.Id, _localizer["Immeuble Mis à jour avec succès"]);
             }
         }

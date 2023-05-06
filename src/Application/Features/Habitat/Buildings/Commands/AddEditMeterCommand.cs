@@ -1,5 +1,6 @@
 ﻿using BlazorHero.CleanArchitecture.Application.Interfaces.Repositories;
 using BlazorHero.CleanArchitecture.Domain.Entities.Bail;
+using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
 
 using FluentValidation;
@@ -83,7 +84,7 @@ internal class AddEditMeterCommandHandler : IRequestHandler<AddEditMeterCommand,
 
                 var meter = request.GetMeter();
                 await repository.AddAsync(meter);
-                await _unitOfWork.Commit(cancellationToken);
+                await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.BuildindMetersCacheKey(request.BuildingId) );
                 return await Result<int>.SuccessAsync(meter.Id, _localizer["Compteur Enregistré avec Succès"]);
             }
 
@@ -98,7 +99,7 @@ internal class AddEditMeterCommandHandler : IRequestHandler<AddEditMeterCommand,
             dbItem.BuildingId = request.BuildingId;
             dbItem.IsActive = request.IsActive;
             await repository.UpdateAsync(dbItem);
-            await _unitOfWork.Commit(cancellationToken);
+            await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.BuildindMetersCacheKey(request.BuildingId));
             return await Result<int>.SuccessAsync(_localizer["Compteur Mis à jour avec succès"]);
         }catch(Exception e)
         {

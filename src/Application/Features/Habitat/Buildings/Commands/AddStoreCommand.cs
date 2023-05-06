@@ -71,7 +71,7 @@ internal class AddEditStoreCommandHandler : IRequestHandler<AddEditStoreCommand,
     {
         var shopRepos = _unitOfWork.Repository<Shop>();
         if (await shopRepos.Entities.Where(p => p.Id != command.Id)
-                .AnyAsync(p => p.Name == command.Name, cancellationToken))
+                .AnyAsync(p => p.Name == command.Name && p.BuildingId== command.BuildingId, cancellationToken))
         {
             return await Result<int>.FailAsync("Boutique déjà Existante.");
         }
@@ -97,7 +97,7 @@ internal class AddEditStoreCommandHandler : IRequestHandler<AddEditStoreCommand,
 
             };
             await shopRepos.AddAsync(shop);
-            await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.Shops);
+            await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.AllShops);
             return await Result<int>.SuccessAsync(shop.Id, "Boutique Enregistrée avec Succès");
         }
 
@@ -114,7 +114,7 @@ internal class AddEditStoreCommandHandler : IRequestHandler<AddEditStoreCommand,
         }
         dbItem.Name = command.Name;
         await shopRepos.UpdateAsync(dbItem);
-        await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.Shops);
+        await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.AllShops);
         return await Result<int>.SuccessAsync(dbItem.Id, "Boutique Mise à jour avec Succès");
     }
 }
