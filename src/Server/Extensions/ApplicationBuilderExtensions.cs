@@ -64,14 +64,14 @@ namespace BlazorHero.CleanArchitecture.Server.Extensions
 
         internal static IApplicationBuilder UseRequestLocalizationByCulture(this IApplicationBuilder app)
         {
-            var supportedCultures = LocalizationConstants.SupportedLanguages.Select(l => new CultureInfo(l.Code)).ToArray();
-            app.UseRequestLocalization(options =>
-            {
-                options.SupportedUICultures = supportedCultures;
-                options.SupportedCultures = supportedCultures;
-                options.DefaultRequestCulture = new RequestCulture(supportedCultures.First());
-                options.ApplyCurrentCultureToResponseHeaders = true;
-            });
+        //    var supportedCultures = LocalizationConstants.SupportedLanguages.Select(l => new CultureInfo(l.Code)).ToArray();
+        //    app.UseRequestLocalization(options =>
+        //    {
+        //        options.SupportedUICultures = supportedCultures;
+        //        options.SupportedCultures = supportedCultures;
+        //        options.DefaultRequestCulture = new RequestCulture(supportedCultures.First());
+        //        options.ApplyCurrentCultureToResponseHeaders = true;
+        //    });
 
             app.UseMiddleware<RequestCultureMiddleware>();
 
