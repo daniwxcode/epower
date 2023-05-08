@@ -1,22 +1,22 @@
-﻿using BlazorHero.CleanArchitecture.Application.Features.Brands.Queries.GetAll;
-using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
+﻿using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Queries;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Meters.Queries;
 
 using Microsoft.AspNetCore.Mvc;
+
 using System.Threading.Tasks;
 
 namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Bail
 {
-    public class BuildingController:BaseApiController<BuildingController>
+    public class BuildingController : BaseApiController<BuildingController>
     {
-        [HttpGet]
+        [HttpGet("all")]
         public async Task<IActionResult> GetAll()
         {
             var data = await _mediator.Send(new GetAllBuildingsRequest());
             return Ok(data);
         }
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<IActionResult> AddBuilding(AddEditBuildingCommand command)
         {
             return Ok(await _mediator.Send(command));
@@ -27,13 +27,13 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Bail
             var data = await _mediator.Send(new GetAllMetersRequest());
             return Ok(data);
         }
-        [HttpGet("building-meters//{id}")]
+        [HttpGet("{id}/meters")]
         public async Task<IActionResult> GetAllByBuilding(int id)
         {
             var data = await _mediator.Send(new GetAllMetersByBuildingIdRequest(id));
             return Ok(data);
         }
-        [HttpGet("meters/{id}")]
+        [HttpGet("all-meters/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var data = await _mediator.Send(new GetMeterByIdRequest(id));
@@ -45,12 +45,12 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Bail
             return Ok(await _mediator.Send(command));
         }
         [HttpGet("stores")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAllStores()
         {
             var data = await _mediator.Send(new GetAllShopRequest());
             return Ok(data);
         }
-        [HttpPost]
+        [HttpPost("add-store")]
         public async Task<IActionResult> AddStore(AddEditStoreCommand command)
         {
             return Ok(await _mediator.Send(command));
