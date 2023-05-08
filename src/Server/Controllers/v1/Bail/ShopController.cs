@@ -12,7 +12,7 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Bail
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var data = await _mediator.Send(new GetAllBuildingsRequest());
+            var data = await _mediator.Send(new GetAllShopRequest());
             return Ok(data);
         }
         [HttpPost]

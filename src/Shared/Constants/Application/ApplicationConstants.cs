@@ -9,6 +9,13 @@ namespace BlazorHero.CleanArchitecture.Shared.Constants.Application
         {
 
             public const string AllShops = "AllShops";
+            public static string AllShopByBuilding(int id) => $"AllShop-{id}";
+            public static string[] AllShopKeys(int id) => new[]
+            {
+                AllShops,
+                AllShopByBuilding(id)
+            };
+
             public static string[] MetersCacheKeys(int id)
             {
                 return new string[]
@@ -49,7 +56,7 @@ namespace BlazorHero.CleanArchitecture.Shared.Constants.Application
         }
         public static class Cache
         {
-           
+
 
             public const string GetAllBrandsCacheKey = "all-brands";
             public const string GetAllDocumentTypesCacheKey = "all-document-types";
@@ -63,7 +70,7 @@ namespace BlazorHero.CleanArchitecture.Shared.Constants.Application
                 return $"all-{entityFullName}-extended-attributes-{entityId}";
             }
         }
-     
+
 
         public static class MimeTypes
         {

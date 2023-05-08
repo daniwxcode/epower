@@ -22,10 +22,10 @@ public class AddEditStoreCommand : IRequest<Result<int>>
 {
     public int Id { get; set; } = 0;
     public int BuildingId { get; set; }
-    public int? MeterId { get; set; }
     public string Name { get; set; }
-    public string? MeterSerialNumber { get; set; }
-    public string? Code { get; set; }
+    public int MeterId { get; set; } = 0;
+    
+  
 
 }
 
@@ -47,26 +47,7 @@ internal class AddEditStoreCommandHandler : IRequestHandler<AddEditStoreCommand,
     {
         _unitOfWork = unitOfWork;
     }
-    private async Task<Meter> getExistingMeter(AddEditStoreCommand command)
-    {
-        var meterRepos = _unitOfWork.Repository<Meter>();
-        if (command.MeterId != null)
-        {
-            return await meterRepos.GetByIdAsync(command.MeterId.Value);
-        }
-
-        if (command.MeterSerialNumber != null)
-        {
-            return await meterRepos.Entities.FirstOrDefaultAsync(_ => _.SerialNumber == command.MeterSerialNumber);
-        }
-
-        if (command.Code != null)
-        {
-            return await meterRepos.Entities.FirstOrDefaultAsync(_ => _.Code == command.Code);
-        }
-
-        return null;
-    }
+    
     public async Task<Result<int>> Handle(AddEditStoreCommand command, CancellationToken cancellationToken)
     {
         var shopRepos = _unitOfWork.Repository<Shop>();
@@ -74,10 +55,10 @@ internal class AddEditStoreCommandHandler : IRequestHandler<AddEditStoreCommand,
                 .AnyAsync(p => p.Name == command.Name && p.BuildingId== command.BuildingId, cancellationToken))
         {
             return await Result<int>.FailAsync("Boutique déjà Existante.");
-        }
-        Meter dbMeter = await getExistingMeter(command);
+        }        
+        Meter dbMeter = await _unitOfWork.Repository<Meter>().GetByIdAsync(command.MeterId);
 
-        if (dbMeter is null)
+        if (command.MeterId>0 && dbMeter is null)
         {
             return await Result<int>.FailAsync("Le compteur est inexistant");
         }
@@ -92,12 +73,14 @@ internal class AddEditStoreCommandHandler : IRequestHandler<AddEditStoreCommand,
             {
                 Id = command.Id,
                 Name = command.Name,
-                BuildingId = command.BuildingId,
-                MeterId = command.MeterId.Value,
-
+                BuildingId = command.BuildingId,                
             };
+            if (dbMeter != null)
+            {
+                shop.MeterId = dbMeter.Id;
+            }
             await shopRepos.AddAsync(shop);
-            await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.AllShops);
+            await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.AllShopKeys(command.BuildingId));
             return await Result<int>.SuccessAsync(shop.Id, "Boutique Enregistrée avec Succès");
         }
 
@@ -114,7 +97,7 @@ internal class AddEditStoreCommandHandler : IRequestHandler<AddEditStoreCommand,
         }
         dbItem.Name = command.Name;
         await shopRepos.UpdateAsync(dbItem);
-        await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.AllShops);
+        await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.AllShopKeys(command.BuildingId));
         return await Result<int>.SuccessAsync(dbItem.Id, "Boutique Mise à jour avec Succès");
     }
 }
