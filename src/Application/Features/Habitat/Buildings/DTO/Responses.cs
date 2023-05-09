@@ -1,6 +1,8 @@
 ﻿using BlazorHero.CleanArchitecture.Domain.Entities.Bail;
 
+using System;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 
@@ -10,6 +12,12 @@ public record MeterResponseBase(int Id,string SerialNumber, string code, bool Is
 
 public record BuildingWithMeters(int Id, string name, string Address) : BuildingResponseBase(Id, name, Address);
 public record ShopResponseBase(int Id,int buildingId,string BuildingName, string Name);
+
+public record BuyCreditResponse(int Id,int Amount,string SerialNumber,string Reference, DateTime date, string InternalReference, string Code, decimal Credit)
+{
+    public string Message() => $"Vous avez payé {Amount} FCFA de crédit CASH POWER (Ref: {InternalReference} ce {date.ToLongDateString()}. Le Code de Votre paiement est : {Code}, Compteur: {SerialNumber} ";
+}
+
 
 public static partial class DataConverter
 {

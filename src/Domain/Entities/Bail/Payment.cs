@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BlazorHero.CleanArchitecture.Domain.Entities.Bail
 {
-    public abstract class Payment : AuditableEntity<int>
+    public class Payment : AuditableEntity<int>
     {
         public decimal Amount { get; set; }
         public string SerialNumber { get; set; }
