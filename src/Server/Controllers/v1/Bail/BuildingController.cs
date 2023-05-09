@@ -55,6 +55,15 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Bail
         {
             return Ok(await _mediator.Send(command));
         }
-
+        [HttpPost("createtenant")]
+        public async Task<IActionResult> AddEditShopTenant(AddEditShopTenantCommand command)
+        {
+            return Ok(await _mediator.Send(command));
+        }
+        [HttpPost("createRentalAgreement")]
+        public async Task<IActionResult> AddRentalAgreement (AddEditRentalAgreementCommand command)
+        {
+            return Ok(await _mediator.Send(command));
+        }
     }
 }
