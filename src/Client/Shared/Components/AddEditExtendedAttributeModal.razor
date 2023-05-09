@@ -6,7 +6,7 @@
 @typeparam TEntity
 @typeparam TExtendedAttribute
 
-<EditForm Model="@AddEditExtendedAttributeModel" OnValidSubmit="SaveAsync">
+<EditForm Context="model" Model="@AddEditExtendedAttributeModel" OnValidSubmit="SaveAsync">
     <FluentValidationValidator @ref="_fluentValidationValidator" />
     <MudDialog>
         <TitleContent>

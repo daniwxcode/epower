@@ -1,7 +1,36 @@
-﻿namespace BlazorHero.CleanArchitecture.Shared.Constants.Application
+﻿using System.Data;
+
+namespace BlazorHero.CleanArchitecture.Shared.Constants.Application
 {
     public static class ApplicationConstants
     {
+        #region Building
+        public static class BuildingsCache
+        {
+
+            public const string AllShops = "AllShops";
+            public static string AllShopByBuilding(int id) => $"AllShop-{id}";
+            public static string[] AllShopKeys(int id) => new[]
+            {
+                AllShops,
+                AllShopByBuilding(id)
+            };
+
+            public static string[] MetersCacheKeys(int id)
+            {
+                return new string[]
+                 {
+                    AllMeterCacheKey,
+                    BuildindMetersCacheKey(id)
+                 };
+            }
+            public const string AllBuildingCacheKey = "all-buildings";
+            public static string BuildindMetersCacheKey(int id) => $"{id}all-meters";
+            public const string AllMeterCacheKey = "all-meters";
+        }
+
+
+        #endregion
         public static class SignalR
         {
             public const string HubUrl = "/signalRHub";
@@ -27,9 +56,10 @@
         }
         public static class Cache
         {
+
+
             public const string GetAllBrandsCacheKey = "all-brands";
             public const string GetAllDocumentTypesCacheKey = "all-document-types";
-
             public static string GetAllEntityExtendedAttributesCacheKey(string entityFullName)
             {
                 return $"all-{entityFullName}-extended-attributes";
@@ -40,6 +70,7 @@
                 return $"all-{entityFullName}-extended-attributes-{entityId}";
             }
         }
+
 
         public static class MimeTypes
         {

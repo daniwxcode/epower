@@ -4,6 +4,7 @@ using BlazorHero.CleanArchitecture.Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
 {
     [DbContext(typeof(BlazorHeroContext))]
-    partial class BlazorHeroContextModelSnapshot : ModelSnapshot
+    [Migration("20230505160326_HabitatDuGolFModel")]
+    partial class HabitatDuGolFModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,9 +96,6 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("BuildingId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -108,8 +107,9 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(128)");
@@ -124,9 +124,9 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BuildingId");
-
                     b.ToTable("Meters");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Meter");
                 });
 
             modelBuilder.Entity("BlazorHero.CleanArchitecture.Domain.Entities.Bail.Payment", b =>
@@ -241,6 +241,9 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("InternalMeterId")
+                        .HasColumnType("int");
+
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(128)");
 
@@ -258,6 +261,8 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BuildingId");
+
+                    b.HasIndex("InternalMeterId");
 
                     b.HasIndex("MeterId");
 
@@ -816,6 +821,16 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
                     b.ToTable("UserTokens", "Identity");
                 });
 
+            modelBuilder.Entity("BlazorHero.CleanArchitecture.Domain.Entities.Bail.InternalMeter", b =>
+                {
+                    b.HasBaseType("BlazorHero.CleanArchitecture.Domain.Entities.Bail.Meter");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.HasDiscriminator().HasValue("InternalMeter");
+                });
+
             modelBuilder.Entity("BlazorHero.CleanArchitecture.Domain.Entities.Bail.InternalPayement", b =>
                 {
                     b.HasBaseType("BlazorHero.CleanArchitecture.Domain.Entities.Bail.Payment");
@@ -848,17 +863,6 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("ToUser");
                 });
 
-            modelBuilder.Entity("BlazorHero.CleanArchitecture.Domain.Entities.Bail.Meter", b =>
-                {
-                    b.HasOne("BlazorHero.CleanArchitecture.Domain.Entities.Bail.Building", "Building")
-                        .WithMany("Meters")
-                        .HasForeignKey("BuildingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Building");
-                });
-
             modelBuilder.Entity("BlazorHero.CleanArchitecture.Domain.Entities.Bail.RentalAgreement", b =>
                 {
                     b.HasOne("BlazorHero.CleanArchitecture.Domain.Entities.Bail.Shop", "Shop")
@@ -886,8 +890,12 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BlazorHero.CleanArchitecture.Domain.Entities.Bail.Meter", "Meter")
+                    b.HasOne("BlazorHero.CleanArchitecture.Domain.Entities.Bail.InternalMeter", null)
                         .WithMany("Shops")
+                        .HasForeignKey("InternalMeterId");
+
+                    b.HasOne("BlazorHero.CleanArchitecture.Domain.Entities.Bail.Meter", "Meter")
+                        .WithMany()
                         .HasForeignKey("MeterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -985,7 +993,7 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
 
             modelBuilder.Entity("BlazorHero.CleanArchitecture.Domain.Entities.Bail.InternalPayement", b =>
                 {
-                    b.HasOne("BlazorHero.CleanArchitecture.Domain.Entities.Bail.Meter", "Meter")
+                    b.HasOne("BlazorHero.CleanArchitecture.Domain.Entities.Bail.InternalMeter", "Meter")
                         .WithMany("Payements")
                         .HasForeignKey("MeterId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1000,15 +1008,6 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
 
             modelBuilder.Entity("BlazorHero.CleanArchitecture.Domain.Entities.Bail.Building", b =>
                 {
-                    b.Navigation("Meters");
-
-                    b.Navigation("Shops");
-                });
-
-            modelBuilder.Entity("BlazorHero.CleanArchitecture.Domain.Entities.Bail.Meter", b =>
-                {
-                    b.Navigation("Payements");
-
                     b.Navigation("Shops");
                 });
 
@@ -1039,6 +1038,13 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("ChatHistoryFromUsers");
 
                     b.Navigation("ChatHistoryToUsers");
+                });
+
+            modelBuilder.Entity("BlazorHero.CleanArchitecture.Domain.Entities.Bail.InternalMeter", b =>
+                {
+                    b.Navigation("Payements");
+
+                    b.Navigation("Shops");
                 });
 #pragma warning restore 612, 618
         }
