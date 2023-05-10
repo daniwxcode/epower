@@ -1,5 +1,7 @@
-﻿using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
+﻿using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
+using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 using BlazorHero.CleanArchitecture.Client.Extensions;
+using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -8,6 +10,7 @@ using MudBlazor;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -22,9 +25,6 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
         private List<BuildingResponseBase> _List = new();
         private BuildingResponseBase item;
         private string _searchString = "";
-        private bool _dense = false;
-        private bool _striped = true;
-        private bool _bordered = false;
 
         private ClaimsPrincipal _currentUser;
 
@@ -61,35 +61,35 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
             }
         }
 
-        //private async Task Delete(int id)
-        //{
-        //    string deleteContent = _localizer["Delete Content"];
-        //    var parameters = new DialogParameters
-        //    {
-        //        { nameof(Shared.Dialogs.DeleteConfirmation.ContentText), string.Format(deleteContent, id) }
-        //    };
-        //    var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
-        //    var dialog = _dialogService.Show<Shared.Dialogs.DeleteConfirmation>(_localizer["Delete"], parameters, options);
-        //    var result = await dialog.Result;
-        //    if (!result.Cancelled)
-        //    {
-        //        var response = await BrandManager.DeleteAsync(id);
-        //        if (response.Succeeded)
-        //        {
-        //            await Reset();
-        //            await HubConnection.SendAsync(ApplicationConstants.SignalR.SendUpdateDashboard);
-        //            _snackBar.Add(response.Messages[0], Severity.Success);
-        //        }
-        //        else
-        //        {
-        //            await Reset();
-        //            foreach (var message in response.Messages)
-        //            {
-        //                _snackBar.Add(message, Severity.Error);
-        //            }
-        //        }
-        //    }
-        //}
+        private async Task Delete(int id)
+        {
+            string deleteContent = _localizer["Delete Content"];
+            var parameters = new DialogParameters
+            {
+                { nameof(Shared.Dialogs.DeleteConfirmation.ContentText), string.Format(deleteContent, id) }
+            };
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
+            var dialog = _dialogService.Show<Shared.Dialogs.DeleteConfirmation>(_localizer["Delete"], parameters, options);
+            var result = await dialog.Result;
+            if (!result.Cancelled)
+            {
+                var response = await _cashPowerManager.DeleteBuilding(id);
+                if (response.Succeeded)
+                {
+                    await Reset();
+                    await HubConnection.SendAsync(ApplicationConstants.SignalR.SendUpdateDashboard);
+                    _snackBar.Add(response.Messages[0], Severity.Success);
+                }
+                else
+                {
+                    await Reset();
+                    foreach (var message in response.Messages)
+                    {
+                        _snackBar.Add(message, Severity.Error);
+                    }
+                }
+            }
+        }
 
         //private async Task ExportToExcel()
         //{
@@ -115,31 +115,31 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
         //    }
         //}
 
-        //private async Task InvokeModal(int id = 0)
-        //{
-        //    var parameters = new DialogParameters();
-        //    if (id != 0)
-        //    {
-        //        item = _brandList.FirstOrDefault(c => c.Id == id);
-        //        if (_brand != null)
-        //        {
-        //            parameters.Add(nameof(AddEditBrandModal.AddEditBrandModel), new AddEditBrandCommand
-        //            {
-        //                Id = _brand.Id,
-        //                Name = _brand.Name,
-        //                Description = _brand.Description,
-        //                Tax = _brand.Tax
-        //            });
-        //        }
-        //    }
-        //    var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
-        //    var dialog = _dialogService.Show<AddEditBrandModal>(id == 0 ? _localizer["Create"] : _localizer["Edit"], parameters, options);
-        //    var result = await dialog.Result;
-        //    if (!result.Cancelled)
-        //    {
-        //        await Reset();
-        //    }
-        //}
+        private async Task InvokeModal(int id = 0)
+        {
+            var parameters = new DialogParameters();
+            if (id != 0)
+            {
+                item = _List.FirstOrDefault(c => c.Id == id);
+                if (item != null)
+                {
+                    parameters.Add("Model", new AddEditBuildingCommand
+                    {
+                        Id = item.Id,
+                        Name = item.name,
+                        Address = item.Address,
+
+                    });
+                }
+            }
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
+            var dialog = _dialogService.Show<AddEditBuildingModal>(id == 0 ? _localizer["Create"] : _localizer["Edit"], parameters, options);
+            var result = await dialog.Result;
+            if (!result.Cancelled)
+            {
+                await Reset();
+            }
+        }
 
         //private async Task<IResult<int>> ImportExcel(UploadRequest uploadFile)
         //{
@@ -173,8 +173,10 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
 
         private async Task Reset()
         {
+            _loaded = false;
             _List = new();
             await GetBuildingAsync();
+            _loaded = true;
         }
 
         private bool Search(BuildingResponseBase item)

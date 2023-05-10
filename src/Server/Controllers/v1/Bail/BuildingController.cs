@@ -21,6 +21,13 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Bail
         {
             return Ok(await _mediator.Send(command));
         }
+
+        [HttpDelete("/{id}")]
+        public async Task<IActionResult> DeleteBuilding(int id)
+        {
+            return Ok(await _mediator.Send(new DeleteBuildingCommand(id)));
+        }
+
         [HttpGet("all-meters")]
         public async Task<IActionResult> GetAllMeters()
         {
@@ -61,7 +68,7 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Bail
             return Ok(await _mediator.Send(command));
         }
         [HttpPost("createRentalAgreement")]
-        public async Task<IActionResult> AddRentalAgreement (AddEditRentalAgreementCommand command)
+        public async Task<IActionResult> AddRentalAgreement(AddEditRentalAgreementCommand command)
         {
             return Ok(await _mediator.Send(command));
         }

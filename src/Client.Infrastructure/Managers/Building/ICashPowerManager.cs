@@ -10,6 +10,8 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Building
     public interface ICashPowerManager : IManager
     {
         Task<IResult<int>> SaveABuildingAsync(AddEditBuildingCommand command);
+        Task<IResult<int>> DeleteBuilding(int id);
         Task<IResult<List<BuildingResponseBase>>> GetAllBuilding();
+        
     }
 }

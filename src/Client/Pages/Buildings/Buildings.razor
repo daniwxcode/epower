@@ -13,6 +13,7 @@
 <HeroTitle Title="@_localizer["Immeubles"]" Description="@_localizer["Gestion des Immeubles."]" />
 @if (!_loaded)
 {
+    <Overlay MudOverlayIsVisible="@(!_loaded)"/>
     <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
 }
 else
@@ -20,7 +21,7 @@ else
     <MudTable Hover="true" Elevation="25" Items="_List" Dense="true" Bordered="true" Striped="true" Filter="new Func<BuildingResponseBase, bool>(Search)" @bind-brand="item">
         <ToolBarContent>
             <div class="justify-center mud-text-align-center">
-                <MudButton DisableElevation Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Surface">@_localizer["Enregistrer un Immeuble"]</MudButton>
+                <MudButton DisableElevation Variant="Variant.Filled" OnClick="(()=> InvokeModal())" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Surface">@_localizer["Enregistrer un Immeuble"]</MudButton>
                 <MudButton DisableElevation Variant="Variant.Filled" OnClick="GetBuildingAsync" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Surface" Color="Color.Secondary" Style="margin-left: 5px;">@_localizer["Reload"]</MudButton>
             </div>
             <MudSpacer />
@@ -45,8 +46,8 @@ else
                 <MudTd DataLabel="Actions" Style="text-align: right">
                     <MudMenu Label="@_localizer["Actions"]" Variant="Variant.Filled" DisableElevation="true" EndIcon="@Icons.Filled.KeyboardArrowDown" IconColor="Color.Secondary" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopLeft">
                         <MudMenuItem>@_localizer["Détails"]</MudMenuItem>
-                        <MudMenuItem>@_localizer["Modifier"]</MudMenuItem>
-                        <MudMenuItem>@_localizer["Supprimer"]</MudMenuItem>
+                        <MudMenuItem @onclick="@(() => InvokeModal(@context.Id))">@_localizer["Modifier"]</MudMenuItem>
+                        <MudMenuItem @onclick="@(() => Delete(@context.Id))">@_localizer["Supprimer"]</MudMenuItem>
                     </MudMenu>
                 </MudTd>
             </RowTemplate>

@@ -4,6 +4,7 @@
     {
         public static string GetAllBuildings = "api/v1/Building/all";
         public static string AddBuilding = "api/v1/Building/add";
+        public static string DeleteBuilding(int id) => $"api/v1/Building/{id}";
         public static string GetAllMeters = "api/v1/Building/all-meters";
         public static string GetAllBulding(int id) => $"api/v1/Building/{id}/meters";
         public static string AddMeter = "api/v1/Building/add-meter";
