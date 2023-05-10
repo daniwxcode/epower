@@ -22,7 +22,7 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Bail
             return Ok(await _mediator.Send(command));
         }
 
-        [HttpDelete("/{id}")]
+        [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> DeleteBuilding(int id)
         {
             return Ok(await _mediator.Send(new DeleteBuildingCommand(id)));
