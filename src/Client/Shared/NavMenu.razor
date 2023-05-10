@@ -69,7 +69,7 @@
     }
     @if (_canViewProducts || _canViewBrands)
     {
-        <MudListSubheader Class="mt-2 mb-n2">@_localizer["Catalog Management"]</MudListSubheader>
+        <MudListSubheader Class="mt-2 mb-n2">@_localizer["Gestion Immobilière"]</MudListSubheader>
         @if (_canViewProducts)
         {
             <MudNavLink Href="/catalog/products" Icon="@Icons.Material.Outlined.CallToAction">
@@ -78,8 +78,8 @@
         }
         @if (_canViewBrands)
         {
-            <MudNavLink Href="/catalog/brands" Icon="@Icons.Material.Outlined.CallToAction">
-                @_localizer["Brands"]
+            <MudNavLink Href="/Buildings" Icon="@Icons.Material.Outlined.CallToAction">
+                @_localizer["Immeubles"]
             </MudNavLink>
         }
     }
