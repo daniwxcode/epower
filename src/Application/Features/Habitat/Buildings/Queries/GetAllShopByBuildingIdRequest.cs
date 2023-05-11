@@ -39,7 +39,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Qu
 
         public async Task<Result<List<ShopResponseBase>>> Handle(GetAllShopByBuildingIdRequest request, CancellationToken cancellationToken)
         {
-            var repo = _unitOfWork.Repository<Shop>().Entities.Include(_ => _.Building);
+            var repo = _unitOfWork.Repository<Shop>().Entities.Include(_ => _.Building).Include(_=>_.Meter);
             Func<Task<List<Shop>>> getAll = () => repo.ToListAsync();
             var dataList = await _cache.GetOrAddAsync(ApplicationConstants.BuildingsCache.AllShopByBuilding(request.Id), getAll);
             var mappedData = dataList.Select(_ => _.GetShopResponse()).ToList();
