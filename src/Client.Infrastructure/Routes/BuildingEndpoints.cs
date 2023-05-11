@@ -6,9 +6,10 @@
         public static string AddBuilding = "api/v1/Building/add";
         public static string DeleteBuilding(int id) => $"api/v1/Building/Delete/{id}";
         public static string GetAllMeters = "api/v1/Building/all-meters";
-        public static string GetAllBulding(int id) => $"api/v1/Building/{id}/meters";
+        public static string GetAllBuldingMeters(int id) => $"api/v1/Building/{id}/meters";
         public static string AddMeter = "api/v1/Building/add-meter";
         public static string GetAllStores = "api/v1/Building/stores";
+        public static string GetBuildingStores(int id) => $"api/v1/Building/store-by-building/{id}";
         public static string AddStore = "api/v1/Building/add-store";
         public static string AddStoreTenant = "api/v1/Building/createtenant";
         public static string createRentalAgreement = "api/v1/Building/createRentalAgreement";

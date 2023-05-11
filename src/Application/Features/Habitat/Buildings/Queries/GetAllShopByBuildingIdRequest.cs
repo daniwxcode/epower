@@ -22,6 +22,10 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Qu
     public class GetAllShopByBuildingIdRequest : IRequest<Result<List<ShopResponseBase>>>
     {
         public int Id { get; set; }
+        public GetAllShopByBuildingIdRequest(int id)
+        {
+            Id= id;
+        }
     }
     internal class GetAllShopByBuildingIdRequestHandler : IRequestHandler<GetAllShopByBuildingIdRequest, Result<List<ShopResponseBase>>>
     {

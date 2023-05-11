@@ -57,6 +57,11 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Bail
             var data = await _mediator.Send(new GetAllShopRequest());
             return Ok(data);
         }
+        [HttpGet("store-by-building/{id}")]
+        public async Task<IActionResult> GetBuildingStores(int id)
+        {
+            return Ok(await _mediator.Send(new GetAllShopByBuildingIdRequest(id)));
+        }
         [HttpPost("add-store")]
         public async Task<IActionResult> AddStore(AddEditStoreCommand command)
         {
