@@ -22,7 +22,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
     public partial class Store
     {
         [Parameter]
-        public int Id { get; set; }
+        public int Id { get; set; } = 0;
         [CascadingParameter] private HubConnection HubConnection { get; set; }
 
         private List<ShopResponseBase> _List = new();
