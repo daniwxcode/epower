@@ -39,26 +39,35 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Building
 
         public async Task<IResult<List<ShopResponseBase>>> GetStores(int id = 0)
         {
-            HttpResponseMessage response=new();
-            if (id > 0)
-            {
-                 response = await _httpClient.GetAsync(BuildingEndpoints.GetBuildingStores(id));
-                return await response.ToResult<List<ShopResponseBase>>();
-            }
-            response = await _httpClient.GetAsync(BuildingEndpoints.GetAllStores);
+            var url = id > 0 ? BuildingEndpoints.GetBuildingStores(id) : BuildingEndpoints.GetAllStores;
+            var response = await _httpClient.GetAsync(url);
             return await response.ToResult<List<ShopResponseBase>>();
         }
 
         public async Task<IResult<int>> AddStore(AddEditStoreCommand command)
         {
             var response = await _httpClient.PostAsJsonAsync(BuildingEndpoints.AddStore, command);
-            return await response.ToResult<int>();           
+            return await response.ToResult<int>();
         }
 
         public async Task<IResult<int>> DeleteStore(int id)
         {
             var response = await _httpClient.DeleteAsync(BuildingEndpoints.DeleteStore(id));
             return await response.ToResult<int>();
+        }
+
+        public async Task<IResult<List<MeterResponseBase>>> GetAllMeters(int BuildingId = 0)
+        {
+            string url = BuildingId > 0 ? BuildingEndpoints.GetAllBuldingMeters(BuildingId) : BuildingEndpoints.GetAllMeters;
+            var response = await _httpClient.GetAsync(url);
+            return await response.ToResult<List<MeterResponseBase>>();
+
+        }
+
+        public async Task<IResult<MeterResponseBase>> GetMeterById(int id)
+        {
+            var response = await _httpClient.GetAsync(BuildingEndpoints.GetMeterById(id));
+            return await response.ToResult<MeterResponseBase>();
         }
     }
 }

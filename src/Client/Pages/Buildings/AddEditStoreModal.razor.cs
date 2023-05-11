@@ -1,6 +1,7 @@
 ﻿using Blazored.FluentValidation;
 
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
+using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 using BlazorHero.CleanArchitecture.Client.Extensions;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 
@@ -9,6 +10,9 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 using MudBlazor;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
@@ -19,6 +23,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
         public AddEditStoreCommand Model { get; set; }
         [Parameter]
         public string BuildingName { get; set; }
+        private List<MeterResponseBase> _buildingMeters = new ();
         [CascadingParameter] private MudDialogInstance MudDialog { get; set; }
         [CascadingParameter] private HubConnection HubConnection { get; set; }
 
@@ -58,9 +63,26 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
             }
         }
 
+        private async Task<IEnumerable<int>> Search(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return _buildingMeters.Select(x => x.Id);
+            return _buildingMeters
+                .Where(t => t.SerialNumber.Contains(value, StringComparison.InvariantCultureIgnoreCase))
+                .Select(t => t.Id)
+                .ToList();
+        }
         private async Task LoadDataAsync()
         {
-            await Task.CompletedTask;
+            var response = await _cashPowerManager.GetAllMeters(Model.BuildingId);
+            if (response.Succeeded)
+            {
+                _buildingMeters = response.Data;
+            }
+            else
+            {
+                response.Messages.ForEach(_=>_snackBar.Add(_, Severity.Error));
+            }           
         }
     }
 }

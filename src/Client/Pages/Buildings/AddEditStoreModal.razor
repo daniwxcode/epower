@@ -28,15 +28,15 @@
                         </MudItem>
                 }
                 <MudItem xs="12">
-                   @* <MudAutocomplete T="int" Label="Modèle ETAFI"
+                <MudAutocomplete T="int" Label="Modèle ETAFI"
                                      For="@(() => Model.MeterId)"
                                      @bind-Value="Model.MeterId"
                                      ResetValueOnEmptyText="true"
-                                     SearchFunc="@SearchDoc"
+                                     SearchFunc="@Search"
                                      Variant="Variant.Outlined"
-                                     ToStringFunc="@(e =>  _documents.FirstOrDefault(t => t.Id == e).Libelle ?? string.Empty)"
+                                     ToStringFunc="@(e =>  _buildingMeters.FirstOrDefault(t => t.Id == e).SerialNumber ?? string.Empty)"
                                      OffsetY="true" 
-                                     />*@
+                                     />
                 </MudItem>
                 <MudItem xs="12" md="6">
                     <MudTextField Disabled="true" @bind-Value="BuildingName" Label="@_localizer["Nom Boutique"]" />

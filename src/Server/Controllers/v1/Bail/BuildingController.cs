@@ -40,7 +40,7 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Bail
             var data = await _mediator.Send(new GetAllMetersByBuildingIdRequest(id));
             return Ok(data);
         }
-        [HttpGet("all-meters/{id}")]
+        [HttpGet("GetMeter/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var data = await _mediator.Send(new GetMeterByIdRequest(id));
