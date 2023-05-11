@@ -98,6 +98,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
         private async Task InvokeModal(int id = 0)
         {
             var parameters = new DialogParameters();
+          
             if (id != 0)
             {
                 item = _List.FirstOrDefault(c => c.Id == id);
@@ -108,10 +109,10 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
                         BuildingId = Id,
                         Id = id,
                         Name = item.Name,
-                        MeterId= item.Meter.Id                       
-
+                        MeterId= item.Meter.Id                     
                     });
                 }
+                parameters.Add("BuildingName", item.BuildingName);
             }
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
             var dialog = _dialogService.Show<AddEditStoreModal>(id == 0 ? _localizer["Ajouter"] : _localizer["Modifier"], parameters, options);

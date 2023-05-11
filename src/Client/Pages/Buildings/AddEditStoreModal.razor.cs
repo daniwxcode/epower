@@ -17,6 +17,8 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
     {
         [Parameter]
         public AddEditStoreCommand Model { get; set; }
+        [Parameter]
+        public string BuildingName { get; set; }
         [CascadingParameter] private MudDialogInstance MudDialog { get; set; }
         [CascadingParameter] private HubConnection HubConnection { get; set; }
 
