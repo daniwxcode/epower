@@ -11,7 +11,7 @@ public record BuildingResponseBase(int Id, string name, string Address);
 public record MeterResponseBase(int Id,string SerialNumber, string code, bool IsActive);
 
 public record BuildingWithMeters(int Id, string name, string Address) : BuildingResponseBase(Id, name, Address);
-public record ShopResponseBase(int Id,int buildingId,string BuildingName, string Name);
+public record ShopResponseBase(int Id,int buildingId,string BuildingName, string Name, MeterResponseBase Meter);
 
 public record BuyCreditResponse(int Id,int Amount,string SerialNumber,string Reference, DateTime date, string InternalReference, string Code, decimal Credit)
 {
@@ -25,5 +25,5 @@ public static partial class DataConverter
         new BuildingResponseBase(building.Id, building.Name, building.Address);
     public static MeterResponseBase GetMeterResponse(this Meter meter) => new MeterResponseBase(meter.Id, meter.SerialNumber, meter.Code, meter.IsActive);
     public static ShopResponseBase GetShopResponse(this Shop shop) =>
-        new ShopResponseBase(shop.Id, shop.BuildingId, shop.Building.Name, shop.Name);
+        new ShopResponseBase(shop.Id, shop.BuildingId, shop.Building.Name, shop.Name,shop.Meter.GetMeterResponse());
 }

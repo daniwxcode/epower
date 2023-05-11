@@ -48,5 +48,17 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Building
             response = await _httpClient.GetAsync(BuildingEndpoints.GetAllStores);
             return await response.ToResult<List<ShopResponseBase>>();
         }
+
+        public async Task<IResult<int>> AddStore(AddEditStoreCommand command)
+        {
+            var response = await _httpClient.PostAsJsonAsync(BuildingEndpoints.AddStore, command);
+            return await response.ToResult<int>();           
+        }
+
+        public async Task<IResult<int>> DeleteStore(int id)
+        {
+            var response = await _httpClient.DeleteAsync(BuildingEndpoints.DeleteStore(id));
+            return await response.ToResult<int>();
+        }
     }
 }

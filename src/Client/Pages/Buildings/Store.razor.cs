@@ -66,32 +66,32 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
 
         private async Task Delete(int id)
         {
-            //string deleteContent = "Supprimer cette Boutique?";
-            //var parameters = new DialogParameters
-            //{
-            //    { nameof(Shared.Dialogs.DeleteConfirmation.ContentText), string.Format(deleteContent, id) }
-            //};
-            //var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
-            //var dialog = _dialogService.Show<Shared.Dialogs.DeleteConfirmation>(_localizer["Delete"], parameters, options);
-            //var result = await dialog.Result;
-            //if (!result.Cancelled)
-            //{
-            //    var response = await _cashPowerManager.DeleteBuilding(id);
-            //    if (response.Succeeded)
-            //    {
-            //        await Reset();
-            //        await HubConnection.SendAsync(ApplicationConstants.SignalR.SendUpdateDashboard);
-            //        _snackBar.Add(response.Messages[0], Severity.Success);
-            //    }
-            //    else
-            //    {
-            //        await Reset();
-            //        foreach (var message in response.Messages)
-            //        {
-            //            _snackBar.Add(message, Severity.Error);
-            //        }
-            //    }
-            //}
+            string deleteContent = "Supprimer cette Boutique?";
+            var parameters = new DialogParameters
+            {
+                { nameof(Shared.Dialogs.DeleteConfirmation.ContentText), string.Format(deleteContent, id) }
+            };
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
+            var dialog = _dialogService.Show<Shared.Dialogs.DeleteConfirmation>(_localizer["Supprimer"], parameters, options);
+            var result = await dialog.Result;
+            if (!result.Cancelled)
+            {
+                var response = await _cashPowerManager.DeleteStore(id);
+                if (response.Succeeded)
+                {
+                    await Reset();
+                    await HubConnection.SendAsync(ApplicationConstants.SignalR.SendUpdateDashboard);
+                    _snackBar.Add(response.Messages[0], Severity.Success);
+                }
+                else
+                {
+                    await Reset();
+                    foreach (var message in response.Messages)
+                    {
+                        _snackBar.Add(message, Severity.Error);
+                    }
+                }
+            }
         }
 
         
@@ -108,13 +108,13 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
                         BuildingId = Id,
                         Id = id,
                         Name = item.Name,
-                        MeterId= 0                       
+                        MeterId= item.Meter.Id                       
 
                     });
                 }
             }
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
-            var dialog = _dialogService.Show<AddEditBuildingModal>(id == 0 ? _localizer["Ajouter"] : _localizer["Modifier"], parameters, options);
+            var dialog = _dialogService.Show<AddEditStoreModal>(id == 0 ? _localizer["Ajouter"] : _localizer["Modifier"], parameters, options);
             var result = await dialog.Result;
             if (!result.Cancelled)
             {
