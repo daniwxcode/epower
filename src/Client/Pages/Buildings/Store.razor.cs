@@ -23,6 +23,8 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
     {
         [Parameter]
         public int Id { get; set; } = 0;
+        [Parameter]
+        public string BuildingName { get; set; }
         [CascadingParameter] private HubConnection HubConnection { get; set; }
 
         private List<ShopResponseBase> _List = new();
@@ -94,29 +96,33 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
             }
         }
 
-        
+
         private async Task InvokeModal(int id = 0)
         {
             var parameters = new DialogParameters();
             if (Id == 0)
                 return;
-            if (id != 0)
+            string libelle = "";
+            if (id > 0)
             {
                 item = _List.FirstOrDefault(c => c.Id == id);
                 if (item != null)
                 {
-                    parameters.Add("Model", new AddEditStoreCommand
-                    {
-                        BuildingId = Id,
-                        Id = id,
-                        Name = item.Name,
-                        MeterId= item.Meter.Id                     
-                    });
-                }               
-            }           
+                    libelle = item.Name;
+                }
+            }
+            parameters.Add("Model", new AddEditStoreCommand
+            {
+                BuildingId = Id,
+                Id = id,
+                Name = libelle,
+            });
             parameters.Add("BuildingId", Id);
+
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
+            
             var dialog = _dialogService.Show<AddEditStoreModal>(id == 0 ? _localizer["Ajouter"] : _localizer["Modifier"], parameters, options);
+            
             var result = await dialog.Result;
             if (!result.Cancelled)
             {
