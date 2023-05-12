@@ -15,24 +15,16 @@
     <MudNavLink Href="/account" Icon="@Icons.Material.Outlined.SupervisorAccount">
         @_localizer["Account"]
     </MudNavLink>
-    du 
-    @if (_canViewDocuments || _canViewDocumentTypes)
-    {
-        <MudListSubheader Class="mt-2 mb-n2">@_localizer["Document Management"]</MudListSubheader>
-        @if (_canViewDocuments)
-        {
-            <MudNavLink Href="/document-store" Icon="@Icons.Material.Outlined.AttachFile">
-                @_localizer["Document Store"]
-            </MudNavLink>
-        }
-        @if (_canViewDocumentTypes)
-        {
-            <MudNavLink Href="/document-types" Icon="@Icons.Material.Outlined.FileCopy">
-                @_localizer["Document Types"]
-            </MudNavLink>
-        }
-    }
+    <MudDivider></MudDivider>
+    <MudListSubheader Class="mt-2 mb-n2">@_localizer["Gestion Immobilière"]</MudListSubheader>
 
+    <MudNavLink Href="/Buildings" Icon="@Icons.Material.Outlined.Business">
+        @_localizer["Immeubles"]
+    </MudNavLink>
+    <MudNavLink Href="/Stores" Icon="@Icons.Material.Outlined.Storefront">
+        @_localizer["Boutiques"]
+    </MudNavLink>
+    <MudDivider></MudDivider>
     @if (_canViewUsers || _canViewRoles)
     {
         <MudListSubheader Class="mt-2 mb-n2">@_localizer["Administrator"]</MudListSubheader>
@@ -48,15 +40,6 @@
         }
     }
  
-    <MudListSubheader Class="mt-2 mb-n2">@_localizer["Gestion Immobilière"]</MudListSubheader>
-
-    <MudNavLink Href="/Buildings" Icon="@Icons.Material.Outlined.Business">
-        @_localizer["Immeubles"]
-    </MudNavLink>
-    <MudNavLink Href="/Stores" Icon="@Icons.Material.Outlined.Storefront">
-        @_localizer["Boutiques"]
-    </MudNavLink>
-
 
 </MudNavMenu>
 
