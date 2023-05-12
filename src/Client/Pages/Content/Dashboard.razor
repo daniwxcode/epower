@@ -2,56 +2,56 @@
 @attribute [Authorize(Policy = Permissions.Dashboards.View)]
 @inject Microsoft.Extensions.Localization.IStringLocalizer<Dashboard> _localizer
 
-<HeroTitle Title="@_localizer["Dashboard"]" Description="@_localizer["Realtime Updates & Insights with SignalR."]" />
+<HeroTitle Title="@_localizer["Dashboard"]"/>
 @if (!_loaded)
 {
-    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    <Overlay MudOverlayIsVisible=@(!_loaded) />
 }
 else
 {
     <MudGrid>
         <MudItem xs="12" sm="6" md="3">
             <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-                <MudIcon Icon="@Icons.Material.Filled.ViewCarousel" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                <MudIcon Icon="@Icons.Material.Filled.Business" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                 <div>
-                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Products"]</MudText>
-                    <MudText Typo="Typo.h5">@ProductCount</MudText>
+                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Immeubles"]</MudText>
+                    <MudText Typo="Typo.h5">@Model.BuildingCount</MudText>
                 </div>
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
             <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-                <MudIcon Icon="@Icons.Material.Filled.PanoramaPhotosphereSelect" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                <MudIcon Icon="@Icons.Material.Filled.Storefront" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                 <div>
-                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Brands"]</MudText>
-                    <MudText @bind-Value="@BrandCount" Typo="Typo.h5">@BrandCount</MudText>
+                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Boutiques"]</MudText>
+                    <MudText @bind-Value="@Model.StoreCount" Typo="Typo.h5">@Model.StoreCount</MudText>
                 </div>
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
             <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-                <MudIcon Icon="@Icons.Material.Filled.AttachFile" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                <MudIcon Icon="@Icons.Material.Filled.ElectricalServices" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                 <div>
-                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Documents"]</MudText>
-                    <MudText @bind-Value="@DocumentCount" Typo="Typo.h5">@DocumentCount</MudText>
+                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Compteurs"]</MudText>
+                    <MudText @bind-Value="@Model.MeterCount" Typo="Typo.h5">@Model.MeterCount</MudText>
                 </div>
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
             <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-                <MudIcon Icon="@Icons.Material.Filled.FileCopy" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                <MudIcon Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                 <div>
-                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Document Types"]</MudText>
-                    <MudText @bind-Value="@DocumentTypeCount" Typo="Typo.h5">@DocumentTypeCount</MudText>
+                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Ventes"]</MudText>
+                    <MudText @bind-Value="@Model.SalesCount" Typo="Typo.h5">@Model.SalesCount</MudText>
                 </div>
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
             <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-                <MudIcon Icon="@Icons.Material.Filled.Assignment" Color="Color.Error" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+                <MudIcon Icon="@Icons.Material.Filled.Money" Color="Color.Error" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                 <div>
-                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Document Extended Attributes"]</MudText>
-                    <MudText @bind-Value="@DocumentExtendedAttributeCount" Typo="Typo.h5">@DocumentExtendedAttributeCount</MudText>
+                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Total des Ventes"]</MudText>
+                    <MudText @bind-Value="@Model.SalesSum" Typo="Typo.h5">@Model.SalesSum</MudText>
                 </div>
             </MudPaper>
         </MudItem>
@@ -59,8 +59,8 @@ else
             <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
                 <MudIcon Icon="@Icons.Material.Filled.Face" Color="Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                 <div>
-                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Registered Users"]</MudText>
-                    <MudText Typo="Typo.h5">@UserCount</MudText>
+                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Utilisateurs"]</MudText>
+                    <MudText Typo="Typo.h5">@Model.UserCount</MudText>
                 </div>
             </MudPaper>
         </MudItem>
@@ -68,20 +68,16 @@ else
             <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
                 <MudIcon Icon="@Icons.Material.Filled.Groups" Color="Color.Warning" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
                 <div>
-                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Registered Roles"]</MudText>
-                    <MudText Typo="Typo.h5">@RoleCount</MudText>
+                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Profils"]</MudText>
+                    <MudText Typo="Typo.h5">@Model.RoleCount</MudText>
                 </div>
             </MudPaper>
         </MudItem>
-        <MudItem xs="12" sm="8">
+        <MudItem xs="12">
             <MudPaper Elevation="25" Class="pa-4" Style="height:400px;">
                 <MudChart ChartType="ChartType.Bar" ChartSeries="@_dataEnterBarChartSeries" XAxisLabels="@_dataEnterBarChartXAxisLabels.Select(a => _localizer[a].Value).ToArray()" Width="100%" Height="300px"></MudChart>
             </MudPaper>
         </MudItem>
-        <MudItem xs="12" sm="4">
-            <MudPaper Elevation="25" Class="pa-4" Style="height:400px;">
-                @_localizer["Charts comming soon ish..."]
-            </MudPaper>
-        </MudItem>
+       
     </MudGrid>
 }
