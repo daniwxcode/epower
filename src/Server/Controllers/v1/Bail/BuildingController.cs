@@ -1,6 +1,7 @@
 ﻿using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Queries;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Meters.Queries;
+using BlazorHero.CleanArchitecture.Application.Features.Habitat.Stores.Commands;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -66,6 +67,11 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Bail
         public async Task<IActionResult> AddStore(AddEditStoreCommand command)
         {
             return Ok(await _mediator.Send(command));
+        }
+        [HttpDelete("DeleteStore/{id}")]
+        public async Task<IActionResult> DeleteStore(int id)
+        {
+            return Ok(await _mediator.Send(new DeleteStoreCommand(id)));
         }
         [HttpPost("createtenant")]
         public async Task<IActionResult> AddEditShopTenant(AddEditShopTenantCommand command)
