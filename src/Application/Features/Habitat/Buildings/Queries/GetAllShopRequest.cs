@@ -35,6 +35,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Qu
             var repo = _unitOfWork.Repository<Shop>().Entities.
             Include(_=>_.Meter).
             Include(_ => _.Building);
+
             Func<Task<List<Shop>>> getAll = () => repo.ToListAsync();
             var dataList = await _cache.GetOrAddAsync(ApplicationConstants.BuildingsCache.AllShops, getAll);
             var mappedData = dataList.Select(_ => _.GetShopResponse()).ToList();

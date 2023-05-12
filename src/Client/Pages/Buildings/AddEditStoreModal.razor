@@ -34,17 +34,12 @@
                                      ResetValueOnEmptyText="true"
                                      SearchFunc="@Search"
                                      Variant="Variant.Outlined"
-                                     ToStringFunc="@(e =>  _buildingMeters.FirstOrDefault(t => t.Id == e).SerialNumber ?? string.Empty)"
-                                     OffsetY="true" 
+                                     ToStringFunc="@(e =>  _buildingMeters.FirstOrDefault(t => t.Id == e).SerialNumber ?? string.Empty)"                                   
                                      />
-                </MudItem>
-                <MudItem xs="12" md="6">
-                    <MudTextField Disabled="true" @bind-Value="BuildingName" Label="@_localizer["Nom Boutique"]" />
-                </MudItem>
-                <MudItem xs="12" md="6">
+                </MudItem>               
+                <MudItem xs="12" md="12">
                     <MudTextField For="@(() => Model.Name)" @bind-Value="Model.Name" Label="@_localizer["Nom Boutique"]" />
-                </MudItem>  
-              
+                </MudItem>                
             </MudGrid>
         </DialogContent>
         <DialogActions>

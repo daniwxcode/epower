@@ -44,7 +44,10 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
                 await HubConnection.StartAsync();
             }
         }
-
+        private void ViewProfile(int buildingId)
+        {
+            _navigationManager.NavigateTo($"/Building/Details/{buildingId}");
+        }
         private async Task GetBuildingAsync()
         {
             var response = await _cashPowerManager.GetAllBuilding();

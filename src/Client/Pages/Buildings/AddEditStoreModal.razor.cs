@@ -21,9 +21,12 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
     {
         [Parameter]
         public AddEditStoreCommand Model { get; set; }
+        
+        
         [Parameter]
-        public string BuildingName { get; set; }
-        private List<MeterResponseBase> _buildingMeters = new ();
+        public int BuildingId { get; set; }
+        private string BuildingName { get; set; }
+        private List<MeterResponseBase> _buildingMeters = new();
         [CascadingParameter] private MudDialogInstance MudDialog { get; set; }
         [CascadingParameter] private HubConnection HubConnection { get; set; }
 
@@ -55,7 +58,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadDataAsync();
+            await LoadDataAsync(BuildingId);
             HubConnection = HubConnection.TryInitialize(_navigationManager, _localStorage);
             if (HubConnection.State == HubConnectionState.Disconnected)
             {
@@ -72,17 +75,18 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
                 .Select(t => t.Id)
                 .ToList();
         }
-        private async Task LoadDataAsync()
+        private async Task LoadDataAsync(int id)
         {
-            var response = await _cashPowerManager.GetAllMeters(Model.BuildingId);
+            var response = await _cashPowerManager.GetAllMeters(id);
             if (response.Succeeded)
             {
                 _buildingMeters = response.Data;
             }
             else
             {
-                response.Messages.ForEach(_=>_snackBar.Add(_, Severity.Error));
-            }           
+                response.Messages.ForEach(_ => _snackBar.Add(_, Severity.Error));
+            }
+            
         }
     }
 }

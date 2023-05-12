@@ -1,0 +1,9 @@
+﻿@page "/Building/Details/{Id:int}"
+@attribute [Authorize()]
+
+<Store Id="Id"/>
+
+@code {
+    [Parameter]
+    public int Id{ get; set; }
+}
