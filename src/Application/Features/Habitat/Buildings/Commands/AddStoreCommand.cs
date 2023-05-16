@@ -74,7 +74,7 @@ internal class AddEditStoreCommandHandler : IRequestHandler<AddEditStoreCommand,
                 Id = command.Id,
                 Name = command.Name,
                 BuildingId = command.BuildingId,
-                
+                MeterId = null
             };
             if (dbMeter != null)
             {

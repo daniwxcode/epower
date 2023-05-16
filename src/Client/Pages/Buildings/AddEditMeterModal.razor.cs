@@ -53,7 +53,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadDataAsync(BuildingId);
+            //await LoadDataAsync(BuildingId);
             HubConnection = HubConnection.TryInitialize(_navigationManager, _localStorage);
             if (HubConnection.State == HubConnectionState.Disconnected)
             {

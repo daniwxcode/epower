@@ -154,9 +154,14 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
             {
                 return true;
             }
+            if(DisplayMeter(item.Meter).Contains(_searchString, StringComparison.OrdinalIgnoreCase) )
+            {
+                return true;
+            }
             return false;
         }
-
+        private string DisplayMeter(MeterResponseBase meterResponse)
+        => meterResponse is null ? "" : $"{meterResponse.code}({meterResponse.SerialNumber})";
 
     }
 }

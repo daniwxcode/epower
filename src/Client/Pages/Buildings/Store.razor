@@ -21,7 +21,7 @@ else
     <MudTable Hover="true" Elevation="25" Items="_List" Dense="true" Bordered="true" Striped="true" Filter="new Func<ShopResponseBase, bool>(Search)" @bind-brand="item">
         <ToolBarContent>
             <div class="justify-center mud-text-align-center">
-                <MudButton Disabled="@(Id==0)" DisableElevation Variant="Variant.Filled" OnClick="(()=> InvokeModal())" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Surface">@_localizer["Enregistrer un Immeuble"]</MudButton>
+                <MudButton Disabled="@(Id==0)" DisableElevation Variant="Variant.Filled" OnClick="(()=> InvokeModal())" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Surface">@_localizer["Enregistrer une Boutique"]</MudButton>
                 <MudButton DisableElevation Variant="Variant.Filled" OnClick="GetBuildingAsync" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Surface" Color="Color.Secondary" Style="margin-left: 5px;">@_localizer["Reload"]</MudButton>
             </div>
             <MudSpacer />
@@ -31,6 +31,7 @@ else
         <HeaderContent>
             <MudTh><MudTableSortLabel SortBy="new Func<ShopResponseBase, object>(x => x.Id)">@_localizer["N°"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<ShopResponseBase, object>(x => x.BuildingName)">@_localizer["Immeuble"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ShopResponseBase, object>(x => x.Meter.code)">@_localizer["Compteur"]</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<ShopResponseBase, object>(x => x.Name)">@_localizer["Libellé"]</MudTableSortLabel></MudTh>
             <MudTh Style="text-align:right">@_localizer["Actions"]</MudTh>
         </HeaderContent>
@@ -41,6 +42,9 @@ else
                 </MudTd>
                 <MudTd DataLabel="Libellé">
                     <MudHighlighter Text="@context.Name" HighlightedText="@_searchString" />
+                </MudTd>
+                <MudTd DataLabel="Compteur">
+                    <MudHighlighter Text="@DisplayMeter(context.Meter)" HighlightedText="@_searchString" />
                 </MudTd>
                 <MudTd DataLabel="Actions" Style="text-align: right">
                     <MudMenu Label="@_localizer["Actions"]" Variant="Variant.Filled" DisableElevation="true" EndIcon="@Icons.Filled.KeyboardArrowDown" IconColor="Color.Secondary" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopLeft">

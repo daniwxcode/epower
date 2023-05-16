@@ -57,7 +57,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
 
         protected override async Task OnInitializedAsync()
         {
-            //await LoadDataAsync(BuildingId);
+            await LoadDataAsync(BuildingId);
             Model.BuildingId = BuildingId;
             HubConnection = HubConnection.TryInitialize(_navigationManager, _localStorage);
             if (HubConnection.State == HubConnectionState.Disconnected)
@@ -65,13 +65,14 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
                 await HubConnection.StartAsync();
             }
         }
-
+        private string MeterDisplay(MeterResponseBase model) =>
+           model == null ? string.Empty : $"{model.code} -({model.SerialNumber})";
         private async Task<IEnumerable<int>> Search(string value)
         {
             if (string.IsNullOrEmpty(value))
                 return _buildingMeters.Select(x => x.Id);
             return _buildingMeters
-                .Where(t => t.code.Contains(value, StringComparison.InvariantCultureIgnoreCase))
+                .Where(t => t.code.Contains(value, StringComparison.InvariantCultureIgnoreCase) || t.SerialNumber.Contains(value, StringComparison.InvariantCultureIgnoreCase))
                 .Select(t => t.Id)
                 .ToList();
         }

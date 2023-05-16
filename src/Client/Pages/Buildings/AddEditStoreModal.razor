@@ -34,8 +34,7 @@
                                      ResetValueOnEmptyText="true"
                                      SearchFunc="@Search"
                                      Variant="Variant.Outlined"
-                                     ToStringFunc="@(e =>  _buildingMeters.FirstOrDefault(t => t.Id == e).code ?? string.Empty)"                                   
-                                     />
+                                     ToStringFunc="@(e =>MeterDisplay(_buildingMeters.FirstOrDefault(t => t.Id == e)))" />
                 </MudItem>               
                 <MudItem xs="12" md="12">
                     <MudTextField For="@(() => Model.Name)" @bind-Value="Model.Name" Label="@_localizer["Nom Boutique"]" />
