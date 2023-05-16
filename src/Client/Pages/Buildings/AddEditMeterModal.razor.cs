@@ -1,7 +1,6 @@
 ﻿using Blazored.FluentValidation;
 
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
-using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 using BlazorHero.CleanArchitecture.Client.Extensions;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 
@@ -10,22 +9,19 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 using MudBlazor;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
 {
-    public partial class AddEditStoreModal
+    public partial class AddEditMeterModal
     {
         [Parameter]
-        public AddEditStoreCommand Model { get; set; } = new();
+        public AddEditMeterCommand Model { get; set; }
+
 
         [Parameter]
         public int BuildingId { get; set; }
-        private string BuildingName { get; set; }
-        private List<MeterResponseBase> _buildingMeters = new();
+
         [CascadingParameter] private MudDialogInstance MudDialog { get; set; }
         [CascadingParameter] private HubConnection HubConnection { get; set; }
 
@@ -39,7 +35,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
 
         private async Task SaveAsync()
         {
-            var response = await _cashPowerManager.AddStore(Model);
+            var response = await _cashPowerManager.AddMeter(Model);
             if (response.Succeeded)
             {
                 _snackBar.Add(response.Messages[0], Severity.Success);
@@ -57,8 +53,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
 
         protected override async Task OnInitializedAsync()
         {
-            //await LoadDataAsync(BuildingId);
-            Model.BuildingId = BuildingId;
+            await LoadDataAsync(BuildingId);
             HubConnection = HubConnection.TryInitialize(_navigationManager, _localStorage);
             if (HubConnection.State == HubConnectionState.Disconnected)
             {
@@ -66,26 +61,9 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
             }
         }
 
-        private async Task<IEnumerable<int>> Search(string value)
+        private Task LoadDataAsync(int id)
         {
-            if (string.IsNullOrEmpty(value))
-                return _buildingMeters.Select(x => x.Id);
-            return _buildingMeters
-                .Where(t => t.code.Contains(value, StringComparison.InvariantCultureIgnoreCase))
-                .Select(t => t.Id)
-                .ToList();
-        }
-        private async Task LoadDataAsync(int id)
-        {
-            var response = await _cashPowerManager.GetAllMeters(id);
-            if (response.Succeeded)
-            {
-                _buildingMeters = response.Data;
-            }
-            else
-            {
-                response.Messages.ForEach(_ => _snackBar.Add(_, Severity.Error));
-            }
+            return Task.CompletedTask;
 
         }
     }

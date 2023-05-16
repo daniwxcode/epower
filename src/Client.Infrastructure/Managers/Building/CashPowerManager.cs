@@ -69,5 +69,16 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Building
             var response = await _httpClient.GetAsync(BuildingEndpoints.GetMeterById(id));
             return await response.ToResult<MeterResponseBase>();
         }
+
+        public async Task<IResult<int>> AddMeter(AddEditMeterCommand command)
+        {
+            var response = await _httpClient.PostAsJsonAsync(BuildingEndpoints.AddMeter, command);
+            return await response.ToResult<int>();
+        }
+
+        public Task<IResult<int>> DeleteMeter(int id)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

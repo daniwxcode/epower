@@ -1,4 +1,5 @@
-﻿<EditForm Model="@Model" OnValidSubmit="SaveAsync">
+﻿
+<EditForm Model="@Model" OnValidSubmit="SaveAsync">
     <FluentValidationValidator @ref="_fluentValidationValidator" />
     <MudDialog>
         <TitleContent>
@@ -27,23 +28,16 @@
                         <MudTextField Disabled For="@(() => Model.Id)" @bind-Value="Model.Id" Label="@_localizer["Id"]" />
                         </MudItem>
                 }
-                <MudItem xs="12">
-                <MudAutocomplete T="int" Label="Compteur"
-                                     For="@(() => Model.MeterId)"
-                                     @bind-Value="Model.MeterId"
-                                     ResetValueOnEmptyText="true"
-                                     SearchFunc="@Search"
-                                     Variant="Variant.Outlined"
-                                     ToStringFunc="@(e =>  _buildingMeters.FirstOrDefault(t => t.Id == e).code ?? string.Empty)"                                   
-                                     />
-                </MudItem>               
-                <MudItem xs="12" md="12">
-                    <MudTextField For="@(() => Model.Name)" @bind-Value="Model.Name" Label="@_localizer["Nom Boutique"]" />
+                <MudItem xs="12" md="6">
+                    <MudTextField T="string" For="@(() => Model.Code)" @bind-Value="Model.Code" Label="@_localizer["Code"]" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTextField For="@(() => Model.SerialNumber)" @bind-Value="Model.SerialNumber" Label="@_localizer["Numéro Compteur"]" />
                 </MudItem>                
             </MudGrid>
         </DialogContent>
         <DialogActions>
-            <MudButton DisableElevation Variant="Variant.Filled" OnClick="Cancel">@_localizer["Cancel"]</MudButton>
+            <MudButton DisableElevation Variant="Variant.Filled" OnClick="Cancel">@_localizer["Annuler"]</MudButton>
             @if (Model.Id != 0)
             {
                 <MudButton DisableElevation Variant="Variant.Filled" ButtonType="ButtonType.Submit" Disabled="@(!Validated)" Color="Color.Secondary">@_localizer["Modifier"]</MudButton>

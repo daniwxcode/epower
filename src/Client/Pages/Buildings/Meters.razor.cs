@@ -110,7 +110,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
 
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
 
-            var dialog = _dialogService.Show<AddEditStoreModal>(id == 0 ? _localizer["Ajouter"] : _localizer["Modifier"], parameters, options);
+            var dialog = _dialogService.Show<AddEditMeterModal>(id == 0 ? _localizer["Ajouter"] : _localizer["Modifier"], parameters, options);
 
             var result = await dialog.Result;
             if (!result.Cancelled)

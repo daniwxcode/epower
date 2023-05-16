@@ -12,13 +12,12 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Building
         Task<IResult<List<BuildingResponseBase>>> GetAllBuilding();
         Task<IResult<int>> SaveABuildingAsync(AddEditBuildingCommand command);
         Task<IResult<int>> DeleteBuilding(int id);
-
         Task<IResult<List<ShopResponseBase>>> GetStores(int id=0);
         Task<IResult<int>> AddStore(AddEditStoreCommand command);
         Task<IResult<int>> DeleteStore(int id);
-
         Task<IResult<List<MeterResponseBase>>> GetAllMeters(int BuildingId=0);
         Task<IResult<MeterResponseBase>> GetMeterById(int id);
-
+        Task<IResult<int>> AddMeter(AddEditMeterCommand command);
+        Task<IResult<int>> DeleteMeter(int id);
     }
 }
