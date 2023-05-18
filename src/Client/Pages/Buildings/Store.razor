@@ -1,8 +1,6 @@
 ﻿@page "/Stores"
 @page "/Building/{Id:int}/Stores"
 @attribute [Authorize()]
-@inject Microsoft.Extensions.Localization.IStringLocalizer<Brands> _localizer
-@using BlazorHero.CleanArchitecture.Application.Features.Brands.Queries.GetAll
 @using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 
 <style>

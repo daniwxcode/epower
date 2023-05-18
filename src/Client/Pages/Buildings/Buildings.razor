@@ -1,6 +1,5 @@
 ﻿@page "/Buildings"
-@attribute [Authorize(Policy = Permissions.Brands.View)]
-@inject Microsoft.Extensions.Localization.IStringLocalizer<Brands> _localizer
+@attribute [Authorize()]
 @using BlazorHero.CleanArchitecture.Application.Features.Brands.Queries.GetAll
 @using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 
