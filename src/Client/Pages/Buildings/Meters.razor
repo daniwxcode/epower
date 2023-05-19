@@ -24,7 +24,6 @@ else
             </div>
             <MudSpacer />
             <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="@_localizer["Rechercher"]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0 mb-3"></MudTextField>
-
         </ToolBarContent>
         <HeaderContent>
             <MudTh><MudTableSortLabel SortBy="new Func<MeterResponseBase, object>(x => x.Id)">@_localizer["N°"]</MudTableSortLabel></MudTh>

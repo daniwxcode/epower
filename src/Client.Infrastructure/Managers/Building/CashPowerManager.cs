@@ -1,6 +1,7 @@
 ﻿using BlazorHero.CleanArchitecture.Application.Features.Brands.Commands.AddEdit;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
+using BlazorHero.CleanArchitecture.Application.Features.Habitat.Enums;
 using BlazorHero.CleanArchitecture.Client.Infrastructure.Extensions;
 using BlazorHero.CleanArchitecture.Client.Infrastructure.Routes;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
@@ -79,6 +80,25 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Building
         public Task<IResult<int>> DeleteMeter(int id)
         {
             throw new System.NotImplementedException();
+        }
+
+        public async Task<IResult<BuyCreditResponse>> BuyCredit(MakeAPaymentCommand command)
+        {
+            var response = await _httpClient.PostAsJsonAsync(BuildingEndpoints.MakePayement, command);
+            return await response.ToResult<BuyCreditResponse>();
+        }
+
+        public async Task<IResult<List<PayementResponseBase>>> GetPayementByCriteria(PaymentRequestCriteria criteria, string criteriavalue)
+        {
+            var url = criteria switch
+            {
+                PaymentRequestCriteria.ByMeter => BuildingEndpoints.GetAllPayementByMeter(criteriavalue),
+                PaymentRequestCriteria.ByUser =>
+                criteriavalue == string.Empty ? BuildingEndpoints.CurrentUserSales : BuildingEndpoints.GetAllUserSales(criteriavalue),
+                _ => BuildingEndpoints.GetAllPayement
+            };
+            var response = await _httpClient.GetAsync(url);
+            return await response.ToResult<List<PayementResponseBase>>();
         }
     }
 }

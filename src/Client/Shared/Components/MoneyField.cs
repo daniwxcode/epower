@@ -1,7 +1,6 @@
-﻿using BlazorHero.CleanArchitecture.Client.Pages.Identity;
-using MudBlazor;
+﻿using MudBlazor;
+
 using System.Globalization;
-using System.Text.RegularExpressions;
 
 namespace BlazorHero.CleanArchitecture.Client.Shared.Components;
 
@@ -25,6 +24,6 @@ public class MoneyField : MudField
         Margin = Margin.Dense;
         Adornment = Adornment.End;
         AdornmentText = "FCFA";
-        Variant = Variant.Text;
+        Variant = Variant.Outlined;
     }
 }
