@@ -1,5 +1,6 @@
 ﻿using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Queries;
+using BlazorHero.CleanArchitecture.Application.Interfaces.Services;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,15 +13,55 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Sales
     [ApiController]
     public class CashPowerController : BaseApiController<CashPowerController>
     {
+        private readonly ICurrentUserService _currentUserService;
+        public CashPowerController(ICurrentUserService currentUserService)
+        {
+            _currentUserService = currentUserService;
+        }
         [HttpPost]
         public async Task<IActionResult> SellCredit(MakeAPaymentCommand command)
         {
             return Ok(await _mediator.Send(command));
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetSales(GetPayementByCriteriaRequest request)
+        [HttpGet("all-payement")]
+        public async Task<IActionResult> GetSales()
         {
+            var request = new GetPayementByCriteriaRequest()
+            {
+                PaymentRequestCriteria = Application.Features.Habitat.Enums.PaymentRequestCriteria.All
+            };
+            return Ok(await _mediator.Send(request));
+        }
+        [HttpGet("all-payement/{serialnumber}")]
+        public async Task<IActionResult> GetSalesByMeter(string serialnumber)
+        {
+            var request = new GetPayementByCriteriaRequest()
+            {
+                PaymentRequestCriteria = Application.Features.Habitat.Enums.PaymentRequestCriteria.ByMeter,
+                Criteria = serialnumber,
+            };
+            return Ok(await _mediator.Send(request));
+        }
+        [HttpGet("all-payement/byuser/{user}")]
+        public async Task<IActionResult> GetSalesByUser(string user)
+        {
+            var request = new GetPayementByCriteriaRequest()
+            {
+                PaymentRequestCriteria = Application.Features.Habitat.Enums.PaymentRequestCriteria.ByUser,
+                Criteria = user,
+            };
+            return Ok(await _mediator.Send(request));
+        }
+        [HttpGet("all-payement/mysales/")]
+        public async Task<IActionResult> GetCurrentUserSales()
+        {
+            
+            var request = new GetPayementByCriteriaRequest()
+            {
+                PaymentRequestCriteria = Application.Features.Habitat.Enums.PaymentRequestCriteria.ByUser,
+                Criteria = _currentUserService.UserId,
+            };
             return Ok(await _mediator.Send(request));
         }
     }
