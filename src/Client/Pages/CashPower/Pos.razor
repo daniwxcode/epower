@@ -1,3 +1,10 @@
-﻿<MudGrid>
-   
+﻿@page "/pos"
+
+<MudGrid>
+    <MudItem xs="12" md="4">
+        <MudTextField @bind-Value="@SerialNumber" Immediate="true" Placeholder="@_localizer["Numéro Compteur"]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.ElectricalServices" IconSize="Size.Medium" Class="mt-0 mb-3"></MudTextField>
+        <MoneyTextField T='decimal' Immediate="true" HideSpinButtons="true" @bind-Value="@Amount"></MoneyTextField>
+        <MudTextField @bind-Value="@Amount" Immediate="true" Placeholder="@_localizer["Montant Achat"]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.ElectricalServices" IconSize="Size.Medium" Class="mt-0 mb-3"></MudTextField>
+        
+    </MudItem>
 </MudGrid>

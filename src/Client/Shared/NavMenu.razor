@@ -4,7 +4,7 @@
 <UserCard />
 <MudNavMenu>
     <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Home">@_localizer["Home"]</MudNavLink>
-   
+    <MudNavLink Href="/pos" Icon="@Icons.Material.Outlined.PointOfSale">Point de Ventes</MudNavLink>
     <MudListSubheader Class="mt-2 mb-n2">@_localizer["Personal"]</MudListSubheader>
     @if (_canViewDashboards)
     {
@@ -12,6 +12,7 @@
             @_localizer["Dashboard"]
         </MudNavLink>
     }
+
     <MudNavLink Href="/account" Icon="@Icons.Material.Outlined.SupervisorAccount">
         @_localizer["Account"]
     </MudNavLink>
