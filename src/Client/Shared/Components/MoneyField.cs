@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace BlazorHero.CleanArchitecture.Client.Shared.Components;
 
-public class MoneyTextField<T> : MudTextField<T>
+public class MoneyTextField<T> : MudNumericField<T>
 {
     public MoneyTextField()
     {
