@@ -1,26 +1,17 @@
 ﻿@page "/pos"
-
 <MudGrid>
-    <MudItem xs="12" md="4">
-        <MudCard Outlined="true">
-            <MudCardContent>
-                <MudText>Effectuer Une Vente</MudText>
-                <MudTextField @bind-Value="@SerialNumber" Immediate="true" Placeholder="@_localizer["Numéro Compteur"]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.ElectricalServices" IconSize="Size.Medium" Class="mt-0 mb-3"></MudTextField>
-                <MoneyTextField T='decimal' Min="0" Max="100000" Immediate="true" HideSpinButtons="true" @bind-Value="@Amount"></MoneyTextField>
-            </MudCardContent>
-            <MudCardActions>
-                <MudButton Variant="Variant.Outlined" Color="Color.Primary">Valider</MudButton>
-            </MudCardActions>
-        </MudCard>
-       
+    <MudItem xs="12">
+        <MudExpansionPanels>
+            <MudExpansionPanel Text="Mes Ventes" MaxHeight="150">
+                <MudCard Elevation="2" Outlined="true">
+                    <MudCardContent>
+                        <Sales Criteria="2"></Sales>
+                    </MudCardContent>
+                </MudCard>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
     </MudItem>
-    <MudItem>
-        <MudCard Outlined="true">
-            <MudCardContent>
-                <MudText>Mes Ventes</MudText>
-                <MudText Typo="Typo.body2">Liste des Ventes</MudText>
-                <Sales Criteria="2"></Sales>
-            </MudCardContent>           
-        </MudCard>
+        <MudItem xs="12">
+        <SellCreditForm> </SellCreditForm>
     </MudItem>
 </MudGrid>

@@ -1,0 +1,24 @@
+﻿
+<MudForm Model="Model">
+
+    <MudCard Outlined="true">
+        <MudCardContent>
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudText>Effectuer Une Vente</MudText>
+                    <MudTextField @bind-Value="@Model.SerialNumber" Immediate="true" Placeholder="@_localizer["Numéro Compteur"]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.ElectricalServices" IconSize="Size.Medium" Class="mt-0 mb-3"></MudTextField>
+                    <MoneyTextField T='decimal' Min="0" Immediate="true" HideSpinButtons="true" @bind-Value="@Model.Amount"></MoneyTextField>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <Receipt Serial="@Model.SerialNumber" Amount="Model.Amount">
+
+                    </Receipt>
+                </MudItem>
+            </MudGrid>
+           
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary">Valider</MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudForm>

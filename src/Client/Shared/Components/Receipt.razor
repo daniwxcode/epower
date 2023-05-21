@@ -1,0 +1,46 @@
+﻿<MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+           <MudText>Compteur:@Serial</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudGrid>
+            <MudItem xs="6">
+                <MudText Align="Align.Center" Typo="Typo.subtitle2">HABITAT DU GOLF</MudText>
+                <MudText Align="Align.Center">(+228) 91378364</MudText>
+                <MudText Align="Align.Center">Lomé-Togo</MudText>
+            </MudItem>
+            <MudItem xs="6">
+                <MudText Align="Align.End">@DateTime.Today.ToShortDateString()</MudText>
+            </MudItem>
+        </MudGrid>
+        <MudText Align="Align.Center">Reçu N°: 1255555</MudText>
+        <MudGrid>
+            <MudItem xs="12">
+                <MudSimpleTable Striped="true" Dense="true" Bordered="true">
+                    <MudTHeadRow>
+                        <MudTh>Libellé</MudTh>
+                        <MudTh>Prix</MudTh>
+                    </MudTHeadRow>
+                    <MudTr>
+                        <MudTd>Achat de Crédit</MudTd>
+                        <MudTd><MoneyField Variant="Variant.Text">@Amount</MoneyField></MudTd>
+                    </MudTr>
+                    <MudTr>
+                        <MudTd>Frais</MudTd>
+                        <MudTd>
+                            
+                            <MoneyField Variant="Variant.Text">@string.Format("{0:N}", getFees())</MoneyField>
+                        </MudTd>
+                    </MudTr> 
+                    <MudTr>
+                        <MudTd>Total</MudTd>
+                        <MudTd><MoneyField Variant="Variant.Text">@string.Format("{0:N}", Total)</MoneyField></MudTd>
+                    </MudTr>
+                </MudSimpleTable>
+            </MudItem>
+        </MudGrid>
+
+    </MudCardContent>
+</MudCard>

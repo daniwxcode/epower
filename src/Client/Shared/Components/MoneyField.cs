@@ -23,7 +23,8 @@ public class MoneyField : MudField
     {
         Margin = Margin.Dense;
         Adornment = Adornment.End;
+        
         AdornmentText = "FCFA";
-        Variant = Variant.Outlined;
+       
     }
 }

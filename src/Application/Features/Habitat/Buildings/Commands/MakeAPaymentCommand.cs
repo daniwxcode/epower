@@ -17,9 +17,9 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
 {
     public class MakeAPaymentCommand : IRequest<Result<BuyCreditResponse>>
     {
-        public int Amount { get; init; }
-        public int MeterId { get; init; } = 0;
-        public string SerialNumber { get; init; } = string.Empty;
+        public decimal Amount { get; set; }
+        public int MeterId { get; set; } = 0;
+        public string SerialNumber { get; set; } = string.Empty;
         public Guid Reference { get; init; } = new Guid();
     }
     internal class MakeAPaymentCommandHandler : IRequestHandler<MakeAPaymentCommand, Result<BuyCreditResponse>>
@@ -45,7 +45,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                 dbMeter = await _unitOfWork.Repository<Meter>().GetByIdAsync(request.MeterId);
                 if (dbMeter == null)
                     return await Result<BuyCreditResponse>.FailAsync("Impossible d'effectuer cette vente, Compteur Id Erronée");
-                var ceetvente = await _ceetService.BuyCredit(new CreditRequest(dbMeter.SerialNumber, request.Amount));
+                var ceetvente = await _ceetService.BuyCredit(new CreditRequest(dbMeter.SerialNumber, (int)request.Amount));
                 InternalPayement internalPayement = new InternalPayement()
                 {
                     Amount = request.Amount,
@@ -58,7 +58,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                 };
                 await db.AddAsync(internalPayement);
                 await _unitOfWork.Commit(cancellationToken);
-                return Result<BuyCreditResponse>.Success(new BuyCreditResponse(internalPayement.Id, request.Amount, internalPayement.SerialNumber, internalPayement.InternalReference, DateTime.UtcNow, internalPayement.InternalReference, ceetvente.code, ceetvente.credit));
+                return Result<BuyCreditResponse>.Success(new BuyCreditResponse(internalPayement.Id, (int)request.Amount, internalPayement.SerialNumber, internalPayement.InternalReference, DateTime.UtcNow, internalPayement.InternalReference, ceetvente.code, ceetvente.credit));
             }
 
             return await Result<BuyCreditResponse>.FailAsync("Vente des Compteurs Externes non actif");
