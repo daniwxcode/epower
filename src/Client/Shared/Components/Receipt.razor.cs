@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 
+using System.Globalization;
+
 namespace BlazorHero.CleanArchitecture.Client.Shared.Components
 {
     public partial class Receipt
@@ -21,5 +23,10 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
                 _=> 150
             };
         }
+        public NumberFormatInfo separator = new System.Globalization.NumberFormatInfo()
+        {
+            NumberDecimalDigits = 0,
+            NumberGroupSeparator = "."
+        };
     }
 }

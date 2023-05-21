@@ -1,4 +1,5 @@
-﻿<MudCard>
+﻿@using System.Globalization;
+<MudCard>
     <MudCardHeader>
         <CardHeaderContent>
            <MudText>Compteur:@Serial</MudText>
@@ -25,18 +26,18 @@
                     </MudTHeadRow>
                     <MudTr>
                         <MudTd>Achat de Crédit</MudTd>
-                        <MudTd><MoneyField Variant="Variant.Text">@Amount</MoneyField></MudTd>
+                        <MudTd><MoneyField Variant="Variant.Text">@Amount.ToString("N0", new CultureInfo("fr-FR"))</MoneyField></MudTd>
                     </MudTr>
                     <MudTr>
                         <MudTd>Frais</MudTd>
                         <MudTd>
                             
-                            <MoneyField Variant="Variant.Text">@string.Format("{0:N}", getFees())</MoneyField>
+                            <MoneyField Variant="Variant.Text">@getFees().ToString("N0", new CultureInfo("fr-FR"))</MoneyField>
                         </MudTd>
                     </MudTr> 
                     <MudTr>
                         <MudTd>Total</MudTd>
-                        <MudTd><MoneyField Variant="Variant.Text">@string.Format("{0:N}", Total)</MoneyField></MudTd>
+                        <MudTd><MoneyField Variant="Variant.Text">@Total.ToString("N0", new CultureInfo("fr-FR"))</MoneyField></MudTd>
                     </MudTr>
                 </MudSimpleTable>
             </MudItem>
