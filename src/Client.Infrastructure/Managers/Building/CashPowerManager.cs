@@ -70,6 +70,11 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Building
             var response = await _httpClient.GetAsync(BuildingEndpoints.GetMeterById(id));
             return await response.ToResult<MeterResponseBase>();
         }
+        public async Task<IResult<MeterResponseBase>> GetMeterBySerial(string strial)
+        {
+            var response = await _httpClient.GetAsync(BuildingEndpoints.GetMeterBySerial(strial));
+            return await response.ToResult<MeterResponseBase>();
+        }
 
         public async Task<IResult<int>> AddMeter(AddEditMeterCommand command)
         {
@@ -100,5 +105,7 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Building
             var response = await _httpClient.GetAsync(url);
             return await response.ToResult<List<PayementResponseBase>>();
         }
+
+
     }
 }

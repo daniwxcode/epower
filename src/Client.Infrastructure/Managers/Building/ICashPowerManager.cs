@@ -20,7 +20,9 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Building
         Task<IResult<int>> DeleteStore(int id);
         Task<IResult<List<MeterResponseBase>>> GetAllMeters(int BuildingId = 0);
         Task<IResult<MeterResponseBase>> GetMeterById(int id);
+        Task<IResult<MeterResponseBase>> GetMeterBySerial(string strial);
         Task<IResult<int>> AddMeter(AddEditMeterCommand command);
+
         Task<IResult<int>> DeleteMeter(int id);
     }
 }

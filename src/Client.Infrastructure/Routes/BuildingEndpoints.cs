@@ -21,7 +21,7 @@
 
         public static string GetAllBuldingMeters(int id) => $"api/v1/Building/{id}/meters";
         public static string GetMeterById(int id) => $"api/v1/Building/GetMeter/{id}";
-
+        public static string GetMeterBySerial(string serial) => $"api/v1/Building/GetMeter-by-serial/{serial}";
 
         public static string GetAllStores = "api/v1/Building/stores";
         public static string AddStore = "api/v1/Building/add-store";

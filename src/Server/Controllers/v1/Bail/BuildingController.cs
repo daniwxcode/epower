@@ -46,6 +46,11 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Bail
         {
             var data = await _mediator.Send(new GetMeterByIdRequest(id));
             return Ok(data);
+        }  [HttpGet("GetMeter-by-serial/{serial}")]
+        public async Task<IActionResult> GetBySerial(string serial)
+        {
+            var data = await _mediator.Send(new GetMeterBySerialRequest(serial));
+            return Ok(data);
         }
         [HttpPost("add-meter")]
         public async Task<IActionResult> AddStore(AddEditMeterCommand command)

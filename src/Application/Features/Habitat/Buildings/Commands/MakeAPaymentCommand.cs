@@ -6,6 +6,8 @@ using BlazorHero.CleanArchitecture.Shared.Wrapper;
 
 using MediatR;
 
+using Microsoft.EntityFrameworkCore;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,8 +42,15 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
             if (itemdb != null)
                 return await Result<BuyCreditResponse>.FailAsync("Cette Vente a déjà été effectuée");
             Meter dbMeter = null;
+            if(request.SerialNumber!= string.Empty && request.MeterId==0)
+            dbMeter = await _unitOfWork.Repository<Meter>().Entities.FirstOrDefaultAsync(_ => _.SerialNumber == request.SerialNumber);
+           
+            if (dbMeter != null)
+                request.MeterId = dbMeter.Id;
+            
             if (request.MeterId > 0)
             {
+                if(dbMeter== null)
                 dbMeter = await _unitOfWork.Repository<Meter>().GetByIdAsync(request.MeterId);
                 if (dbMeter == null)
                     return await Result<BuyCreditResponse>.FailAsync("Impossible d'effectuer cette vente, Compteur Id Erronée");
@@ -58,7 +67,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                 };
                 await db.AddAsync(internalPayement);
                 await _unitOfWork.Commit(cancellationToken);
-                return Result<BuyCreditResponse>.Success(new BuyCreditResponse(internalPayement.Id, (int)request.Amount, internalPayement.SerialNumber, internalPayement.InternalReference, DateTime.UtcNow, internalPayement.InternalReference, ceetvente.code, ceetvente.credit));
+                return Result<BuyCreditResponse>.Success(new BuyCreditResponse(internalPayement.Id, (int)request.Amount, internalPayement.SerialNumber, internalPayement.InternalReference, DateTime.UtcNow, internalPayement.InternalReference, ceetvente.code, ceetvente.credit),"Vente Effectuée avec Succès!");
             }
 
             return await Result<BuyCreditResponse>.FailAsync("Vente des Compteurs Externes non actif");
