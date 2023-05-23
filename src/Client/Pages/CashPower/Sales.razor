@@ -18,13 +18,13 @@ else
     {
         <HeroTitle Title="@_localizer["Gestion Des Ventes"]" Description="@_localizer["Gestion des Ventes."]" />
     }
-    <MudTable Hover="true" Elevation="25" Items="_List" Dense="true" Bordered="true" Striped="true" Filter="new Func<PayementResponseBase, bool>(Search)">
+    <MudTable @ref="_table" Loading="!_loaded" ServerData="@(new Func<TableState, Task<TableData<PayementResponseBase>>>(ServerReload))" Elevation="25" Hover="true" Dense="true" Bordered="true" Striped="true" Filter="new Func<PayementResponseBase, bool>(Search)">
         <ToolBarContent>
             <div class="justify-center mud-text-align-center">
-                <MudButton DisableElevation Variant="Variant.Filled" OnClick="GetDataAsync" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Surface" Color="Color.Secondary" Style="margin-left: 5px;">@_localizer["Reload"]</MudButton>
+                <MudButton DisableElevation Variant="Variant.Filled" OnClick="@(() => OnSearch(""))" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Surface" Color="Color.Secondary" Style="margin-left: 5px;">@_localizer["Reload"]</MudButton>
             </div>
             <MudSpacer />
-            <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="@_localizer["Rechercher"]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0 mb-3"></MudTextField>
+            <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="@_localizer["Rechercher"]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
             <MudTh><MudTableSortLabel SortBy="new Func<PayementResponseBase, object>(x => x.Id)">@_localizer["N°"]</MudTableSortLabel></MudTh>
@@ -32,7 +32,7 @@ else
             <MudTh><MudTableSortLabel SortBy="new Func<PayementResponseBase, object>(x => x.Amount)">@_localizer["Montant"]</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Id">@(_List.IndexOf(context) + 1)</MudTd>
+            <MudTd DataLabel="Id">@(_pagedData.IndexOf(context) + 1)</MudTd>
                 <MudTd DataLabel="Date">
                     <MudHighlighter Text="@context.Date.ToShortDateString()" HighlightedText="@_searchString" />
                 </MudTd>

@@ -31,11 +31,14 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Sales
 
         [HttpGet("all-payement")]
         [Authorize(Policy = Permissions.CashPower.View)]
-        public async Task<IActionResult> GetSales()
+        public async Task<IActionResult> GetSales(int pageNumber, int pageSize )
         {
             var request = new GetPayementByCriteriaRequest()
             {
-                PaymentRequestCriteria = Application.Features.Habitat.Enums.PaymentRequestCriteria.All
+                PaymentRequestCriteria = Application.Features.Habitat.Enums.PaymentRequestCriteria.All,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+                
             };
             return Ok(await _mediator.Send(request));
         }
