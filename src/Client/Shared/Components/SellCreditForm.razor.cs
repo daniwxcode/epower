@@ -13,7 +13,6 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
 {
     public partial class SellCreditForm
     {
-
         public MakeAPaymentCommand Model { get; set; } = new();
         [CascadingParameter] private HubConnection HubConnection { get; set; }
         private bool loading = false;
