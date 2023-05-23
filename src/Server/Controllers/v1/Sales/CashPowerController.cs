@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using Polly;
 
+using System.Drawing.Printing;
 using System.Threading.Tasks;
 
 namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Sales
@@ -33,20 +34,18 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Sales
         [Authorize(Policy = Permissions.CashPower.View)]
         public async Task<IActionResult> GetSales(int pageNumber, int pageSize )
         {
-            var request = new GetPayementByCriteriaRequest()
+            var request = new GetPayementByCriteriaRequest(pageNumber,pageSize)
             {
-                PaymentRequestCriteria = Application.Features.Habitat.Enums.PaymentRequestCriteria.All,
-                PageNumber = pageNumber,
-                PageSize = pageSize
+                PaymentRequestCriteria = Application.Features.Habitat.Enums.PaymentRequestCriteria.All               
                 
             };
             return Ok(await _mediator.Send(request));
         }
         [HttpGet("all-payement/{serialnumber}")]
         [Authorize(Policy = Permissions.CashPower.View)]
-        public async Task<IActionResult> GetSalesByMeter(string serialnumber)
+        public async Task<IActionResult> GetSalesByMeter(string serialnumber, int pageNumber, int pageSize)
         {
-            var request = new GetPayementByCriteriaRequest()
+            var request = new GetPayementByCriteriaRequest(pageNumber, pageSize)
             {
                 PaymentRequestCriteria = Application.Features.Habitat.Enums.PaymentRequestCriteria.ByMeter,
                 Criteria = serialnumber,
@@ -55,9 +54,9 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Sales
         }
         [HttpGet("all-payement/byuser/{user}")]
         [Authorize(Policy = Permissions.CashPower.View)]
-        public async Task<IActionResult> GetSalesByUser(string user)
+        public async Task<IActionResult> GetSalesByUser(string user, int pageNumber, int pageSize)
         {
-            var request = new GetPayementByCriteriaRequest()
+            var request = new GetPayementByCriteriaRequest(pageNumber,pageSize)
             {
                 PaymentRequestCriteria = Application.Features.Habitat.Enums.PaymentRequestCriteria.ByUser,
                 Criteria = user,
@@ -66,10 +65,10 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Sales
         }
         [HttpGet("all-payement/mysales/")]
         [Authorize(Policy = Permissions.CashPower.View)]
-        public async Task<IActionResult> GetCurrentUserSales()
+        public async Task<IActionResult> GetCurrentUserSales(int pageNumber, int pageSize)
         {
             
-            var request = new GetPayementByCriteriaRequest()
+            var request = new GetPayementByCriteriaRequest(pageNumber,pageSize)
             {
                 PaymentRequestCriteria = Application.Features.Habitat.Enums.PaymentRequestCriteria.ByUser,
                 Criteria = _currentUserService.UserId,
