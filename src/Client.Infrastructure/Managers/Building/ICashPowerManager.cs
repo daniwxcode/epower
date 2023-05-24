@@ -11,7 +11,7 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Building
     public interface ICashPowerManager : IManager
     {
         Task<IResult<BuyCreditResponse>> BuyCredit(MakeAPaymentCommand command);
-        Task<IResult<List<PayementResponseBase>>> GetPayementByCriteria(PaymentRequestCriteria criteria, string criteriavalue);
+        Task<PaginatedResult<PayementResponseBase>> GetPayementByCriteria(PaymentRequestCriteria criteria, string criteriavalue, int pageNumber, int pageSize);
         Task<IResult<List<BuildingResponseBase>>> GetAllBuilding();
         Task<IResult<int>> SaveABuildingAsync(AddEditBuildingCommand command);
         Task<IResult<int>> DeleteBuilding(int id);

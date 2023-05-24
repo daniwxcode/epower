@@ -1,7 +1,8 @@
 ﻿<Overlay MudOverlayIsVisible="@(loading)" />
 <MudGrid>
-    <MudItem xs="12" md="6">
-        <MudGrid>
+    @if (canSellAgain)
+    {
+        <MudItem xs="12" md="getSize">
             <EditForm Model="Model" OnValidSubmit="SaveAsync">
                 <MudCard Outlined="true">
                     <MudCardContent>
@@ -14,12 +15,15 @@
                     </MudCardContent>
                 </MudCard>
             </EditForm>
-        </MudGrid>
-    </MudItem>
-    <MudItem xs="12" md="6">
-        <Receipt Serial="@Model.SerialNumber" Amount="Model.Amount">
-        </Receipt>
+        </MudItem>
+    }
+    <MudItem xs="12" md="getSize">
+        <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Outlined.AddCircle" OnClick="reset">Effectuer une Nouvelle Vente</MudButton>
+        <Receipt Serial="@Model.SerialNumber" Sold="!canSellAgain" Code="@Code" Kw="@Kw" Ref="@Ref" Amount="Model.Amount" />
     </MudItem>
 </MudGrid>
+
+
+
 
 

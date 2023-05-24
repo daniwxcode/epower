@@ -9,7 +9,15 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
         [Parameter]
         public string Serial { get; set; } = "000000000000";
         [Parameter]
+        public string Ref { get; set; } = "000000000000";
+        [Parameter]
+        public string Code { get; set; } = "000000000000";
+        [Parameter]
+        public decimal Kw { get; set; } = 0;
+        [Parameter]
         public decimal Amount { get; set; } = 0;
+        [Parameter]
+        public bool Sold { get; set; } = false;
         private int Total { get { return (int)Amount + getFees(); }}
         private int getFees()
         {

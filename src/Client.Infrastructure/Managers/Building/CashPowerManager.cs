@@ -1,5 +1,4 @@
-﻿using BlazorHero.CleanArchitecture.Application.Features.Brands.Commands.AddEdit;
-using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
+﻿using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Enums;
 using BlazorHero.CleanArchitecture.Client.Infrastructure.Extensions;
@@ -93,7 +92,7 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Building
             return await response.ToResult<BuyCreditResponse>();
         }
 
-        public async Task<IResult<List<PayementResponseBase>>> GetPayementByCriteria(PaymentRequestCriteria criteria, string criteriavalue)
+        public async Task<PaginatedResult<PayementResponseBase>> GetPayementByCriteria(PaymentRequestCriteria criteria, string criteriavalue, int pageNumber, int pageSize)
         {
             var url = criteria switch
             {
@@ -102,10 +101,8 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Building
                 criteriavalue == string.Empty ? BuildingEndpoints.CurrentUserSales : BuildingEndpoints.GetAllUserSales(criteriavalue),
                 _ => BuildingEndpoints.GetAllPayement
             };
-            var response = await _httpClient.GetAsync(url);
-            return await response.ToResult<List<PayementResponseBase>>();
+            var response = await _httpClient.GetAsync(url+ $"?pageNumber={pageNumber+1}&pageSize={pageSize}");
+            return await response.ToPaginatedResult<PayementResponseBase>();
         }
-
-
     }
 }
