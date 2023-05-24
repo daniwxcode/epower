@@ -1,17 +1,13 @@
 ﻿@page "/pos"
-<MudGrid>
-    <MudItem xs="12">
+
+<MudCard Elevation="2" Outlined="true">
+    <MudCardContent>        
         <MudExpansionPanels>
-            <MudExpansionPanel Text="Mes Ventes" MaxHeight="150">
-                <MudCard Elevation="2" Outlined="true">
-                    <MudCardContent>
-                        <Sales Criteria="2"></Sales>
-                    </MudCardContent>
-                </MudCard>
+            <MudExpansionPanel Text="Mes Ventes">
+                <Sales Criteria="2"></Sales>
             </MudExpansionPanel>
         </MudExpansionPanels>
-    </MudItem>
-        <MudItem xs="12">
         <SellCreditForm> </SellCreditForm>
-    </MudItem>
-</MudGrid>
+    </MudCardContent>
+</MudCard>
+

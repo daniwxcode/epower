@@ -29,7 +29,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.CashPower
         private string CurrentUserId { get; set; }
         private int _totalItems;
         private int _currentPage;
-        private List<PayementResponseBase> _pagedData;
+        private IEnumerable<PayementResponseBase> _pagedData;
         private MudTable<PayementResponseBase> _table;
         private ClaimsPrincipal _currentUser;
 
@@ -50,8 +50,8 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.CashPower
         {
             if (!string.IsNullOrWhiteSpace(_searchString))
             {
-                state.Page = 0;
-                state.PageSize = 5;
+                state.Page = state.Page;
+                state.PageSize = state.PageSize;
             }
             await GetDataAsync(state.Page, state.PageSize, state);
             return new TableData<PayementResponseBase> { TotalItems = _totalItems, Items = _pagedData };
@@ -64,7 +64,8 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.CashPower
             {
                 _totalItems = response.TotalCount;
                 _currentPage = response.CurrentPage;
-                _pagedData = response.Data.Where(_=>Search(_)).ToList();
+                var data = response.Data.Where(_=>Search(_)).ToList();
+                _pagedData = data.ToList();
             }
             else
             {

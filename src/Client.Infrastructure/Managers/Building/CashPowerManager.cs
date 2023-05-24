@@ -101,7 +101,7 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Building
                 criteriavalue == string.Empty ? BuildingEndpoints.CurrentUserSales : BuildingEndpoints.GetAllUserSales(criteriavalue),
                 _ => BuildingEndpoints.GetAllPayement
             };
-            var response = await _httpClient.GetAsync(url);
+            var response = await _httpClient.GetAsync(url+ $"?pageNumber={pageNumber+1}&pageSize={pageSize}");
             return await response.ToPaginatedResult<PayementResponseBase>();
         }
     }

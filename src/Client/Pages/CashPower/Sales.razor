@@ -18,7 +18,7 @@ else
     {
         <HeroTitle Title="@_localizer["Gestion Des Ventes"]" Description="@_localizer["Gestion des Ventes."]" />
     }
-    <MudTable @ref="_table" Loading="!_loaded" ServerData="@(new Func<TableState, Task<TableData<PayementResponseBase>>>(ServerReload))" Elevation="25" Hover="true" Dense="true" Bordered="true" Striped="true" Filter="new Func<PayementResponseBase, bool>(Search)">
+    <MudTable @ref="_table" ServerData="@(new Func<TableState, Task<TableData<PayementResponseBase>>>(ServerReload))" Elevation="25" Hover="true" Dense="true" Bordered="true" Striped="true">
         <ToolBarContent>
             <div class="justify-center mud-text-align-center">
                 <MudButton DisableElevation Variant="Variant.Filled" OnClick="@(() => OnSearch(""))" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Surface" Color="Color.Secondary" Style="margin-left: 5px;">@_localizer["Reload"]</MudButton>
@@ -32,7 +32,7 @@ else
             <MudTh><MudTableSortLabel SortBy="new Func<PayementResponseBase, object>(x => x.Amount)">@_localizer["Montant"]</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Id">@(_pagedData.IndexOf(context) + 1)</MudTd>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
                 <MudTd DataLabel="Date">
                     <MudHighlighter Text="@context.Date.ToShortDateString()" HighlightedText="@_searchString" />
                 </MudTd>
@@ -41,8 +41,7 @@ else
                 </MudTd>
             </RowTemplate>
             <PagerContent>
-                <MudTablePager RowsPerPageString="Ventes par Pages" PageSizeOptions="new int[]{1,2,5,10,20,50,100,1000}"></MudTablePager>
-               
+                <TablePager />
             </PagerContent>
         </MudTable>
 }
