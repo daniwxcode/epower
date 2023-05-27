@@ -23,6 +23,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
         public int MeterId { get; set; } = 0;
         public string SerialNumber { get; set; } = string.Empty;
         public Guid Reference { get; init; } = Guid.NewGuid();
+        
     }
     internal class MakeAPaymentCommandHandler : IRequestHandler<MakeAPaymentCommand, Result<BuyCreditResponse>>
     {
@@ -69,9 +70,21 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                 await _unitOfWork.Commit(cancellationToken);
                 return Result<BuyCreditResponse>.Success(new BuyCreditResponse(internalPayement.Id, (int)request.Amount, internalPayement.SerialNumber, internalPayement.InternalReference, DateTime.UtcNow, internalPayement.InternalReference, ceetvente.code, ceetvente.credit), "Vente Effectuée avec Succès!");
             }
+            var venteExt = await _ceetService.BuyCredit(new CreditRequest(request.SerialNumber, (int)request.Amount));
+            Payment payment = new Payment()
+            {
+                Id = 0,
+                Amount = request.Amount,
+                SerialNumber = request.SerialNumber,
+                Credits = (double)venteExt.credit,
+                InternalReference = request.Reference.ToString(),
+                ExternalReference = venteExt.reference
+            };
+            await db.AddAsync(payment);
+            await _unitOfWork.Commit(cancellationToken);
+            return await Result<BuyCreditResponse>.SuccessAsync(new BuyCreditResponse(payment.Id, (int)request.Amount, payment.SerialNumber, payment.InternalReference, DateTime.UtcNow, payment.InternalReference, venteExt.code, venteExt.credit),"Vente Effectué avec succès");
 
-            return await Result<BuyCreditResponse>.FailAsync("Vente des Compteurs Externes non actif");
-
+          
 
         }
     }

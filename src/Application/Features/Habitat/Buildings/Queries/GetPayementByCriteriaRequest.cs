@@ -47,7 +47,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Qu
         {
             PaginatedResult<PayementResponseBase> response = new PaginatedResult<PayementResponseBase>(new List<PayementResponseBase>());
             
-            var repo = _unitOfWork.Repository<Payment>().Entities;
+            var repo = _unitOfWork.Repository<Payment>().Entities.OrderByDescending(_=>_.CreatedOn);
 
             Expression<Func<Payment, PayementResponseBase>> expression = e => e.GetPayementResponse();
 

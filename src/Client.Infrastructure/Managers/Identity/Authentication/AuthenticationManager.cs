@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+
 using BlazorHero.CleanArchitecture.Application.Requests.Identity;
 using BlazorHero.CleanArchitecture.Application.Responses.Identity;
 using BlazorHero.CleanArchitecture.Client.Infrastructure.Authentication;
@@ -6,8 +7,10 @@ using BlazorHero.CleanArchitecture.Client.Infrastructure.Extensions;
 using BlazorHero.CleanArchitecture.Client.Infrastructure.Routes;
 using BlazorHero.CleanArchitecture.Shared.Constants.Storage;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
+
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Localization;
+
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -72,12 +75,22 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Identity.A
 
         public async Task<IResult> Logout()
         {
-            await _localStorage.RemoveItemAsync(StorageConstants.Local.AuthToken);
-            await _localStorage.RemoveItemAsync(StorageConstants.Local.RefreshToken);
-            await _localStorage.RemoveItemAsync(StorageConstants.Local.UserImageURL);
-            ((BlazorHeroStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
-            _httpClient.DefaultRequestHeaders.Authorization = null;
+            try
+            {
+                await _localStorage.RemoveItemAsync(StorageConstants.Local.AuthToken);
+                await _localStorage.RemoveItemAsync(StorageConstants.Local.RefreshToken);
+                await _localStorage.RemoveItemAsync(StorageConstants.Local.UserImageURL);
+                ((BlazorHeroStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
+                _httpClient.DefaultRequestHeaders.Authorization = null;
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+            }
+
             return await Result.SuccessAsync();
+
+
         }
 
         public async Task<string> RefreshToken()
