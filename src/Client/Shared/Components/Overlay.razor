@@ -1,0 +1,20 @@
+﻿@if (IsAbsolute)
+{
+    <MudOverlay Visible="MudOverlayIsVisible" LightBackground="true" ZIndex="99999" AutoClose="false">
+        <MudProgressCircular Color="Color.Primary" Size="Size.Large" Style="height:80px;width:80px;" Indeterminate="true" />
+    </MudOverlay>
+}
+else
+{
+    <MudOverlay Visible="MudOverlayIsVisible" LightBackground="true" Style="position: relative;" AutoClose="false">
+        <MudProgressCircular Color="Color.Primary" Size="Size.Large" Style="height:80px;width:80px;" Indeterminate="true" />
+    </MudOverlay>
+}
+
+
+@code {
+    [Parameter]
+    public bool MudOverlayIsVisible { get; set; } = true;
+    [Parameter]
+    public bool IsAbsolute { get; set; } = true;
+}

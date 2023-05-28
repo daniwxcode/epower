@@ -146,6 +146,9 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("CreditCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<double>("Credits")
                         .HasColumnType("float");
 
@@ -247,7 +250,7 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("MeterId")
+                    b.Property<int?>("MeterId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -888,9 +891,7 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
 
                     b.HasOne("BlazorHero.CleanArchitecture.Domain.Entities.Bail.Meter", "Meter")
                         .WithMany("Shops")
-                        .HasForeignKey("MeterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MeterId");
 
                     b.Navigation("Building");
 

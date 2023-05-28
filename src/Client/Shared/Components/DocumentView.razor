@@ -1,0 +1,15 @@
+﻿@page "/Visualize/{Url}"
+
+<Overlay MudOverlayIsVisible="@_isloading"></Overlay>
+<iframe id="Document" src="@Url" title="Appercu de Document" allowfullscreen @onload="Loaded"></iframe>
+
+
+@code {
+    [Parameter] public string Url { get; set; }
+    public bool _isloading = true;
+    public void Loaded(ProgressEventArgs e)
+    {
+        Console.WriteLine("IFrame loaded");
+        _isloading = false;
+    }
+}

@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Dashboard;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using BlazorHero.CleanArchitecture.Client.Extensions;
+using BlazorHero.CleanArchitecture.Application.Features.Dashboards.Queries.GetData;
+using ChartSeries = MudBlazor.ChartSeries;
 
 namespace BlazorHero.CleanArchitecture.Client.Pages.Content
 {
@@ -16,15 +18,10 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Content
         [Inject] private IDashboardManager DashboardManager { get; set; }
 
         [CascadingParameter] private HubConnection HubConnection { get; set; }
-        [Parameter] public int ProductCount { get; set; }
-        [Parameter] public int BrandCount { get; set; }
-        [Parameter] public int DocumentCount { get; set; }
-        [Parameter] public int DocumentTypeCount { get; set; }
-        [Parameter] public int DocumentExtendedAttributeCount { get; set; }
-        [Parameter] public int UserCount { get; set; }
-        [Parameter] public int RoleCount { get; set; }
+        [Parameter] public DashboardDataResponse Model { get; set; } 
+        
 
-        private readonly string[] _dataEnterBarChartXAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+        private readonly string[] _dataEnterBarChartXAxisLabels = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };       
         private readonly List<ChartSeries> _dataEnterBarChartSeries = new();
         private bool _loaded;
 
@@ -49,13 +46,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Content
             var response = await DashboardManager.GetDataAsync();
             if (response.Succeeded)
             {
-                ProductCount = response.Data.ProductCount;
-                BrandCount = response.Data.BrandCount;
-                DocumentCount = response.Data.DocumentCount;
-                DocumentTypeCount = response.Data.DocumentTypeCount;
-                DocumentExtendedAttributeCount = response.Data.DocumentExtendedAttributeCount;
-                UserCount = response.Data.UserCount;
-                RoleCount = response.Data.RoleCount;
+                Model= response.Data;
                 foreach (var item in response.Data.DataEnterBarChart)
                 {
                     _dataEnterBarChartSeries

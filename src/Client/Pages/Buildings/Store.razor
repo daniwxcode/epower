@@ -1,0 +1,59 @@
+﻿@page "/Stores"
+@page "/Building/{Id:int}/Stores"
+@attribute [Authorize()]
+@using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
+
+<style>
+    .mud-table-container {
+        overflow: auto;
+    }
+</style>
+
+<HeroTitle Title="@_localizer["Boutiques"]" Description="@_localizer["Gestion des Boutiques."]" />
+@if (!_loaded)
+{
+    <Overlay MudOverlayIsVisible="@(!_loaded)" />   
+}
+else
+{
+    <MudTable Hover="true" Elevation="25" Items="_List" Dense="true" Bordered="true" Striped="true" Filter="new Func<ShopResponseBase, bool>(Search)" @bind-brand="item">
+        <ToolBarContent>
+            <div class="justify-center mud-text-align-center">
+                <MudButton Disabled="@(Id==0)" DisableElevation Variant="Variant.Filled" OnClick="(()=> InvokeModal())" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Surface">@_localizer["Enregistrer une Boutique"]</MudButton>
+                <MudButton DisableElevation Variant="Variant.Filled" OnClick="GetBuildingAsync" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Surface" Color="Color.Secondary" Style="margin-left: 5px;">@_localizer["Reload"]</MudButton>
+            </div>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Immediate="true" Placeholder="@_localizer["Rechercher"]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0 mb-3"></MudTextField>
+
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<ShopResponseBase, object>(x => x.Id)">@_localizer["N°"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ShopResponseBase, object>(x => x.BuildingName)">@_localizer["Immeuble"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ShopResponseBase, object>(x => x.Meter.code)">@_localizer["Compteur"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ShopResponseBase, object>(x => x.Name)">@_localizer["Libellé"]</MudTableSortLabel></MudTh>
+            <MudTh Style="text-align:right">@_localizer["Actions"]</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@(_List.IndexOf(context) + 1)</MudTd>
+                <MudTd DataLabel="Immeuble">
+                    <MudHighlighter Text="@context.BuildingName" HighlightedText="@_searchString" />
+                </MudTd>
+                <MudTd DataLabel="Libellé">
+                    <MudHighlighter Text="@context.Name" HighlightedText="@_searchString" />
+                </MudTd>
+                <MudTd DataLabel="Compteur">
+                    <MudHighlighter Text="@DisplayMeter(context.Meter)" HighlightedText="@_searchString" />
+                </MudTd>
+                <MudTd DataLabel="Actions" Style="text-align: right">
+                    <MudMenu Label="@_localizer["Actions"]" Variant="Variant.Filled" DisableElevation="true" EndIcon="@Icons.Filled.KeyboardArrowDown" IconColor="Color.Secondary" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopLeft">
+                        <MudMenuItem OnClick="(()=>ViewProfile(context.Id))">@_localizer["Détails"]</MudMenuItem>
+                        <MudMenuItem Disabled="@(Id==0)" @onclick="@(() => InvokeModal(@context.Id))">@_localizer["Modifier"]</MudMenuItem>
+                        <MudMenuItem @onclick="@(() => Delete(@context.Id))">@_localizer["Supprimer"]</MudMenuItem>
+                    </MudMenu>
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <TablePager />
+            </PagerContent>
+        </MudTable>
+}

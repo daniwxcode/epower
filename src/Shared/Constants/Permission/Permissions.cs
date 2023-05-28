@@ -18,6 +18,27 @@ namespace BlazorHero.CleanArchitecture.Shared.Constants.Permission
             public const string Export = "Permissions.Products.Export";
             public const string Search = "Permissions.Products.Search";
         }
+        [DisplayName("CashPower")]
+        [Description("CashPower Permissions")]
+        public static class CashPower
+        {
+            public const string View = "Permissions.CashPower.View";
+            public const string Create = "Permissions.CashPower.Create";
+            public const string Edit = "Permissions.CashPower.Edit";
+            public const string Export = "Permissions.CashPower.Export";
+            public const string Search = "Permissions.CashPower.Search";
+        }
+        [DisplayName("BuildingParams")]
+        [Description("BuildingParams Permissions")]
+        public static class BuildingParams
+        {
+            public const string View = "Permissions.BuildingParams.View";
+            public const string Create = "Permissions.BuildingParams.Create";
+            public const string Edit = "Permissions.BuildingParams.Edit";
+            public const string Delete = "Permissions.BuildingParams.Delete";
+            public const string Export = "Permissions.BuildingParams.Export";
+            public const string Search = "Permissions.BuildingParams.Search";
+        }
 
         [DisplayName("Brands")]
         [Description("Brands Permissions")]

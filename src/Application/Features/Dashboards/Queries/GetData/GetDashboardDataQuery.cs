@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using BlazorHero.CleanArchitecture.Domain.Entities.ExtendedAttributes;
 using BlazorHero.CleanArchitecture.Domain.Entities.Misc;
 using Microsoft.Extensions.Localization;
+using BlazorHero.CleanArchitecture.Domain.Entities.Bail;
 
 namespace BlazorHero.CleanArchitecture.Application.Features.Dashboards.Queries.GetData
 {
@@ -38,39 +39,38 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Dashboards.Queries.G
         {
             var response = new DashboardDataResponse
             {
-                ProductCount = await _unitOfWork.Repository<Product>().Entities.CountAsync(cancellationToken),
-                BrandCount = await _unitOfWork.Repository<Brand>().Entities.CountAsync(cancellationToken),
-                DocumentCount = await _unitOfWork.Repository<Document>().Entities.CountAsync(cancellationToken),
-                DocumentTypeCount = await _unitOfWork.Repository<DocumentType>().Entities.CountAsync(cancellationToken),
-                DocumentExtendedAttributeCount = await _unitOfWork.Repository<DocumentExtendedAttribute>().Entities.CountAsync(cancellationToken),
+                BuildingCount = await _unitOfWork.Repository<Building>().Entities.CountAsync(cancellationToken),
+                MeterCount = await _unitOfWork.Repository<Meter>().Entities.CountAsync(cancellationToken),
+                StoreCount = await _unitOfWork.Repository<Shop>().Entities.CountAsync(cancellationToken),
+                SalesCount = await _unitOfWork.Repository<Payment>().Entities.CountAsync(cancellationToken),                
+                SalesSum =(int) await _unitOfWork.Repository<Payment>().Entities.SumAsync(_=>_.Amount,cancellationToken),                
                 UserCount = await _userService.GetCountAsync(),
                 RoleCount = await _roleService.GetCountAsync()
             };
 
             var selectedYear = DateTime.Now.Year;
-            double[] productsFigure = new double[13];
-            double[] brandsFigure = new double[13];
-            double[] documentsFigure = new double[13];
-            double[] documentTypesFigure = new double[13];
-            double[] documentExtendedAttributesFigure = new double[13];
+            double[] buildingFigure = new double[13];
+            double[] storeFigure = new double[13];
+            double[] meterFigure = new double[13];
+            double[] payementFigure = new double[13];
+           
             for (int i = 1; i <= 12; i++)
             {
                 var month = i;
                 var filterStartDate = new DateTime(selectedYear, month, 01);
                 var filterEndDate = new DateTime(selectedYear, month, DateTime.DaysInMonth(selectedYear, month), 23, 59, 59); // Monthly Based
 
-                productsFigure[i - 1] = await _unitOfWork.Repository<Product>().Entities.Where(x => x.CreatedOn >= filterStartDate && x.CreatedOn <= filterEndDate).CountAsync(cancellationToken);
-                brandsFigure[i - 1] = await _unitOfWork.Repository<Brand>().Entities.Where(x => x.CreatedOn >= filterStartDate && x.CreatedOn <= filterEndDate).CountAsync(cancellationToken);
-                documentsFigure[i - 1] = await _unitOfWork.Repository<Document>().Entities.Where(x => x.CreatedOn >= filterStartDate && x.CreatedOn <= filterEndDate).CountAsync(cancellationToken);
-                documentTypesFigure[i - 1] = await _unitOfWork.Repository<DocumentType>().Entities.Where(x => x.CreatedOn >= filterStartDate && x.CreatedOn <= filterEndDate).CountAsync(cancellationToken);
-                documentExtendedAttributesFigure[i - 1] = await _unitOfWork.Repository<DocumentExtendedAttribute>().Entities.Where(x => x.CreatedOn >= filterStartDate && x.CreatedOn <= filterEndDate).CountAsync(cancellationToken);
+                buildingFigure[i - 1] = await _unitOfWork.Repository<Building>().Entities.Where(x => x.CreatedOn >= filterStartDate && x.CreatedOn <= filterEndDate).CountAsync(cancellationToken);
+
+                storeFigure[i - 1] = await _unitOfWork.Repository<Shop>().Entities.Where(x => x.CreatedOn >= filterStartDate && x.CreatedOn <= filterEndDate).CountAsync(cancellationToken);
+                meterFigure[i - 1] = await _unitOfWork.Repository<Meter>().Entities.Where(x => x.CreatedOn >= filterStartDate && x.CreatedOn <= filterEndDate).CountAsync(cancellationToken);
+                payementFigure[i - 1] = await _unitOfWork.Repository<Payment>().Entities.Where(x => x.CreatedOn >= filterStartDate && x.CreatedOn <= filterEndDate).CountAsync(cancellationToken);               
             }
 
-            response.DataEnterBarChart.Add(new ChartSeries { Name = _localizer["Products"], Data = productsFigure });
-            response.DataEnterBarChart.Add(new ChartSeries { Name = _localizer["Brands"], Data = brandsFigure });
-            response.DataEnterBarChart.Add(new ChartSeries { Name = _localizer["Documents"], Data = documentsFigure });
-            response.DataEnterBarChart.Add(new ChartSeries { Name = _localizer["Document Types"], Data = documentTypesFigure });
-            response.DataEnterBarChart.Add(new ChartSeries { Name = _localizer["Document Extended Attributes"], Data = documentExtendedAttributesFigure });
+            response.DataEnterBarChart.Add(new ChartSeries { Name = _localizer["Immeubles"], Data = buildingFigure });
+            response.DataEnterBarChart.Add(new ChartSeries { Name = _localizer["Boutiques"], Data = storeFigure });
+            response.DataEnterBarChart.Add(new ChartSeries { Name = _localizer["Compteurs"], Data = meterFigure });
+            response.DataEnterBarChart.Add(new ChartSeries { Name = _localizer["Ventes"], Data = payementFigure });          
 
             return await Result<DashboardDataResponse>.SuccessAsync(response);
         }

@@ -59,6 +59,13 @@
     <Folder Include="Files\Images\ProfilePictures\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Views\Bordereau\Index.cshtml" />
+    <None Include="Views\Shared\Error.cshtml" />
+    <None Include="Views\Shared\_Layout.cshtml" />
+    <None Include="Views\_ViewImports.cshtml" />
+    <None Include="Views\_ViewStart.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="Files\Images\Products\demo.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -1,0 +1,47 @@
+﻿@page "/Sales"
+@attribute [Authorize()]
+@using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
+
+<style>
+    .mud-table-container {
+        overflow: auto;
+    }
+</style>
+
+@if (!_loaded)
+{
+    <Overlay MudOverlayIsVisible="@(!_loaded)" />
+}
+else
+{
+    @if (Criteria==0)
+    {
+        <HeroTitle Title="@_localizer["Gestion Des Ventes"]" Description="@_localizer["Gestion des Ventes."]" />
+    }
+    <MudTable @ref="_table" ServerData="@(new Func<TableState, Task<TableData<PayementResponseBase>>>(ServerReload))" Elevation="25" Hover="true" Dense="true" Bordered="true" Striped="true">
+        <ToolBarContent>
+            <div class="justify-center mud-text-align-center">
+                <MudButton DisableElevation Variant="Variant.Filled" OnClick="@(() => OnSearch(""))" StartIcon="@Icons.Material.Filled.Refresh" IconColor="Color.Surface" Color="Color.Secondary" Style="margin-left: 5px;">@_localizer["Reload"]</MudButton>
+            </div>
+            <MudSpacer />
+            <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="@_localizer["Rechercher"]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<PayementResponseBase, object>(x => x.Id)">@_localizer["N°"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<PayementResponseBase, object>(x => x.Date)">@_localizer["Date Opération"]</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<PayementResponseBase, object>(x => x.Amount)">@_localizer["Montant"]</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Date">
+                    <MudHighlighter Text="@context.Date.ToShortDateString()" HighlightedText="@_searchString" />
+                </MudTd>
+                <MudTd DataLabel="Montant">
+                    <MoneyField>@context.Amount</MoneyField>
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <TablePager />
+            </PagerContent>
+        </MudTable>
+}

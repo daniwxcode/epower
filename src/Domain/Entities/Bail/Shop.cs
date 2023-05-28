@@ -16,9 +16,9 @@ namespace BlazorHero.CleanArchitecture.Domain.Entities.Bail
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Le nom du magasin doit contenir entre 3 et 50 caractères.")]
         public string Name { get; set; }
 
-        public int MeterId { get; set; }
+        public int? MeterId { get; set; }
 
-        public Meter Meter { get; set; }
+        public Meter? Meter { get; set; }
         public List<InternalPayement> Payments { get; set; } = new();
         public List<RentalAgreement> RentalAgreements { get; set; } = new();
     }

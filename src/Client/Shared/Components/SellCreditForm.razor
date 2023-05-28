@@ -1,0 +1,29 @@
+﻿<Overlay MudOverlayIsVisible="@(loading)" />
+<MudGrid>
+    @if (canSellAgain)
+    {
+        <MudItem xs="12" md="getSize">
+            <EditForm Model="Model" OnValidSubmit="SaveAsync">
+                <MudCard Outlined="true">
+                    <MudCardContent>
+                        <MudText>Effectuer Une Vente</MudText>
+                        <MudTextField @bind-Value="@Model.SerialNumber" Immediate="true" Placeholder="@_localizer["Numéro Compteur"]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.ElectricalServices" IconSize="Size.Medium" Class="mt-0 mb-3"></MudTextField>
+                        <MoneyTextField T='decimal' Min="0" Immediate="true" HideSpinButtons="true" @bind-Value="@Model.Amount"></MoneyTextField>
+                        <MudCardActions>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined" Color="Color.Primary">Valider</MudButton>
+                        </MudCardActions>
+                    </MudCardContent>
+                </MudCard>
+            </EditForm>
+        </MudItem>
+    }
+    <MudItem xs="12" md="getSize">
+        <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Outlined.AddCircle" OnClick="reset">Effectuer une Nouvelle Vente</MudButton>
+        <Receipt Serial="@Model.SerialNumber" Sold="!canSellAgain" Code="@Code" Kw="@Kw" Ref="@Ref" Amount="Model.Amount" />
+    </MudItem>
+</MudGrid>
+
+
+
+
+

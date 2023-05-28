@@ -24,8 +24,8 @@ public class AddEditStoreCommand : IRequest<Result<int>>
     public int BuildingId { get; set; }
     public string Name { get; set; }
     public int MeterId { get; set; } = 0;
-    
-  
+
+
 
 }
 
@@ -47,33 +47,34 @@ internal class AddEditStoreCommandHandler : IRequestHandler<AddEditStoreCommand,
     {
         _unitOfWork = unitOfWork;
     }
-    
+
     public async Task<Result<int>> Handle(AddEditStoreCommand command, CancellationToken cancellationToken)
     {
         var shopRepos = _unitOfWork.Repository<Shop>();
         if (await shopRepos.Entities.Where(p => p.Id != command.Id)
-                .AnyAsync(p => p.Name == command.Name && p.BuildingId== command.BuildingId, cancellationToken))
+                .AnyAsync(p => p.Name == command.Name && p.BuildingId == command.BuildingId, cancellationToken))
         {
             return await Result<int>.FailAsync("Boutique déjà Existante.");
-        }        
+        }
         Meter dbMeter = await _unitOfWork.Repository<Meter>().GetByIdAsync(command.MeterId);
 
-        if (command.MeterId>0 && dbMeter is null)
+        if (command.MeterId > 0)
         {
-            return await Result<int>.FailAsync("Le compteur est inexistant");
-        }
-        if (dbMeter.BuildingId != command.BuildingId)
-        {
-            return await Result<int>.FailAsync("Le compteur et la Boutique ne sont pas dans le même Immeuble");
-        }
+            if (dbMeter is null)
+                return await Result<int>.FailAsync("Le compteur est inexistant");
 
+            if (dbMeter.BuildingId != command.BuildingId)
+                return await Result<int>.FailAsync("Le compteur et la Boutique ne sont pas dans le même Immeuble");
+
+        }
         if (command.Id == 0)
         {
             Shop shop = new Shop()
             {
                 Id = command.Id,
                 Name = command.Name,
-                BuildingId = command.BuildingId,                
+                BuildingId = command.BuildingId,
+                MeterId = null
             };
             if (dbMeter != null)
             {

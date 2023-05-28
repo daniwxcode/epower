@@ -4,48 +4,34 @@
 <UserCard />
 <MudNavMenu>
     <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Home">@_localizer["Home"]</MudNavLink>
-    @if (_canViewHangfire)
-    {
-        <MudNavLink Href="/jobs" Target="_blank" Icon="@Icons.Material.Outlined.Work">
-            @_localizer["Hangfire"]
-        </MudNavLink>
-    }   
-    <MudNavLink Href="/swagger/index.html" Target="_blank" Icon="@Icons.Material.Outlined.LiveHelp">
-        @_localizer["Swagger"]
-    </MudNavLink>
+    <MudNavLink Href="/pos" Icon="@Icons.Material.Outlined.PointOfSale">Point de Ventes</MudNavLink>
     <MudListSubheader Class="mt-2 mb-n2">@_localizer["Personal"]</MudListSubheader>
     @if (_canViewDashboards)
     {
         <MudNavLink Href="/dashboard" Icon="@Icons.Material.Outlined.Dashboard">
             @_localizer["Dashboard"]
         </MudNavLink>
+        <MudNavLink Href="/sales" Icon="@Icons.Material.Outlined.ShoppingBag">
+            @_localizer["Ventes"]
+        </MudNavLink>
     }
+
     <MudNavLink Href="/account" Icon="@Icons.Material.Outlined.SupervisorAccount">
         @_localizer["Account"]
     </MudNavLink>
-    @if (_canViewAuditTrails)
-    {
-        <MudNavLink Href="/audit-trails" Icon="@Icons.Material.Outlined.Security">
-            @_localizer["Audit Trails"]
-        </MudNavLink>
-    }
-    @if (_canViewDocuments || _canViewDocumentTypes)
-    {
-        <MudListSubheader Class="mt-2 mb-n2">@_localizer["Document Management"]</MudListSubheader>
-        @if (_canViewDocuments)
-        {
-            <MudNavLink Href="/document-store" Icon="@Icons.Material.Outlined.AttachFile">
-                @_localizer["Document Store"]
-            </MudNavLink>
-        }
-        @if (_canViewDocumentTypes)
-        {
-            <MudNavLink Href="/document-types" Icon="@Icons.Material.Outlined.FileCopy">
-                @_localizer["Document Types"]
-            </MudNavLink>
-        }
-    }
+    <MudDivider></MudDivider>
+    <MudListSubheader Class="mt-2 mb-n2">@_localizer["Gestion Immobilière"]</MudListSubheader>
 
+    <MudNavLink Href="/Buildings" Icon="@Icons.Material.Outlined.Business">
+        @_localizer["Immeubles"]
+    </MudNavLink>
+    <MudNavLink Href="/Stores" Icon="@Icons.Material.Outlined.Storefront">
+        @_localizer["Boutiques"]
+    </MudNavLink>
+    <MudNavLink Href="/Meters" Icon="@Icons.Material.Outlined.ElectricalServices">
+        @_localizer["Compteurs"]
+    </MudNavLink>
+    <MudDivider></MudDivider>
     @if (_canViewUsers || _canViewRoles)
     {
         <MudListSubheader Class="mt-2 mb-n2">@_localizer["Administrator"]</MudListSubheader>
@@ -60,29 +46,8 @@
             <MudNavLink Href="/identity/roles" Icon="@Icons.Material.Outlined.Person">@_localizer["Roles"]</MudNavLink>
         }
     }
-    @if (_canViewChat)
-    {
-        <MudListSubheader Class="mt-2 mb-n2">@_localizer["Communication"]</MudListSubheader>
-        <MudNavLink Href="/chat" Icon="@Icons.Material.Outlined.Chat">
-            @_localizer["Chat"]
-        </MudNavLink>
-    }
-    @if (_canViewProducts || _canViewBrands)
-    {
-        <MudListSubheader Class="mt-2 mb-n2">@_localizer["Catalog Management"]</MudListSubheader>
-        @if (_canViewProducts)
-        {
-            <MudNavLink Href="/catalog/products" Icon="@Icons.Material.Outlined.CallToAction">
-                @_localizer["Products"]
-            </MudNavLink>
-        }
-        @if (_canViewBrands)
-        {
-            <MudNavLink Href="/catalog/brands" Icon="@Icons.Material.Outlined.CallToAction">
-                @_localizer["Brands"]
-            </MudNavLink>
-        }
-    }
+ 
+
 </MudNavMenu>
 
 @code {

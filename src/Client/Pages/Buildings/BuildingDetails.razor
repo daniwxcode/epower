@@ -1,0 +1,20 @@
+﻿@page "/Building/Details/{Id:int}"
+@attribute [Authorize()]
+<MudTabs Elevation="1" Rounded="true" PanelClass="pa-6">
+    <MudTabPanel Text="Boutiques">
+        <ChildContent>           
+            <Store Id="Id" />
+        </ChildContent>        
+    </MudTabPanel>
+    <MudTabPanel Text="Compteurs">
+        <ChildContent>
+            <Meters Id="Id"/>
+        </ChildContent>
+    </MudTabPanel>
+</MudTabs>
+
+
+@code {
+    [Parameter]
+    public int Id{ get; set; }
+}
