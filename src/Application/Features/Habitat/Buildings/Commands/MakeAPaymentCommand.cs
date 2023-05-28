@@ -72,7 +72,8 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                     Id = 0,
                     Credits = (double)ceetvente.credit,
                     ExternalReference = ceetvente.reference,
-                    MeterId = dbMeter.Id
+                    MeterId = dbMeter.Id,
+                    CreditCode = ceetvente.code
                 };
                 await db.AddAsync(internalPayement);
                 await _unitOfWork.Commit(cancellationToken);
@@ -87,6 +88,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                 Credits = (double)venteExt.credit,
                 InternalReference = request.Reference.ToString(),
                 ExternalReference = venteExt.reference,
+                CreditCode = venteExt.code
                 
             };
             await db.AddAsync(payment);

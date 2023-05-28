@@ -10,6 +10,7 @@ namespace BlazorHero.CleanArchitecture.Domain.Entities.Bail
         public string SerialNumber { get; set; }
         [Required(ErrorMessage = "La référence externe du paiement est requise.")]
         public string ExternalReference { get; set; }
+        public string? CreditCode { get; set; }
 
         [Required(ErrorMessage = "La référence interne du paiement est requise.")]
         public string InternalReference { get; set; }
