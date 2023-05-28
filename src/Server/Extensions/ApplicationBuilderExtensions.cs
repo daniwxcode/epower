@@ -60,6 +60,9 @@ namespace BlazorHero.CleanArchitecture.Server.Extensions
                 endpoints.MapControllers();
                 endpoints.MapFallbackToFile("index.html");
                 endpoints.MapHub<SignalRHub>(ApplicationConstants.SignalR.HubUrl);
+                endpoints.MapControllerRoute(
+                   name: "Bordereau",
+                   pattern: "Bordereau/{controller=Bordereau}/{action=Index}/");
             });
 
         internal static IApplicationBuilder UseRequestLocalizationByCulture(this IApplicationBuilder app)
