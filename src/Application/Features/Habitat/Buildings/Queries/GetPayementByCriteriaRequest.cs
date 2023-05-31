@@ -3,6 +3,7 @@ using BlazorHero.CleanArchitecture.Application.Features.Documents.Queries.GetAll
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Enums;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Repositories;
+using BlazorHero.CleanArchitecture.Application.Interfaces.Services.Identity;
 using BlazorHero.CleanArchitecture.Domain.Entities.Bail;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
 
@@ -39,20 +40,19 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Qu
     internal class GetPayementByCriteriaRequestHandler : IRequestHandler<GetPayementByCriteriaRequest, PaginatedResult<PayementResponseBase>>
     {
         private readonly IUnitOfWork<int> _unitOfWork;
-        public GetPayementByCriteriaRequestHandler(IUnitOfWork<int> unitOfWork)
+        private IUserService _userService;
+        public GetPayementByCriteriaRequestHandler(IUnitOfWork<int> unitOfWork,IUserService userService)
         {
             _unitOfWork = unitOfWork;
+            _userService = userService;
         }
         public async Task<PaginatedResult<PayementResponseBase>> Handle(GetPayementByCriteriaRequest request, CancellationToken cancellationToken)
         {
             PaginatedResult<PayementResponseBase> response = new PaginatedResult<PayementResponseBase>(new List<PayementResponseBase>());
             
-            var repo = _unitOfWork.Repository<Payment>().Entities;
+            var repo = _unitOfWork.Repository<Payment>().Entities.OrderByDescending(_=>_.CreatedOn);
 
-            Expression<Func<Payment, PayementResponseBase>> expression = e => e.GetPayementResponse();
-
-
-
+            Expression<Func<Payment, PayementResponseBase>> expression =  e =>  e.GetPayementResponse(_userService).Result;
 
             response = request.PaymentRequestCriteria switch
             {

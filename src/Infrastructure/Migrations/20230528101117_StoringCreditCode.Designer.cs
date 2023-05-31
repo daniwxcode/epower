@@ -4,6 +4,7 @@ using BlazorHero.CleanArchitecture.Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
 {
     [DbContext(typeof(BlazorHeroContext))]
-    partial class BlazorHeroContextModelSnapshot : ModelSnapshot
+    [Migration("20230528101117_StoringCreditCode")]
+    partial class StoringCreditCode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -826,7 +828,12 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
                     b.Property<int>("MeterId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ShopId")
+                        .HasColumnType("int");
+
                     b.HasIndex("MeterId");
+
+                    b.HasIndex("ShopId");
 
                     b.HasDiscriminator().HasValue("InternalPayement");
                 });
@@ -987,6 +994,10 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BlazorHero.CleanArchitecture.Domain.Entities.Bail.Shop", null)
+                        .WithMany("Payments")
+                        .HasForeignKey("ShopId");
+
                     b.Navigation("Meter");
                 });
 
@@ -1006,6 +1017,8 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Migrations
 
             modelBuilder.Entity("BlazorHero.CleanArchitecture.Domain.Entities.Bail.Shop", b =>
                 {
+                    b.Navigation("Payments");
+
                     b.Navigation("RentalAgreements");
                 });
 
