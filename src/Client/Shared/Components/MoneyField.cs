@@ -13,7 +13,7 @@ public class MoneyTextField<T> : MudNumericField<T>
         Adornment = Adornment.End;
         AdornmentText = "FCFA";
         Variant = Variant.Outlined;
-        Culture = CultureInfo.GetCultureInfo("fr-FR");
+        Culture = CultureInfo.GetCultureInfo("de-DE");
 
     }
 }
