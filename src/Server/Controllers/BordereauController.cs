@@ -19,6 +19,10 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers;
 
 public class BordereauController :BaseController<BordereauController>
 {
+    public BordereauController()
+    {
+        IronBarCode.License.LicenseKey = "IRONBARCODE.OTR.IRO220405.2499.75108.504022-92695B55F6-MI4TIJJBMV35W-242HXZLQLEEE-6VRWU2Q6HBOH-AN3VQOJ6EFND-K2NZ35UK75TP-LPYTJQ-LXEIT7NCVGOJUA-UNLIMITED.SUB-3ULKQ4.RENEW.SUPPORT.13.MAY.2023";
+    }
     [HttpGet]
     [AllowAnonymous]
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.Any)]
