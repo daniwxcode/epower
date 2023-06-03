@@ -112,7 +112,7 @@ background-repeat:repeat; background-size: 192.9px 106.1px;background-color: rgb
         <table class='standard-text' style="width: 100%; margin-right: auto; margin-left: auto;">
             <tr>
                 <td class="logo" style='width:70%;'>
-                    @*Html.Raw(Model.QrCode)*@
+                    <img src="@ViewData["QrCode"]" />
                 </td>
                 <td style="text-align: center; ">
                     VENDEUR:<br/> @Model.Seller

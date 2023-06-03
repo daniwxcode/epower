@@ -1,6 +1,7 @@
 ﻿@page "/Sales"
 @attribute [Authorize()]
 @using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
+@using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 
 <style>
     .mud-table-container {
@@ -45,6 +46,7 @@ else
             <MudTd DataLabel="Date">
                 <MudHighlighter Text="@context.Date.ToShortDateString()" HighlightedText="@_searchString" />
             </MudTd>
+            
             <MudTd DataLabel="Montant">
                 <b>@context.Amount.ToString("# ### ### ###") FCFA</b>
             </MudTd>
@@ -54,6 +56,10 @@ else
                     @context.Agent
                 </MudTd>
             }
+            <MudTd>
+                <MudNavLink Target="blank" Href="@ApplicationConstants.FileConstants.GetReceipt(context.Id)" Icon="@Icons.Material.Outlined.Print">
+                    @_localizer["Reçu"]
+                </MudNavLink> </MudTd>
         </RowTemplate>
         <PagerContent>
             <TablePager />

@@ -56,6 +56,7 @@
     <ProjectReference Include="..\Client\Client.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Files\Bordereaux\" />
     <Folder Include="Files\Images\ProfilePictures\" />
   </ItemGroup>
   <ItemGroup>

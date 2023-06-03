@@ -4,6 +4,7 @@ using BlazorHero.CleanArchitecture.Application.Interfaces.Services;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Services.Identity;
 using BlazorHero.CleanArchitecture.Application.Responses.Identity;
 using BlazorHero.CleanArchitecture.Domain.Entities.Bail;
+using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
 
 using MediatR;
@@ -21,6 +22,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
 {
     public class MakeAPaymentCommand : IRequest<Result<BuyCreditResponse>>
     {
+        public string Orign { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public int MeterId { get; set; } = 0;
         public string SerialNumber { get; set; } = string.Empty;
@@ -33,13 +35,14 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
         private readonly ICeetService _ceetService;
         private readonly ICurrentUserService _currentUserService;
         private readonly IUserService _userService;
-         public MakeAPaymentCommandHandler(IUnitOfWork<int> unitOfWork, ICeetService ceetService, ICurrentUserService currentUserService,IUserService userService)
+        private readonly IPdfService _pdfService;
+         public MakeAPaymentCommandHandler(IUnitOfWork<int> unitOfWork, ICeetService ceetService, ICurrentUserService currentUserService, IUserService userService, IPdfService pdfService)
         {
             _unitOfWork = unitOfWork;
             _ceetService = ceetService;
             _currentUserService = currentUserService;
             _userService = userService;
-
+            _pdfService = pdfService;
         }
         public async Task<Result<BuyCreditResponse>> Handle(MakeAPaymentCommand request, CancellationToken cancellationToken)
         {
@@ -77,6 +80,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                 };
                 await db.AddAsync(internalPayement);
                 await _unitOfWork.Commit(cancellationToken);
+                await _pdfService.GeneratePdf(ApplicationConstants.FileConstants.Url(request.Orign, internalPayement.Id), ApplicationConstants.FileConstants.GetReceipt(internalPayement.Id));
                 return Result<BuyCreditResponse>.Success(new BuyCreditResponse(internalPayement.Id, (int)request.Amount, internalPayement.SerialNumber, internalPayement.InternalReference, DateTime.UtcNow, internalPayement.InternalReference, ceetvente.code, ceetvente.credit,user.Data.UserFullName ), "Vente Effectuée avec Succès!");
             }
             var venteExt = await _ceetService.BuyCredit(new CreditRequest(request.SerialNumber, (int)request.Amount));
@@ -93,9 +97,9 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
             };
             await db.AddAsync(payment);
             await _unitOfWork.Commit(cancellationToken);
+
+            await _pdfService.GeneratePdf(ApplicationConstants.FileConstants.Url(request.Orign, payment.Id), ApplicationConstants.FileConstants.GetReceipt(payment.Id));
             return await Result<BuyCreditResponse>.SuccessAsync(new BuyCreditResponse(payment.Id, (int)request.Amount, payment.SerialNumber, payment.InternalReference, DateTime.UtcNow, payment.InternalReference, venteExt.code, venteExt.credit, user.Data.UserFullName), "Vente Effectué avec succès");
-
-
 
         }
     }

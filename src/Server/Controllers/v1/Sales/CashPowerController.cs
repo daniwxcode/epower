@@ -27,6 +27,7 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Sales
         [Authorize(Policy = Permissions.CashPower.Create)]
         public async Task<IActionResult> SellCredit(MakeAPaymentCommand command)
         {
+            command.Orign = Request.Headers["origin"];
             return Ok(await _mediator.Send(command));
         }
 
