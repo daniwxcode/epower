@@ -1,4 +1,6 @@
-﻿namespace BlazorHero.CleanArchitecture.Application.Responses.Identity
+﻿using BlazorHero.CleanArchitecture.Shared.Models;
+
+namespace BlazorHero.CleanArchitecture.Application.Responses.Identity
 {
     public class UserResponse
     {
@@ -11,5 +13,6 @@
         public bool EmailConfirmed { get; set; }
         public string PhoneNumber { get; set; }
         public string ProfilePictureDataUrl { get; set; }
+        public string UserFullName { get { return $"{LastName.ToUpper()} {FirstName}"; } }
     }
 }

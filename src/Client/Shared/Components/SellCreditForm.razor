@@ -17,8 +17,12 @@
             </EditForm>
         </MudItem>
     }
-    <MudItem xs="12" md="getSize">
-        <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Outlined.AddCircle" OnClick="reset">Effectuer une Nouvelle Vente</MudButton>
+    <MudItem xs="12" md="getSize">       
+            <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Outlined.AddCircle" OnClick="reset">Effectuer une Nouvelle Vente</MudButton>         
+            @if (venteId != 0)
+            {
+                <MudButton Color="Color.Tertiary" StartIcon="@Icons.Material.Outlined.Print" OnClick="(()=>Afficher())">Reçu de Vente</MudButton>
+            }       
         <Receipt Serial="@Model.SerialNumber" Sold="!canSellAgain" Code="@Code" Kw="@Kw" Ref="@Ref" Amount="Model.Amount" />
     </MudItem>
 </MudGrid>

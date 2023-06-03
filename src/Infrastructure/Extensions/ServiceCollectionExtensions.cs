@@ -12,6 +12,8 @@ using BlazorHero.CleanArchitecture.Infrastructure.Services.Storage;
 using BlazorHero.CleanArchitecture.Application.Serialization.Options;
 using BlazorHero.CleanArchitecture.Infrastructure.Services.Storage.Provider;
 using BlazorHero.CleanArchitecture.Application.Serialization.Serializers;
+using BlazorHero.CleanArchitecture.Application.Interfaces.Services;
+using BlazorHero.CleanArchitecture.Infrastructure.Services;
 
 namespace BlazorHero.CleanArchitecture.Infrastructure.Extensions
 {
@@ -30,7 +32,8 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Extensions
                 .AddTransient<IBrandRepository, BrandRepository>()
                 .AddTransient<IDocumentRepository, DocumentRepository>()
                 .AddTransient<IDocumentTypeRepository, DocumentTypeRepository>()
-                .AddTransient(typeof(IUnitOfWork<>), typeof(UnitOfWork<>));
+                .AddTransient(typeof(IUnitOfWork<>), typeof(UnitOfWork<>))
+            .AddSingleton<IPdfService, PDFService>();
         }
 
         public static IServiceCollection AddExtendedAttributesUnitOfWork(this IServiceCollection services)

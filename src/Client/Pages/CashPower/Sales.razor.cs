@@ -2,6 +2,7 @@
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Enums;
 using BlazorHero.CleanArchitecture.Client.Extensions;
+using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -79,6 +80,10 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.CashPower
         {
             _searchString = text;
             _table.ReloadServerData();
+        }
+        public void Print(int id)
+        {
+            _navigationManager.NavigateTo(ApplicationConstants.FileConstants.GetReceipt(id),true);
         }
         private bool Search(PayementResponseBase item)
         {

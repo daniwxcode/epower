@@ -4,6 +4,17 @@ namespace BlazorHero.CleanArchitecture.Shared.Constants.Application
 {
     public static class ApplicationConstants
     {
+        public static class FileConstants
+        {
+            public const string Root = "Files";
+            public const string Receipt = "Bordereaux";
+            public static string Url(string origin, int id) =>
+                $"{origin}/bordereau/bordereau/Index/?Id={id}";
+            public static string GetReceipt(int id) => System.IO.Path.Combine(Root, Receipt, id.ToString()+".pdf");
+
+        }
+
+
         #region Building
         public static class BuildingsCache
         {
@@ -21,7 +32,8 @@ namespace BlazorHero.CleanArchitecture.Shared.Constants.Application
                 return new string[]
                  {
                     AllMeterCacheKey,
-                    BuildindMetersCacheKey(id)
+                    BuildindMetersCacheKey(id),
+                    AllShopByBuilding(id)
                  };
             }
             public const string AllBuildingCacheKey = "all-buildings";

@@ -18,8 +18,7 @@ namespace BlazorHero.CleanArchitecture.Domain.Entities.Bail
 
         public int? MeterId { get; set; }
 
-        public Meter? Meter { get; set; }
-        public List<InternalPayement> Payments { get; set; } = new();
+        public Meter? Meter { get; set; }       
         public List<RentalAgreement> RentalAgreements { get; set; } = new();
     }
 

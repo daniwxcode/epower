@@ -99,7 +99,7 @@ internal class AddEditMeterCommandHandler : IRequestHandler<AddEditMeterCommand,
             dbItem.BuildingId = request.BuildingId;
             dbItem.IsActive = request.IsActive;
             await repository.UpdateAsync(dbItem);
-            await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.BuildindMetersCacheKey(request.BuildingId));
+            await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.BuildingsCache.MetersCacheKeys(request.BuildingId));
             return await Result<int>.SuccessAsync(_localizer["Compteur Mis à jour avec succès"]);
         }catch(Exception e)
         {
