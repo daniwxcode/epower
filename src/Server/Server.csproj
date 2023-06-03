@@ -64,6 +64,7 @@
     <None Include="Views\Shared\_Layout.cshtml" />
     <None Include="Views\_ViewImports.cshtml" />
     <None Include="Views\_ViewStart.cshtml" />
+    <None Include="wwwroot\media\voltmeter.png" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Files\Images\Products\demo.jpg">

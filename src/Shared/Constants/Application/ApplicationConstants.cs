@@ -21,7 +21,8 @@ namespace BlazorHero.CleanArchitecture.Shared.Constants.Application
                 return new string[]
                  {
                     AllMeterCacheKey,
-                    BuildindMetersCacheKey(id)
+                    BuildindMetersCacheKey(id),
+                    AllShopByBuilding(id)
                  };
             }
             public const string AllBuildingCacheKey = "all-buildings";

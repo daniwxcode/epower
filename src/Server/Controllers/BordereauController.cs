@@ -11,9 +11,10 @@ public class BordereauController :BaseController<BordereauController>
 {
     [HttpGet]
     [AllowAnonymous]
-    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.Any)]
     public async Task<IActionResult> Index(int Id)
     {
+
         var response = await _mediator.Send(new GetPayementReceipt() { PayementID = Id });
         if (response.Succeeded)
         {
