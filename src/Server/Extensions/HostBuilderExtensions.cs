@@ -9,7 +9,7 @@ namespace BlazorHero.CleanArchitecture.Server.Extensions
         internal static IHostBuilder UseSerilog(this IHostBuilder builder)
         {
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.Development.json")
+               // .AddJsonFile("appsettings.Development.json")
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .Build();
