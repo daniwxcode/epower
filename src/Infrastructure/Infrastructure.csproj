@@ -24,8 +24,9 @@
 		<PackageReference Include="Blazored.LocalStorage" Version="4.1.5" />
 		<PackageReference Include="EPPlus" Version="5.8.5" />
 		<PackageReference Include="BarCode" Version="2022.9.8982" />
-		<PackageReference Include="Flurl" Version="3.0.6" />
+		<PackageReference Include="Flurl" Version="3.0.7" />
 		<PackageReference Include="Flurl.Http" Version="3.2.4" />
+		<PackageReference Include="Flurl.Http.Xml" Version="2.0.0" />
 		<PackageReference Include="Hangfire.Core" Version="1.7.28" />
 		<PackageReference Include="IronPdf" Version="2022.10.9622" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.1" />

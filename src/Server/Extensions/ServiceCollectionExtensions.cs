@@ -22,6 +22,7 @@ using BlazorHero.CleanArchitecture.Server.Settings;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using BlazorHero.CleanArchitecture.Shared.Constants.Localization;
 using BlazorHero.CleanArchitecture.Shared.Constants.Permission;
+using BlazorHero.CleanArchitecture.Shared.Models;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -246,7 +247,9 @@ namespace BlazorHero.CleanArchitecture.Server.Extensions
         {
             services.AddTransient<IDateTimeService, SystemDateTimeService>();
             services.Configure<MailConfiguration>(configuration.GetSection("MailConfiguration"));
+            services.Configure<CatVendConfig>(configuration.GetSection("CatVendConfig"));
             services.AddTransient<IMailService, SMTPMailService>();
+            services.AddTransient<CatVendConfig>();
             return services;
         }
 
