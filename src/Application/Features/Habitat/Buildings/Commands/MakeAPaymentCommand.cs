@@ -25,7 +25,24 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
     {
         public string Orign { get; set; } = string.Empty;
         public decimal Amount { get; set; }
-        public decimal DueValue { get; set; } = 200;
+        public decimal DueValue
+        {
+            get
+            {
+                return (int)Amount switch
+                {
+                    <= 0 => 0,
+                    > 1_000_000 => 1000,
+                    > 300_000 => 700,
+                    > 50_000 => 500,
+                    > 5_000 => 300,
+                    _ => 200
+                };
+            }
+        }
+
+
+
         public int MeterId { get; set; } = 0;
         public string SerialNumber { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
@@ -71,7 +88,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                 if (dbMeter == null)
                     return await Result<BuyCreditResponse>.FailAsync("Impossible d'effectuer cette vente, Compteur Id Erronée");
                 var ceetvente = await _ceetService.BuyCredit(new CreditRequest(dbMeter.SerialNumber, (int)request.Amount, request.PhoneNumber));
-                if(ceetvente == null)
+                if (ceetvente == null)
                 {
                     return await Result<BuyCreditResponse>.FailAsync("Impossible d'effectuer cette vente");
                 }
@@ -84,15 +101,20 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                     Credits = ceetvente.credit,
                     ExternalReference = ceetvente.bill,
                     MeterId = dbMeter.Id,
-                    CreditCode = ceetvente.Code
+                    CreditCode = ceetvente.Code,
+                    BilledAmount = request.DueValue,
                 };
                 await db.AddAsync(internalPayement);
                 await _unitOfWork.Commit(cancellationToken);
                 await _ceetService.Confirm(ceetvente);
+                internalPayement.IsConfirmed = true;
+                internalPayement.ConfirmationDate = DateTime.UtcNow;
+                await db.UpdateAsync(internalPayement);
+                await _unitOfWork.Commit(cancellationToken);
                 await _pdfService.GeneratePdf(ApplicationConstants.FileConstants.Url(request.Orign, internalPayement.Id), ApplicationConstants.FileConstants.GetReceipt(internalPayement.Id));
 
 
-                return Result<BuyCreditResponse>.Success(new BuyCreditResponse(internalPayement.Id, (int)request.Amount, internalPayement.SerialNumber, internalPayement.ExternalReference, DateTime.UtcNow, internalPayement.InternalReference, ceetvente.Code, ceetvente.credit, user.Data.UserFullName), "Vente Effectuée avec Succès!");
+                return Result<BuyCreditResponse>.Success(new BuyCreditResponse(internalPayement.Id, (int)request.Amount, request.DueValue, internalPayement.SerialNumber, internalPayement.ExternalReference, DateTime.UtcNow, internalPayement.InternalReference, ceetvente.Code, ceetvente.credit, user.Data.UserFullName), "Vente Effectuée avec Succès!");
             }
 
             var venteExt = await _ceetService.BuyCredit(new CreditRequest(request.SerialNumber, (int)request.Amount, request.PhoneNumber));
@@ -110,13 +132,18 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                 Credits = (double)venteExt.credit,
                 InternalReference = request.Reference.ToString(),
                 ExternalReference = venteExt.bill,
-                CreditCode = venteExt.Code
+                CreditCode = venteExt.Code,
+                BilledAmount = request.DueValue
             };
             await db.AddAsync(payment);
             await _unitOfWork.Commit(cancellationToken);
             await _ceetService.Confirm(venteExt);
+            payment.ConfirmationDate = DateTime.UtcNow;
+            payment.IsConfirmed = true;
+            await db.UpdateAsync(payment);
+            await _unitOfWork.Commit(cancellationToken);
             await _pdfService.GeneratePdf(ApplicationConstants.FileConstants.Url(request.Orign, payment.Id), ApplicationConstants.FileConstants.GetReceipt(payment.Id));
-            return await Result<BuyCreditResponse>.SuccessAsync(new BuyCreditResponse(payment.Id, (int)request.Amount, request.SerialNumber, payment.InternalReference, DateTime.UtcNow, payment.InternalReference, venteExt.Code, venteExt.credit, user.Data.UserFullName), "Vente éffectuée avec succès");
+            return await Result<BuyCreditResponse>.SuccessAsync(new BuyCreditResponse(payment.Id, (int)request.Amount, request.DueValue, request.SerialNumber, payment.InternalReference, DateTime.UtcNow, payment.InternalReference, venteExt.Code, venteExt.credit, user.Data.UserFullName), "Vente éffectuée avec succès");
 
         }
     }

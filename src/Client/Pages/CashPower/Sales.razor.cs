@@ -60,6 +60,8 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.CashPower
         private async Task GetDataAsync(int pageNumber, int pageSize, TableState state)
         {
             PaymentRequestCriteria criteria = (PaymentRequestCriteria)Criteria;
+            if (CriteriaValue == string.Empty)
+                CriteriaValue = _searchString;
             var response = await _cashPowerManager.GetPayementByCriteria(criteria, CriteriaValue, pageNumber,pageSize);
             if (response.Succeeded)
             {

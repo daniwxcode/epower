@@ -36,7 +36,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Qu
             var payement =await _unitOfWork.Repository<Payment>().GetByIdAsync(request.PayementID);
             var user = await _userService.GetAsync(payement.CreatedBy);
             var userName = $"{user.Data.LastName.ToUpper()} {user.Data.FirstName}";
-            return Result<BuyCreditResponse>.Success(new BuyCreditResponse(payement.Id, (int)payement.Amount, payement.SerialNumber, payement.ExternalReference, payement.CreatedOn, payement.InternalReference, payement.CreditCode, payement.Credits, userName));
+            return Result<BuyCreditResponse>.Success(new BuyCreditResponse(payement.Id,(int) payement.Amount, payement.BilledAmount, payement.SerialNumber, payement.ExternalReference, payement.CreatedOn, payement.InternalReference, payement.CreditCode, payement.Credits, userName));
 
         }
     }

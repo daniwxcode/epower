@@ -23,12 +23,12 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
         {
             return (int)Amount switch
             {
-                <=0 => 0,
-                > 1_000_000  => 800,
-                > 300_000 => 600,
-                > 50_000 => 400,
-                > 5_000 => 200,
-                _=> 150
+                <= 0 => 0,
+                > 1_000_000 => 1000,
+                > 300_000 => 700,
+                > 50_000 => 500,
+                > 5_000 => 300,
+                _ => 200
             };
         }
         public NumberFormatInfo separator = new System.Globalization.NumberFormatInfo()
