@@ -28,7 +28,7 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
         private string Ref { get; set; } = "000000000000";
         private string Code { get; set; } = "000000000000";
         
-        public decimal Kw { get; set; } = 0;
+        public double Kw { get; set; } = 0;
         private int getSize { get { return canSellAgain ? 6 : 12; } }
         protected override async Task OnInitializedAsync()
         {           
@@ -58,7 +58,7 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
                 canSellAgain = false;
                 Kw = response.Data.Credit;
                 Code = response.Data.Code;
-                Ref = response.Data.Reference;
+                Ref = response.Data.InternalReference;
                 venteId = response.Data.Id;
                 _snackBar.Add(response.Messages[0], MudBlazor.Severity.Success);
                

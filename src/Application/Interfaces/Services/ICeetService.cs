@@ -8,12 +8,13 @@ using System.Threading.Tasks;
 
 namespace BlazorHero.CleanArchitecture.Application.Interfaces.Services
 {
-    public record CreditRequest(string SerialNumber, int Amount);
+    public record CreditRequest(string SerialNumber, int Amount, string PhoneNumber);
+    public record CreditVendResponse(bool Statut, string Code, double credit, string bill, string Message);
     public record ConsumerCheckResponse(bool Status, decimal amount);
     public interface ICeetService
     {
 
-        public Task<(string code, string compteur, decimal credit,string reference)> BuyCredit(CreditRequest creditRequest);
+        public Task<CreditVendResponse> BuyCredit(CreditRequest creditRequest);
         public Task<ConsumerCheckResponse> ConsumerCheck(ConsumerCheckRequestData consumerCheckRequest);
     }
 }

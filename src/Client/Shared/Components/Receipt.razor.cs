@@ -13,7 +13,7 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
         [Parameter]
         public string Code { get; set; } = "000000000000";
         [Parameter]
-        public decimal Kw { get; set; } = 0;
+        public double Kw { get; set; } = 0;
         [Parameter]
         public decimal Amount { get; set; } = 0;
         [Parameter]

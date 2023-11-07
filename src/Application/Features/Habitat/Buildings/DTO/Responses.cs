@@ -11,7 +11,7 @@ public record MeterResponseBase(int Id, string SerialNumber, string code, bool I
 public record BuildingWithMeters(int Id, string name, string Address) : BuildingResponseBase(Id, name, Address);
 public record ShopResponseBase(int Id, int buildingId, string BuildingName, string Name, MeterResponseBase Meter);
 public record PayementResponseBase(int Id,string internalref, DateTime Date, decimal Amount, string MeterSerial, int? MeterId, string Agent);
-public record BuyCreditResponse(int Id, int Amount, string SerialNumber, string Reference, DateTime date, string InternalReference, string Code, decimal Credit, string Seller)
+public record BuyCreditResponse(int Id, int Amount, string SerialNumber, string Reference, DateTime date, string InternalReference, string Code, double Credit, string Seller)
 {
     public string Message() => $"Vous avez payé {Amount} FCFA de crédit CASH POWER (Ref: {InternalReference}) ce {date.ToLongDateString()}. Le Code de Votre paiement est : {Code} (KWh: {Credit}), Compteur: {SerialNumber} ";
 }
