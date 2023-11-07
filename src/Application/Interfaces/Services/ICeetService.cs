@@ -1,9 +1,5 @@
 ﻿using BlazorHero.CleanArchitecture.Application.Features.Habitat.CatVend;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BlazorHero.CleanArchitecture.Application.Interfaces.Services
@@ -16,5 +12,6 @@ namespace BlazorHero.CleanArchitecture.Application.Interfaces.Services
 
         public Task<CreditVendResponse> BuyCredit(CreditRequest creditRequest);
         public Task<ConsumerCheckResponse> ConsumerCheck(ConsumerCheckRequestData consumerCheckRequest);
+        public Task Confirm(CreditVendResponse response);
     }
 }

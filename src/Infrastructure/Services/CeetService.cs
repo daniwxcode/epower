@@ -1,4 +1,5 @@
 ﻿using BlazorHero.CleanArchitecture.Application.Configurations;
+using BlazorHero.CleanArchitecture.Application.Exceptions;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.CatVend;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.CatVend.Vend;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Services;
@@ -27,6 +28,28 @@ using System.Xml.Serialization;
 
 namespace BlazorHero.CleanArchitecture.Infrastructure.Services
 {
+    [XmlRoot(ElementName = "catvend")]
+    public class CatVend
+    {
+        public CatVend()
+        {
+
+        }
+        public CatVend(string unit, string validationcode, string receipt)
+        {
+            this.Unit = unit;
+            this.ValidationCode = validationcode;
+            this.Receipt = receipt;
+        }
+        [XmlElement(ElementName = "unit")]
+        public string Unit { get; set; }
+
+        [XmlElement(ElementName = "validation_code")]
+        public string ValidationCode { get; set; }
+
+        [XmlElement(ElementName = "receipt")]
+        public string Receipt { get; set; }
+    }
     public class CeetService : ICeetService
     {
         private readonly CatVendConfig _config;
@@ -36,64 +59,65 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services
         }
         public async Task<CreditVendResponse> BuyCredit(CreditRequest creditRequest)
         {
-            try
+            var _canBeSold = await ConsumerCheck(new(creditRequest.SerialNumber, creditRequest.Amount));
+            if (_canBeSold is null)
+                return null;
+            if (!_canBeSold.Status)
+                return null;
+            EVendRequest eVendRequest = new EVendRequest()
             {
-                var _canBeSold = await ConsumerCheck(new(creditRequest.SerialNumber, creditRequest.Amount));
-                if (_canBeSold is null)
-                    return null;
-                if (!_canBeSold.Status)
-                    return null;
-                EVendRequest eVendRequest = new EVendRequest()
+                Amount = creditRequest.Amount,
+                Meter = creditRequest.SerialNumber,
+                Phone = "70705684",// creditRequest.PhoneNumber,
+                Unit = _config.Unit,
+                Username = _config.Username,
+                Password = _config.Password,
+                Validation_code = _config.ValidationCode
+            };
+            var call = await $"{_config.BaseUrl}{_config.Vend}"
+               .PostXmlAsync(eVendRequest);
+            checkResponse(call);
+            if (call.StatusCode == 200)
+            {
+                var xmlData = await call.GetStringAsync();
+                VendSuprimaResponse response = new VendSuprimaResponse();
+                XmlSerializer serializer = new XmlSerializer(typeof(VendSuprimaResponse));
+                using (TextReader reader = new StringReader(xmlData))
                 {
-                    Amount = creditRequest.Amount,
-                    Meter = creditRequest.SerialNumber,
-                    Phone ="70705684",// creditRequest.PhoneNumber,
-                    Unit = _config.Unit,
-                    Username = _config.Username,
-                    Password = _config.Password,
-                    Validation_code = _config.ValidationCode
-                };
-                var call = await $"{_config.BaseUrl}{_config.Vend}"
-                   .PostXmlAsync(eVendRequest);
-                if(call.StatusCode== 200)
-                {
-                    var xmlData = await call.GetStringAsync();
-                    VendSuprimaResponse response = new VendSuprimaResponse();
-                    XmlSerializer serializer = new XmlSerializer(typeof(VendSuprimaResponse));
-                    using (TextReader reader = new StringReader(xmlData))
+                    response = (VendSuprimaResponse)serializer.Deserialize(reader);
+                    if (response.ThinClient.Vend.Success == 1)
                     {
-                        response = (VendSuprimaResponse)serializer.Deserialize(reader);
-                        if (response.ThinClient.Vend.Success == 1)
+                        var token = response.ThinClient.Vend.Token;
+                        string pattern = @"(\d{4})(\d{4})(\d{4})(\d{4})(\d{4})";
+                        string replacement = "$1-$2-$3-$4-$5";
+                        string formatted = Regex.Replace(token.Tk60, pattern, replacement);
+                        if (double.TryParse(token.Tk50, NumberStyles.Any, CultureInfo.CurrentCulture, out double result))
                         {
-                            var token = response.ThinClient.Vend.Token;
-                            string pattern = @"(\d{4})(\d{4})(\d{4})(\d{4})(\d{4})";
-                            string replacement = "$1-$2-$3-$4-$5";
-                            string formatted = Regex.Replace(token.Tk60, pattern, replacement);
-                           if( double.TryParse(token.Tk50, NumberStyles.Any, CultureInfo.CurrentCulture,out double result))
-                            {
 
-                                return new CreditVendResponse(true, formatted, result, token.Tk10, "Vente effectuée avec succès");
-                            }
-
-                          
+                            return new CreditVendResponse(true, formatted, result, token.Tk10, "Vente effectuée avec succès");
                         }
+
+
                     }
                 }
-                   
-                   ;
-               
             }
-            catch (Exception e)
-            {
-                return null;
-            }
+            
             return null;
         }
 
+        private void checkResponse(IFlurlResponse call)
+        {
+            if (call.StatusCode == 403)
+            {
+                throw new ApiException("Le revendeur est temporairement bloqué");
+            }
+            if (call.StatusCode == 409)
+            {
+                throw new ApiException("Suprima a refusé la requête (détails dans le corps de la réponse)");
+            }
+        }
         public async Task<ConsumerCheckResponse> ConsumerCheck(ConsumerCheckRequestData command)
         {
-            try
-            {
                 var request = new ConsumerCheckRequest()
                 {
                     Amount = command.amount,
@@ -103,9 +127,11 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services
                     Password = _config.Password,
                     Validation_code = _config.ValidationCode
                 };
-                var xmlData = await $"{_config.BaseUrl}{_config.ConsumerCheck}"
-                    .PostXmlAsync(request)
-                    .ReceiveString();
+                var call = await $"{_config.BaseUrl}{_config.ConsumerCheck}"
+                    .PostXmlAsync(request);
+                checkResponse(call);
+               var  xmlData = await call
+                    .GetStringAsync();
                 SuprimaResponse response = new SuprimaResponse();
                 XmlSerializer serializer = new XmlSerializer(typeof(SuprimaResponse));
                 using (TextReader reader = new StringReader(xmlData))
@@ -121,16 +147,19 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services
                         return new ConsumerCheckResponse(true, amount);
                     }
                 }
-                return null;
-            }
-            catch (Exception ex)
+                return null;           
+        }
+
+        public async Task Confirm(CreditVendResponse response)
+        {
+            CatVend catVend = new CatVend(_config.Unit, _config.ValidationCode, response.bill);
+            var call = await $"{_config.BaseUrl}{_config.Accuse}"
+                   .PostXmlAsync(catVend);
+            checkResponse (call);
+            if (call.StatusCode == 200)
             {
-                Console.WriteLine(ex);
-
-                return null;
+                return;
             }
-
-
         }
     }
 }
