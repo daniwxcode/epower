@@ -13,7 +13,7 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
         [Parameter]
         public string Code { get; set; } = "000000000000";
         [Parameter]
-        public decimal Kw { get; set; } = 0;
+        public double Kw { get; set; } = 0;
         [Parameter]
         public decimal Amount { get; set; } = 0;
         [Parameter]
@@ -23,12 +23,12 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
         {
             return (int)Amount switch
             {
-                <=0 => 0,
-                > 1_000_000  => 800,
-                > 300_000 => 600,
-                > 50_000 => 400,
-                > 5_000 => 200,
-                _=> 150
+                <= 0 => 0,
+                > 1_000_000 => 1000,
+                > 300_000 => 700,
+                > 50_000 => 500,
+                > 5_000 => 300,
+                _ => 200
             };
         }
         public NumberFormatInfo separator = new System.Globalization.NumberFormatInfo()

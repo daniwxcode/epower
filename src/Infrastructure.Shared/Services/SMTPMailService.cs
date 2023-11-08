@@ -27,7 +27,8 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Shared.Services
             {
                 var email = new MimeMessage
                 {
-                    Sender = new MailboxAddress(_config.DisplayName, request.From ?? _config.From),
+                    Sender = new MailboxAddress(_config.DisplayName, _config.From),
+                    From = { new MailboxAddress(_config.DisplayName, _config.From) },
                     Subject = request.Subject,
                     Body = new BodyBuilder
                     {
@@ -36,8 +37,8 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Shared.Services
                 };
                 email.To.Add(MailboxAddress.Parse(request.To));
                 using var smtp = new SmtpClient();
-                await smtp.ConnectAsync(_config.Host, _config.Port, SecureSocketOptions.StartTls);
-                await smtp.AuthenticateAsync(_config.UserName, _config.Password);
+                await smtp.ConnectAsync(_config.Host, _config.Port, SecureSocketOptions.None);
+                // await smtp.AuthenticateAsync(_config.UserName, _config.Password);
                 await smtp.SendAsync(email);
                 await smtp.DisconnectAsync(true);
             }

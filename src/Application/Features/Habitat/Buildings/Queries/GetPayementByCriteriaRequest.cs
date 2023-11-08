@@ -2,9 +2,13 @@
 using BlazorHero.CleanArchitecture.Application.Features.Documents.Queries.GetAll;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Enums;
+using BlazorHero.CleanArchitecture.Application.Features.Products.Queries.GetAllPaged;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Repositories;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Services.Identity;
+using BlazorHero.CleanArchitecture.Application.Specifications.Catalog;
+using BlazorHero.CleanArchitecture.Application.Specifications.Payements;
 using BlazorHero.CleanArchitecture.Domain.Entities.Bail;
+using BlazorHero.CleanArchitecture.Domain.Entities.Catalog;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
 
 using MediatR;
@@ -48,21 +52,20 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Qu
         }
         public async Task<PaginatedResult<PayementResponseBase>> Handle(GetPayementByCriteriaRequest request, CancellationToken cancellationToken)
         {
-            PaginatedResult<PayementResponseBase> response = new PaginatedResult<PayementResponseBase>(new List<PayementResponseBase>());
             
             var repo = _unitOfWork.Repository<Payment>().Entities.OrderByDescending(_=>_.CreatedOn);
 
             Expression<Func<Payment, PayementResponseBase>> expression =  e =>  e.GetPayementResponse(_userService).Result;
 
-            response = request.PaymentRequestCriteria switch
-            {
-                PaymentRequestCriteria.ByMeter => await repo.Where(_ => _.SerialNumber == request.Criteria).Select(expression).ToPaginatedListAsync(request.PageNumber, request.PageSize),
+            var payment = request.PaymentRequestCriteria switch
+            {              
+                PaymentRequestCriteria.ByUser => new PaymentFilterSpecification(string.Empty,request.Criteria),
 
-                PaymentRequestCriteria.ByUser => await repo.Where(_ => _.CreatedBy == request.Criteria).Select(expression).ToPaginatedListAsync(request.PageNumber, request.PageSize),
-
-                _ => await repo.Select(expression).ToPaginatedListAsync(request.PageNumber, request.PageSize)
+                _ => new PaymentFilterSpecification(request.Criteria)
             };
+          var response = await repo.Specify(payment).Select(expression).ToPaginatedListAsync(request.PageNumber,request.PageSize);
             return response;
+           
         }
     }
 

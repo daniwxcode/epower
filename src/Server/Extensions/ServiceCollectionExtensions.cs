@@ -22,6 +22,7 @@ using BlazorHero.CleanArchitecture.Server.Settings;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using BlazorHero.CleanArchitecture.Shared.Constants.Localization;
 using BlazorHero.CleanArchitecture.Shared.Constants.Permission;
+using BlazorHero.CleanArchitecture.Shared.Models;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -32,6 +33,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -221,6 +223,16 @@ namespace BlazorHero.CleanArchitecture.Server.Extensions
         {
             services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
+           
+            return services;
+        }
+        internal static IServiceCollection AddBackGroundService(this IServiceCollection services)
+        {
+            services.AddHostedService<BackGroundServices>();
+            services.Configure<HostOptions>(option =>
+            {
+                option.ShutdownTimeout = TimeSpan.FromHours(2); // Temps de démarrage du service
+            });
             return services;
         }
 
@@ -246,7 +258,9 @@ namespace BlazorHero.CleanArchitecture.Server.Extensions
         {
             services.AddTransient<IDateTimeService, SystemDateTimeService>();
             services.Configure<MailConfiguration>(configuration.GetSection("MailConfiguration"));
+            services.Configure<CatVendConfig>(configuration.GetSection("CatVendConfig"));
             services.AddTransient<IMailService, SMTPMailService>();
+            services.AddTransient<CatVendConfig>();
             return services;
         }
 

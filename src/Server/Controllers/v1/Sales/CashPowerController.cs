@@ -1,11 +1,13 @@
 ﻿using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Queries;
+using BlazorHero.CleanArchitecture.Application.Features.Habitat.CatVend.Requests;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Services;
 using BlazorHero.CleanArchitecture.Shared.Constants.Permission;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 using Polly;
 
@@ -75,6 +77,14 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.v1.Sales
                 Criteria = _currentUserService.UserId,
             };
             return Ok(await _mediator.Send(request));
+        }
+
+        [HttpPost("ConsumerCheck")]
+        
+        public async Task<IActionResult> Checkconsumer(ConsumerCheckRequestData command)
+        {
+            
+            return Ok(await _mediator.Send(command));
         }
     }
 }

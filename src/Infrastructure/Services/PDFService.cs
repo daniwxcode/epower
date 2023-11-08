@@ -30,7 +30,7 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services
         public async Task Generate(string url, string fileName)
         {
             var renderer = new ChromePdfRenderer();
-            renderer.RenderingOptions.MarginTop = 20;
+            renderer.RenderingOptions.MarginTop = 0;
             renderer.RenderingOptions.MarginBottom = 0;
             renderer.RenderingOptions.MarginRight = 0;
             renderer.RenderingOptions.MarginLeft = 0;

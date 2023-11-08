@@ -93,6 +93,17 @@ background-repeat:repeat; background-size: 192.9px 106.1px;background-color: rgb
             <tr>
                 <td style="width:30%;">MONTANT:</td>
                 <td>@Model.Amount</td>
+            </tr> <tr>
+                <td style="width:30%;">FRAIS:</td>
+                <td>@((int)Model.fees)</td>
+            </tr>
+            <tr>
+                <td style="width:30%;">MONTANT:</td>
+                <td>@Model.Amount</td>
+            </tr>
+            <tr>
+                <td style="width:30%;">TOTAL:</td>
+                <td>@(Model.fees + (int)Model.Amount)</td>
             </tr>
             <tr>
                 <td style="width:30%;">CODE :</td>
