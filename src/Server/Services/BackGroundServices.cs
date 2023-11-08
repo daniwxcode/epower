@@ -27,7 +27,7 @@ namespace BlazorHero.CleanArchitecture.Server.Services
                 _logger.LogInformation("Exécution de la tâche planifiée...");
 
                 // Attendez 6 heures (en millisecondes)
-                await Task.Delay(60*60*1000/60000, run(stoppingToken));
+                await Task.Delay(6*60*60*1000, run(stoppingToken));
             }
         }
 

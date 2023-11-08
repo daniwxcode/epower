@@ -231,7 +231,7 @@ namespace BlazorHero.CleanArchitecture.Server.Extensions
             services.AddHostedService<BackGroundServices>();
             services.Configure<HostOptions>(option =>
             {
-                option.ShutdownTimeout = TimeSpan.FromSeconds(30); // Temps de démarrage du service
+                option.ShutdownTimeout = TimeSpan.FromHours(2); // Temps de démarrage du service
             });
             return services;
         }
