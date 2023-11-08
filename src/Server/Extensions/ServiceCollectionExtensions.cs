@@ -223,6 +223,11 @@ namespace BlazorHero.CleanArchitecture.Server.Extensions
         {
             services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
+           
+            return services;
+        }
+        internal static IServiceCollection AddBackGroundService(this IServiceCollection services)
+        {
             services.AddHostedService<BackGroundServices>();
             services.Configure<HostOptions>(option =>
             {
