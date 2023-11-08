@@ -65,7 +65,7 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services
             if (_canBeSold is null)
                 return null;
             if (!_canBeSold.Status)
-                return null;
+                throw new ApiException($"Pas assez d'argent pour acheter: montant min: {_canBeSold.amount} FCFA");
             EVendRequest eVendRequest = new EVendRequest()
             {
                 Amount = creditRequest.Amount,
