@@ -1,6 +1,6 @@
 ﻿using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Queries;
-using BlazorHero.CleanArchitecture.Application.Features.Habitat.CatVend;
+using BlazorHero.CleanArchitecture.Application.Features.Habitat.CatVend.Requests;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Services;
 using BlazorHero.CleanArchitecture.Shared.Constants.Permission;
 

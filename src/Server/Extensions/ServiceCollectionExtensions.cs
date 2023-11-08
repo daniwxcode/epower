@@ -33,6 +33,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -222,6 +223,11 @@ namespace BlazorHero.CleanArchitecture.Server.Extensions
         {
             services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddHostedService<BackGroundServices>();
+            services.Configure<HostOptions>(option =>
+            {
+                option.ShutdownTimeout = TimeSpan.FromSeconds(30); // Temps de démarrage du service
+            });
             return services;
         }
 

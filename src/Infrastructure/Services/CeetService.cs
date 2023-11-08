@@ -1,6 +1,8 @@
 ﻿using BlazorHero.CleanArchitecture.Application.Configurations;
 using BlazorHero.CleanArchitecture.Application.Exceptions;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.CatVend;
+using BlazorHero.CleanArchitecture.Application.Features.Habitat.CatVend.Requests;
+using BlazorHero.CleanArchitecture.Application.Features.Habitat.CatVend.Sessions;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.CatVend.Vend;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Services;
 using BlazorHero.CleanArchitecture.Shared.Models;
@@ -160,6 +162,18 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services
             {
                 return;
             }
+        } 
+        public async Task EOS()
+        {
+            EOSCatVend request = new EOSCatVend()
+            {
+                Password = _config.Password,
+                Username = _config.Username,
+                Unit = _config.Unit,
+                ValidationCode = _config.ValidationCode,
+            };
+            var call = await $"{_config.BaseUrl}{_config.EndOfSession}"
+                    .PostXmlAsync(request);
         }
     }
 }
