@@ -7,7 +7,7 @@ trigger:
 - Dev/Modelisation
 
 pool:
-  vmImage: 'windows-2019'
+  vmImage: 'ubuntu-20.04'
 
 variables:
   solution: '**/*.sln'
