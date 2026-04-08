@@ -41,6 +41,8 @@ namespace BlazorHero.CleanArchitecture.Infrastructure
         {
             AddAdministrator();
             AddBasicUser();
+            AddSellerRole();
+            AddSupervisorRole();
             _db.SaveChanges();
         }
 
@@ -123,6 +125,96 @@ namespace BlazorHero.CleanArchitecture.Infrastructure
                     await _userManager.CreateAsync(basicUser, UserConstants.DefaultPassword);
                     await _userManager.AddToRoleAsync(basicUser, RoleConstants.BasicRole);
                     _logger.LogInformation(_localizer["Seeded User with Basic Role."]);
+                }
+            }).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Rôle Vendeur : accès POS, historique de ses ventes, gestion de sa caisse.
+        /// </summary>
+        private void AddSellerRole()
+        {
+            Task.Run(async () =>
+            {
+                var roleName = RoleConstants.SellerRole;
+                var roleInDb = await _roleManager.FindByNameAsync(roleName);
+                if (roleInDb == null)
+                {
+                    await _roleManager.CreateAsync(new BlazorHeroRole(roleName, "Vendeur ambulant — accès POS et caisse"));
+                    roleInDb = await _roleManager.FindByNameAsync(roleName);
+                    _logger.LogInformation($"Seeded {roleName} Role.");
+                }
+
+                string[] sellerPermissions =
+                [
+                    Permissions.CashPower.View,
+                    Permissions.CashPower.Create,
+                    Permissions.CashPower.Search,
+                    Permissions.CashShifts.ViewOwn,
+                    Permissions.CashShifts.Open,
+                    Permissions.CashShifts.Close,
+                    Permissions.Remittances.ViewOwn,
+                ];
+
+                foreach (var permission in sellerPermissions)
+                {
+                    await _roleManager.AddPermissionClaim(roleInDb, permission);
+                }
+            }).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Rôle Superviseur : toutes les permissions vendeur + recouvrement, dashboard, gestion vendeurs.
+        /// </summary>
+        private void AddSupervisorRole()
+        {
+            Task.Run(async () =>
+            {
+                var roleName = RoleConstants.SupervisorRole;
+                var roleInDb = await _roleManager.FindByNameAsync(roleName);
+                if (roleInDb == null)
+                {
+                    await _roleManager.CreateAsync(new BlazorHeroRole(roleName, "Superviseur — recouvrement, dashboard et gestion vendeurs"));
+                    roleInDb = await _roleManager.FindByNameAsync(roleName);
+                    _logger.LogInformation($"Seeded {roleName} Role.");
+                }
+
+                string[] supervisorPermissions =
+                [
+                    // Cash Power
+                    Permissions.CashPower.View,
+                    Permissions.CashPower.Create,
+                    Permissions.CashPower.Export,
+                    Permissions.CashPower.Search,
+
+                    // Caisses
+                    Permissions.CashShifts.ViewOwn,
+                    Permissions.CashShifts.ViewAll,
+                    Permissions.CashShifts.Open,
+                    Permissions.CashShifts.Close,
+
+                    // Remises de fonds
+                    Permissions.Remittances.ViewOwn,
+                    Permissions.Remittances.ViewAll,
+                    Permissions.Remittances.Create,
+                    Permissions.Remittances.Validate,
+
+                    // Dashboard
+                    Permissions.Dashboards.View,
+
+                    // Vendeurs
+                    Permissions.Sellers.View,
+                    Permissions.Sellers.Create,
+                    Permissions.Sellers.Edit,
+
+                    // Immobilier (lecture)
+                    Permissions.BuildingParams.View,
+                    Permissions.BuildingParams.Search,
+                ];
+
+                foreach (var permission in supervisorPermissions)
+                {
+                    await _roleManager.AddPermissionClaim(roleInDb, permission);
                 }
             }).GetAwaiter().GetResult();
         }

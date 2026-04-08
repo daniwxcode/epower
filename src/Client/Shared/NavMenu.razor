@@ -104,6 +104,13 @@
     <MudNavLink Href="/account" Icon="@Icons.Material.Outlined.SupervisorAccount" Class="mt-2">
         @_localizer["Account"]
     </MudNavLink>
+
+    <MudDivider Class="my-2" />
+    <MudButton Variant="Variant.Text" Color="Color.Error" FullWidth="true"
+               StartIcon="@Icons.Material.Filled.Logout" Class="justify-start pl-6"
+               OnClick="LogoutAsync">
+        @_localizer["Logout"]
+    </MudButton>
 </MudNavMenu>
 
 @code {
@@ -129,5 +136,11 @@
         _canViewSellers = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Sellers.View)).Succeeded;
         _canOpenShift = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.CashShifts.Open)).Succeeded;
         _canViewAllShifts = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.CashShifts.ViewAll)).Succeeded;
+    }
+
+    private async Task LogoutAsync()
+    {
+        await _authenticationManager.Logout();
+        _navigationManager.NavigateTo("/login");
     }
 }

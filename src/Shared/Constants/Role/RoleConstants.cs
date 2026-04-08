@@ -4,6 +4,8 @@
     {
         public const string AdministratorRole = "Administrator";
         public const string BasicRole = "Basic";
+        public const string SellerRole = "Seller";
+        public const string SupervisorRole = "Supervisor";
         public const string DefaultPassword = "123Pa$$word!";
     }
 }
