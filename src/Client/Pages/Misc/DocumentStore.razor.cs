@@ -1,4 +1,4 @@
-﻿using BlazorHero.CleanArchitecture.Application.Features.Documents.Queries.GetAll;
+using BlazorHero.CleanArchitecture.Application.Features.Documents.Queries.GetAll;
 using BlazorHero.CleanArchitecture.Application.Requests.Documents;
 using BlazorHero.CleanArchitecture.Client.Extensions;
 using MudBlazor;
@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using BlazorHero.CleanArchitecture.Application.Features.Documents.Commands.AddEdit;
 using BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Misc.Document;
@@ -58,7 +59,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Misc
             }
         }
 
-        private async Task<TableData<GetAllDocumentsResponse>> ServerReload(TableState state)
+        private async Task<TableData<GetAllDocumentsResponse>> ServerReload(TableState state, CancellationToken cancellationToken)
         {
             if (!string.IsNullOrWhiteSpace(_searchString))
             {
@@ -150,10 +151,10 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Misc
                     });
                 }
             }
-            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true, DisableBackdropClick = true };
-            var dialog = _dialogService.Show<AddEditDocumentModal>(id == 0 ? _localizer["Create"] : _localizer["Edit"], parameters, options);
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true, BackdropClick = false };
+            var dialog = await _dialogService.ShowAsync<AddEditDocumentModal>(id == 0 ? _localizer["Create"] : _localizer["Edit"], parameters, options);
             var result = await dialog.Result;
-            if (!result.Cancelled)
+            if (!result.Canceled)
             {
                 OnSearch("");
             }
@@ -166,10 +167,10 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Misc
             {
                 {nameof(Shared.Dialogs.DeleteConfirmation.ContentText), string.Format(deleteContent, id)}
             };
-            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
-            var dialog = _dialogService.Show<Shared.Dialogs.DeleteConfirmation>(_localizer["Delete"], parameters, options);
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+            var dialog = await _dialogService.ShowAsync<Shared.Dialogs.DeleteConfirmation>(_localizer["Delete"], parameters, options);
             var result = await dialog.Result;
-            if (!result.Cancelled)
+            if (!result.Canceled)
             {
                 var response = await DocumentManager.DeleteAsync(id);
                 if (response.Succeeded)

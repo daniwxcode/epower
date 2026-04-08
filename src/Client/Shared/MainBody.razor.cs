@@ -1,4 +1,4 @@
-﻿using BlazorHero.CleanArchitecture.Client.Extensions;
+using BlazorHero.CleanArchitecture.Client.Extensions;
 using BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Identity.Roles;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using Microsoft.AspNetCore.Components;
@@ -65,7 +65,7 @@ namespace BlazorHero.CleanArchitecture.Client.Shared
                         config.ShowTransitionDuration = 500;
                         config.Action = _localizer["Chat?"];
                         config.ActionColor = Color.Primary;
-                        config.Onclick = snackbar =>
+                        config.OnClick = snackbar =>
                         {
                             _navigationManager.NavigateTo($"chat/{senderUserId}");
                             return Task.CompletedTask;
@@ -180,7 +180,7 @@ namespace BlazorHero.CleanArchitecture.Client.Shared
             _drawerOpen = !_drawerOpen;
         }
 
-        private void Logout()
+        private async Task Logout()
         {
             var parameters = new DialogParameters
             {
@@ -193,7 +193,7 @@ namespace BlazorHero.CleanArchitecture.Client.Shared
 
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
 
-            _dialogService.Show<Dialogs.Logout>(_localizer["Logout"], parameters, options);
+            await _dialogService.ShowAsync<Dialogs.Logout>(_localizer["Logout"], parameters, options);
         }
 
         private HubConnection hubConnection;

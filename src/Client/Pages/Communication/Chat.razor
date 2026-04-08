@@ -1,4 +1,4 @@
-﻿@page "/chat/{CId}"
+@page "/chat/{CId}"
 @page "/chat"
 @using System.Globalization
 @attribute [Authorize(Policy = Permissions.Communication.Chat)]
@@ -59,10 +59,10 @@
                 <MudText Typo="Typo.h6">@_localizer["contacts"]</MudText>
             </MudToolBar>
             <div class="d-flex flex-column px-4" style="max-height:70vh;min-height:70vh; overflow:scroll;">
-                <MudList Clickable="true">
+                <MudList T="string" Clickable="true">
                     @foreach (var user in UserList)
                     {
-                        <MudListItem Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.Id))">
+                        <MudListItem T="string" Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.Id))">
                             <div class="d-flex flex-row mt-n1 mb-n1">
                                 <div class="mr-4">
                                     <MudBadge Class="my-2" Color="@(GetUserStatusBadgeColor(user.IsOnline))" Overlap="true" Origin="Origin.BottomCenter"  Dot="true">
@@ -97,10 +97,10 @@
 </div>
 <MudDrawer @bind-Open="@_open" Anchor="@ChatDrawer" Elevation="1" Variant="@DrawerVariant.Temporary">
     <div class="pa-3">
-        <MudList Clickable="true">
+        <MudList T="string" Clickable="true">
             @foreach (var user in UserList)
             {
-                <MudListItem Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.Id))">
+                <MudListItem T="string" Class="pa-0 px-2" OnClick="@(() => LoadUserChat(user.Id))">
                     <div class="d-flex flex-row mt-n1 mb-n1">
                         <div class="mr-4">
                             <MudBadge Class="my-2" Color="@(GetUserStatusBadgeColor(user.IsOnline))" Overlap="true" Origin="Origin.BottomRight" Dot="true">

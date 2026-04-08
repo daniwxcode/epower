@@ -1,4 +1,4 @@
-﻿using Blazored.FluentValidation;
+using Blazored.FluentValidation;
 
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
@@ -13,6 +13,7 @@ using MudBlazor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
@@ -26,7 +27,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
         public int BuildingId { get; set; }
         private string BuildingName { get; set; }
         private List<MeterResponseBase> _buildingMeters = new();
-        [CascadingParameter] private MudDialogInstance MudDialog { get; set; }
+        [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
         [CascadingParameter] private HubConnection HubConnection { get; set; }
 
         private FluentValidationValidator _fluentValidationValidator;
@@ -67,7 +68,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
         }
         private string MeterDisplay(MeterResponseBase model) =>
            model == null ? string.Empty : $"{model.code} -({model.SerialNumber})";
-        private async Task<IEnumerable<int>> Search(string value)
+        private async Task<IEnumerable<int>> Search(string value, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(value))
                 return _buildingMeters.Select(x => x.Id);

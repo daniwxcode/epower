@@ -1,4 +1,4 @@
-﻿@inject Microsoft.Extensions.Localization.IStringLocalizer<ImportExcelModal> _localizer
+@inject Microsoft.Extensions.Localization.IStringLocalizer<ImportExcelModal> _localizer
 
 <EditForm Model="@UploadRequest" OnValidSubmit="SaveAsync">
     <FluentValidationValidator @ref="_fluentValidationValidator" />
@@ -13,7 +13,7 @@
                                Variant="Variant.Filled"
                                Color="Color.Primary"
                                Size="Size.Large"
-                               StartIcon="@Icons.Filled.CloudUpload"
+                               StartIcon="@Icons.Material.Filled.CloudUpload"
                                for="fileInput"
                                Class="mb-1">
                         @_localizer["Upload"]
@@ -23,7 +23,7 @@
                     <br />
                     @if (_file != null)
                     {
-                        <MudAlert ShowCloseIcon="true" CloseIconClicked="(() => _file = null)" OnClick="(() => _file = null)">@_file.Name</MudAlert>
+                        <MudAlert ShowCloseIcon="true" CloseIconClicked="@((MudAlert _) => _file = null)" OnClick="@((MouseEventArgs _) => _file = null)">@_file.Name</MudAlert>
                     }
                     else
                     {

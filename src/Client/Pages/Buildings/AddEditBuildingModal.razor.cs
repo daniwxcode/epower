@@ -1,4 +1,4 @@
-﻿using Blazored.FluentValidation;
+using Blazored.FluentValidation;
 
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
 using BlazorHero.CleanArchitecture.Client.Extensions;
@@ -17,7 +17,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
     {
 
         [Parameter] public AddEditBuildingCommand Model { get; set; } = new();
-        [CascadingParameter] private MudDialogInstance MudDialog { get; set; }
+        [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
         [CascadingParameter] private HubConnection HubConnection { get; set; }
 
         private FluentValidationValidator _fluentValidationValidator;

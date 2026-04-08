@@ -1,4 +1,4 @@
-﻿using Blazored.FluentValidation;
+using Blazored.FluentValidation;
 using BlazorHero.CleanArchitecture.Application.Requests.Identity;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;

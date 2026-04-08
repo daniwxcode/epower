@@ -9,6 +9,8 @@ using BlazorHero.CleanArchitecture.Client.Infrastructure.Mappings;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using MudBlazor;
 using System.Threading.Tasks;
 using BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Identity.Roles;
@@ -58,7 +60,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Identity
 
         private async Task GetRolePermissionsAsync()
         {
-            _mapper = new MapperConfiguration(c => { c.AddProfile<RoleProfile>(); }).CreateMapper();
+            _mapper = new MapperConfiguration(c => { c.AddProfile<RoleProfile>(); }, NullLoggerFactory.Instance).CreateMapper();
             var roleId = Id;
             var result = await RoleManager.GetPermissionsAsync(roleId);
             if (result.Succeeded)

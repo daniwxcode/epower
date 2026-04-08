@@ -4,146 +4,182 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Settings
 {
     public class BlazorHeroTheme
     {
-        private static Typography DefaultTypography = new Typography()
+        private static readonly string[] FontStack = ["Inter", "Roboto", "Helvetica", "Arial", "sans-serif"];
+
+        private static readonly Typography DefaultTypography = new()
         {
-            Default = new Default()
+            Default = new DefaultTypography
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = FontStack,
                 FontSize = ".875rem",
-                FontWeight = 400,
-                LineHeight = 1.43,
-                LetterSpacing = ".01071em"
+                FontWeight = "400",
+                LineHeight = "1.5",
+                LetterSpacing = ".01em"
             },
-            H1 = new H1()
+            H1 = new H1Typography
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
-                FontSize = "6rem",
-                FontWeight = 300,
-                LineHeight = 1.167,
-                LetterSpacing = "-.01562em"
+                FontFamily = FontStack,
+                FontSize = "3.5rem",
+                FontWeight = "700",
+                LineHeight = "1.2",
+                LetterSpacing = "-.02em"
             },
-            H2 = new H2()
+            H2 = new H2Typography
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
-                FontSize = "3.75rem",
-                FontWeight = 300,
-                LineHeight = 1.2,
-                LetterSpacing = "-.00833em"
+                FontFamily = FontStack,
+                FontSize = "2.5rem",
+                FontWeight = "700",
+                LineHeight = "1.25",
+                LetterSpacing = "-.01em"
             },
-            H3 = new H3()
+            H3 = new H3Typography
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
-                FontSize = "3rem",
-                FontWeight = 400,
-                LineHeight = 1.167,
+                FontFamily = FontStack,
+                FontSize = "2rem",
+                FontWeight = "600",
+                LineHeight = "1.3",
                 LetterSpacing = "0"
             },
-            H4 = new H4()
+            H4 = new H4Typography
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
-                FontSize = "2.125rem",
-                FontWeight = 400,
-                LineHeight = 1.235,
-                LetterSpacing = ".00735em"
-            },
-            H5 = new H5()
-            {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = FontStack,
                 FontSize = "1.5rem",
-                FontWeight = 400,
-                LineHeight = 1.334,
+                FontWeight = "600",
+                LineHeight = "1.35",
+                LetterSpacing = ".005em"
+            },
+            H5 = new H5Typography
+            {
+                FontFamily = FontStack,
+                FontSize = "1.25rem",
+                FontWeight = "600",
+                LineHeight = "1.4",
                 LetterSpacing = "0"
             },
-            H6 = new H6()
+            H6 = new H6Typography
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
-                FontSize = "1.25rem",
-                FontWeight = 400,
-                LineHeight = 1.6,
-                LetterSpacing = ".0075em"
+                FontFamily = FontStack,
+                FontSize = "1.125rem",
+                FontWeight = "600",
+                LineHeight = "1.5",
+                LetterSpacing = ".005em"
             },
-            Button = new Button()
+            Button = new ButtonTypography
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = FontStack,
                 FontSize = ".875rem",
-                FontWeight = 500,
-                LineHeight = 1.75,
-                LetterSpacing = ".02857em"
+                FontWeight = "600",
+                LineHeight = "1.75",
+                LetterSpacing = ".02em",
+                TextTransform = "none"
             },
-            Body1 = new Body1()
+            Body1 = new Body1Typography
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = FontStack,
                 FontSize = "1rem",
-                FontWeight = 400,
-                LineHeight = 1.5,
-                LetterSpacing = ".00938em"
+                FontWeight = "400",
+                LineHeight = "1.6",
+                LetterSpacing = ".01em"
             },
-            Body2 = new Body2()
+            Body2 = new Body2Typography
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = FontStack,
                 FontSize = ".875rem",
-                FontWeight = 400,
-                LineHeight = 1.43,
-                LetterSpacing = ".01071em"
+                FontWeight = "400",
+                LineHeight = "1.5",
+                LetterSpacing = ".01em"
             },
-            Caption = new Caption()
+            Caption = new CaptionTypography
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = FontStack,
                 FontSize = ".75rem",
-                FontWeight = 400,
-                LineHeight = 1.66,
-                LetterSpacing = ".03333em"
+                FontWeight = "400",
+                LineHeight = "1.5",
+                LetterSpacing = ".02em"
             },
-            Subtitle2 = new Subtitle2()
+            Subtitle1 = new Subtitle1Typography
             {
-                FontFamily = new[] { "Montserrat", "Helvetica", "Arial", "sans-serif" },
+                FontFamily = FontStack,
+                FontSize = "1rem",
+                FontWeight = "500",
+                LineHeight = "1.5",
+                LetterSpacing = ".01em"
+            },
+            Subtitle2 = new Subtitle2Typography
+            {
+                FontFamily = FontStack,
                 FontSize = ".875rem",
-                FontWeight = 500,
-                LineHeight = 1.57,
-                LetterSpacing = ".00714em"
+                FontWeight = "500",
+                LineHeight = "1.5",
+                LetterSpacing = ".01em"
             }
         };
 
-        private static LayoutProperties DefaultLayoutProperties = new LayoutProperties()
+        private static readonly LayoutProperties DefaultLayoutProperties = new()
         {
-            DefaultBorderRadius = "3px"
+            DefaultBorderRadius = "8px"
         };
 
-        public static MudTheme DefaultTheme = new MudTheme()
+        public static readonly MudTheme DefaultTheme = new()
         {
-            Palette = new Palette()
+            PaletteLight = new PaletteLight
             {
-                Primary = "#1E88E5",
-                AppbarBackground = "#1E88E5",
-                Background = Colors.Grey.Lighten5,
-                DrawerBackground = "#FFF",
-                DrawerText = "rgba(0,0,0, 0.7)",
-                Success = "#007E33"
+                Primary = "#1565C0",
+                PrimaryDarken = "#0D47A1",
+                PrimaryLighten = "#42A5F5",
+                Secondary = "#00897B",
+                Tertiary = "#7E57C2",
+                Info = "#0288D1",
+                Success = "#2E7D32",
+                Warning = "#F57C00",
+                Error = "#C62828",
+                AppbarBackground = "#FFFFFF",
+                AppbarText = "#1C1C1E",
+                Background = "#F5F7FA",
+                Surface = "#FFFFFF",
+                DrawerBackground = "#FFFFFF",
+                DrawerText = "#424242",
+                DrawerIcon = "#616161",
+                TextPrimary = "#1C1C1E",
+                TextSecondary = "#5F6368",
+                ActionDefault = "#757575",
+                Divider = "#E0E0E0",
+                DividerLight = "#F0F0F0",
+                LinesDefault = "#E0E0E0"
             },
             Typography = DefaultTypography,
             LayoutProperties = DefaultLayoutProperties
         };
 
-        public static MudTheme DarkTheme = new MudTheme()
+        public static readonly MudTheme DarkTheme = new()
         {
-            Palette = new Palette()
+            PaletteDark = new PaletteDark
             {
-                Primary = "#1E88E5",
-                Success = "#007E33",
-                Black = "#27272f",
-                Background = "#32333d",
-                BackgroundGrey = "#27272f",
-                Surface = "#373740",
-                DrawerBackground = "#27272f",
-                DrawerText = "rgba(255,255,255, 0.50)",
-                AppbarBackground = "#373740",
-                AppbarText = "rgba(255,255,255, 0.70)",
-                TextPrimary = "rgba(255,255,255, 0.70)",
-                TextSecondary = "rgba(255,255,255, 0.50)",
-                ActionDefault = "#adadb1",
+                Primary = "#42A5F5",
+                PrimaryDarken = "#1E88E5",
+                PrimaryLighten = "#90CAF9",
+                Secondary = "#4DB6AC",
+                Tertiary = "#B39DDB",
+                Info = "#29B6F6",
+                Success = "#66BB6A",
+                Warning = "#FFA726",
+                Error = "#EF5350",
+                Black = "#1A1A2E",
+                Background = "#121218",
+                Surface = "#1E1E2D",
+                AppbarBackground = "#1E1E2D",
+                AppbarText = "rgba(255,255,255, 0.85)",
+                DrawerBackground = "#16161F",
+                DrawerText = "rgba(255,255,255, 0.65)",
+                DrawerIcon = "rgba(255,255,255, 0.50)",
+                TextPrimary = "rgba(255,255,255, 0.87)",
+                TextSecondary = "rgba(255,255,255, 0.55)",
+                ActionDefault = "rgba(255,255,255, 0.60)",
                 ActionDisabled = "rgba(255,255,255, 0.26)",
-                ActionDisabledBackground = "rgba(255,255,255, 0.12)",
-                DrawerIcon = "rgba(255,255,255, 0.50)"
+                ActionDisabledBackground = "rgba(255,255,255, 0.08)",
+                Divider = "rgba(255,255,255, 0.10)",
+                DividerLight = "rgba(255,255,255, 0.05)",
+                LinesDefault = "rgba(255,255,255, 0.10)"
             },
             Typography = DefaultTypography,
             LayoutProperties = DefaultLayoutProperties

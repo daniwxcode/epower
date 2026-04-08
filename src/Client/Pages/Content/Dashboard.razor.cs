@@ -9,7 +9,7 @@ using BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Dashboard;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using BlazorHero.CleanArchitecture.Client.Extensions;
 using BlazorHero.CleanArchitecture.Application.Features.Dashboards.Queries.GetData;
-using ChartSeries = MudBlazor.ChartSeries;
+using ChartSeries = MudBlazor.ChartSeries<double>;
 
 namespace BlazorHero.CleanArchitecture.Client.Pages.Content
 {

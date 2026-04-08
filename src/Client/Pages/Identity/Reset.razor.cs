@@ -1,4 +1,4 @@
-﻿using BlazorHero.CleanArchitecture.Application.Requests.Identity;
+using BlazorHero.CleanArchitecture.Application.Requests.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using MudBlazor;
 using System.Linq;

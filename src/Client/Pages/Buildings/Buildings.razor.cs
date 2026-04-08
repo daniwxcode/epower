@@ -1,4 +1,4 @@
-﻿using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
+using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 using BlazorHero.CleanArchitecture.Client.Extensions;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
@@ -71,10 +71,10 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
             {
                 { nameof(Shared.Dialogs.DeleteConfirmation.ContentText), string.Format(deleteContent, id) }
             };
-            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
-            var dialog = _dialogService.Show<Shared.Dialogs.DeleteConfirmation>(_localizer["Delete"], parameters, options);
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+            var dialog = await  _dialogService.ShowAsync<Shared.Dialogs.DeleteConfirmation>(_localizer["Delete"], parameters, options);
             var result = await dialog.Result;
-            if (!result.Cancelled)
+            if (!result.Canceled)
             {
                 var response = await _cashPowerManager.DeleteBuilding(id);
                 if (response.Succeeded)
@@ -135,10 +135,10 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
                     });
                 }
             }
-            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
-            var dialog = _dialogService.Show<AddEditBuildingModal>(id == 0 ? _localizer["Create"] : _localizer["Edit"], parameters, options);
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+            var dialog = await _dialogService.ShowAsync<AddEditBuildingModal>(id == 0 ? _localizer["Create"] : _localizer["Edit"], parameters, options);
             var result = await dialog.Result;
-            if (!result.Cancelled)
+            if (!result.Canceled)
             {
                 await Reset();
             }
@@ -164,11 +164,11 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
         //        CloseButton = true,
         //        MaxWidth = MaxWidth.Small,
         //        FullWidth = true,
-        //        DisableBackdropClick = true
+        //        BackdropClick = false
         //    };
-        //    var dialog = _dialogService.Show<ImportExcelModal>(_localizer["Import"], parameters, options);
+        //    var dialog = await _dialogService.ShowAsync<ImportExcelModal>(_localizer["Import"], parameters, options);
         //    var result = await dialog.Result;
-        //    if (!result.Cancelled)
+        //    if (!result.Canceled)
         //    {
         //        await Reset();
         //    }

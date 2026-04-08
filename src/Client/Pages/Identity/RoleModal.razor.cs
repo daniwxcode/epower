@@ -1,4 +1,4 @@
-﻿using BlazorHero.CleanArchitecture.Application.Requests.Identity;
+using BlazorHero.CleanArchitecture.Application.Requests.Identity;
 using BlazorHero.CleanArchitecture.Client.Extensions;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using Microsoft.AspNetCore.Components;
@@ -15,7 +15,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Identity
         [Inject] private IRoleManager RoleManager { get; set; }
 
         [Parameter] public RoleRequest RoleModel { get; set; } = new();
-        [CascadingParameter] private MudDialogInstance MudDialog { get; set; }
+        [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
         [CascadingParameter] private HubConnection HubConnection { get; set; }
 
         private FluentValidationValidator _fluentValidationValidator;

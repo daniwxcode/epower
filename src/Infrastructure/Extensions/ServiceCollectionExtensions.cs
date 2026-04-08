@@ -21,7 +21,7 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Extensions
     {
         public static void AddInfrastructureMappings(this IServiceCollection services)
         {
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddAutoMapper(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
         }
 
         public static IServiceCollection AddRepositories(this IServiceCollection services)

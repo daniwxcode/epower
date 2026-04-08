@@ -36,7 +36,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Newtonsoft.Json;
 using Serilog;
 using System;
@@ -177,20 +177,10 @@ namespace BlazorHero.CleanArchitecture.Server.Extensions
                     BearerFormat = "JWT",
                     Description = localizer["Input your Bearer token in this format - Bearer {your token here} to access this API"],
                 });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                c.AddSecurityRequirement(_ => new OpenApiSecurityRequirement
                 {
                     {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer",
-                            },
-                            Scheme = "Bearer",
-                            Name = "Bearer",
-                            In = ParameterLocation.Header,
-                        }, new List<string>()
+                        new OpenApiSecuritySchemeReference("Bearer"), new List<string>()
                     },
                 });
             });

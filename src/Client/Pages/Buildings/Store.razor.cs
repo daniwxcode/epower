@@ -1,4 +1,4 @@
-﻿using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
+using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 
@@ -73,10 +73,10 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
             {
                 { nameof(Shared.Dialogs.DeleteConfirmation.ContentText), string.Format(deleteContent, id) }
             };
-            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
-            var dialog = _dialogService.Show<Shared.Dialogs.DeleteConfirmation>(_localizer["Supprimer"], parameters, options);
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+            var dialog = await _dialogService.ShowAsync<Shared.Dialogs.DeleteConfirmation>(_localizer["Supprimer"], parameters, options);
             var result = await dialog.Result;
-            if (!result.Cancelled)
+            if (!result.Canceled)
             {
                 var response = await _cashPowerManager.DeleteStore(id);
                 if (response.Succeeded)
@@ -119,12 +119,12 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Buildings
             });
             parameters.Add("BuildingId", Id);
 
-            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
             
-            var dialog = _dialogService.Show<AddEditStoreModal>(id == 0 ? _localizer["Ajouter"] : _localizer["Modifier"], parameters, options);
+            var dialog = await _dialogService.ShowAsync<AddEditStoreModal>(id == 0 ? _localizer["Ajouter"] : _localizer["Modifier"], parameters, options);
             
             var result = await dialog.Result;
-            if (!result.Cancelled)
+            if (!result.Canceled)
             {
                 await Reset();
             }

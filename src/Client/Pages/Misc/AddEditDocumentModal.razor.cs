@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using BlazorHero.CleanArchitecture.Application.Features.Documents.Commands.AddEdit;
 using BlazorHero.CleanArchitecture.Application.Requests;
@@ -12,6 +12,7 @@ using Blazored.FluentValidation;
 using BlazorHero.CleanArchitecture.Application.Features.DocumentTypes.Queries.GetAll;
 using BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Misc.Document;
 using BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Misc.DocumentType;
+using System.Threading;
 
 namespace BlazorHero.CleanArchitecture.Client.Pages.Misc
 {
@@ -21,7 +22,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Misc
         [Inject] private IDocumentTypeManager DocumentTypeManager { get; set; }
 
         [Parameter] public AddEditDocumentCommand AddEditDocumentModel { get; set; } = new();
-        [CascadingParameter] private MudDialogInstance MudDialog { get; set; }
+        [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
 
         private FluentValidationValidator _fluentValidationValidator;
         private bool Validated => _fluentValidationValidator.Validate(options => { options.IncludeAllRuleSets(); });
@@ -84,10 +85,10 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Misc
             }
         }
 
-        private async Task<IEnumerable<int>> SearchDocumentTypes(string value)
+        private async Task<IEnumerable<int>> SearchDocumentTypes(string value, CancellationToken cancellationToken)
         {
             // In real life use an asynchronous function for fetching data from an api.
-            await Task.Delay(5);
+            await Task.Delay(5, cancellationToken);
 
             // if text is null or empty, show complete list
             if (string.IsNullOrEmpty(value))

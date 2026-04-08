@@ -1,4 +1,4 @@
-﻿using BlazorHero.CleanArchitecture.Application.Responses.Identity;
+using BlazorHero.CleanArchitecture.Application.Responses.Identity;
 using MudBlazor;
 using System;
 using System.Collections.Generic;
@@ -99,10 +99,10 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Identity
         private async Task InvokeModal()
         {
             var parameters = new DialogParameters();
-            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
-            var dialog = _dialogService.Show<RegisterUserModal>(_localizer["Register New User"], parameters, options);
+            var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true, BackdropClick = false };
+            var dialog = await _dialogService.ShowAsync<RegisterUserModal>(_localizer["Register New User"], parameters, options);
             var result = await dialog.Result;
-            if (!result.Cancelled)
+            if (!result.Canceled)
             {
                 await GetUsersAsync();
             }

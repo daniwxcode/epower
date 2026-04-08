@@ -3,7 +3,6 @@ using BlazorHero.CleanArchitecture.Application.Configurations;
 using BlazorHero.CleanArchitecture.Application.Features.ExtendedAttributes.Commands.AddEdit;
 using BlazorHero.CleanArchitecture.Application.Validators.Features.ExtendedAttributes.Commands.AddEdit;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BlazorHero.CleanArchitecture.Server.Extensions
@@ -12,7 +11,7 @@ namespace BlazorHero.CleanArchitecture.Server.Extensions
     {
         internal static IMvcBuilder AddValidators(this IMvcBuilder builder)
         {
-            builder.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<AppConfiguration>());
+            builder.Services.AddValidatorsFromAssemblyContaining<AppConfiguration>();
             return builder;
         }
 

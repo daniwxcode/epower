@@ -4,13 +4,13 @@ using Flurl.Http;
 
 using Hangfire;
 
-using IronPdf;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace BlazorHero.CleanArchitecture.Infrastructure.Services
@@ -19,8 +19,7 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services
     {
         public PDFService()
         {
-            License.LicenseKey = "IRONPDF.OTR.IRO220405.2499.75108.504022-C58226B4C5-CD2VLU6ONWP66XZ-RL44IBRWC6ND-B2CMHUHEXN2U-TKB4FT6V2LJ2-7HCMFKOVUA42-UKHBNE-LAOLMXLCVGOJUA-UNLIMITED.SUB-3XDWJR.RENEW.SUPPORT.13.MAY.2023";
-            IronPdf.Installation.LinuxAndDockerDependenciesAutoConfig = true;
+            QuestPDF.Settings.License = LicenseType.Community;
         }
         public Task GeneratePdf(string url, string fileName)
         {
@@ -29,25 +28,25 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services
         }
         public async Task Generate(string url, string fileName)
         {
-            var renderer = new ChromePdfRenderer();
-            renderer.RenderingOptions.MarginTop = 0;
-            renderer.RenderingOptions.MarginBottom = 0;
-            renderer.RenderingOptions.MarginRight = 0;
-            renderer.RenderingOptions.MarginLeft = 0;
-            renderer.RenderingOptions.PrintHtmlBackgrounds = true;
+            var htmlContent = await url.GetStringAsync();
+            var textContent = Regex.Replace(htmlContent, "<[^>]+>", " ");
+            textContent = Regex.Replace(textContent, @"\s+", " ").Trim();
 
-            var htmldoc = await url.GetStringAsync();
-            var pdf = renderer.RenderHtmlAsPdf(htmldoc);           
-
-            var folder = new FileInfo(fileName).Directory.FullName;
+            var folder = new FileInfo(fileName).Directory!.FullName;
             if (!Directory.Exists(folder))
             {
                 Directory.CreateDirectory(folder);
             }
-            using (var stream = new FileStream(fileName, FileMode.Create))
+
+            Document.Create(container =>
             {
-                await pdf.Stream.CopyToAsync(stream);
-            }
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(20);
+                    page.Content().Text(textContent).FontSize(10);
+                });
+            }).GeneratePdf(fileName);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@page "/Buildings"
+@page "/Buildings"
 @attribute [Authorize()]
  
 @using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
@@ -17,7 +17,7 @@
 }
 else
 {
-    <MudTable Hover="true" Elevation="25" Items="_List" Dense="true" Bordered="true" Striped="true" Filter="new Func<BuildingResponseBase, bool>(Search)" @bind-brand="item">
+    <MudTable Hover="true" Elevation="25" Items="_List" Dense="true" Bordered="true" Striped="true" Filter="new Func<BuildingResponseBase, bool>(Search)">
         <ToolBarContent>
             <div class="justify-center mud-text-align-center">
                 <MudButton DisableElevation Variant="Variant.Filled" OnClick="(()=> InvokeModal())" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Surface">@_localizer["Enregistrer un Immeuble"]</MudButton>
@@ -43,7 +43,7 @@ else
                     <MudHighlighter Text="@context.Address" HighlightedText="@_searchString" />
                 </MudTd>
                 <MudTd DataLabel="Actions" Style="text-align: right">
-                    <MudMenu Label="@_localizer["Actions"]" Variant="Variant.Filled" DisableElevation="true" EndIcon="@Icons.Filled.KeyboardArrowDown" IconColor="Color.Secondary" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopLeft">
+                    <MudMenu Label="@_localizer["Actions"]" Variant="Variant.Filled" DisableElevation="true" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" IconColor="Color.Secondary" AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopLeft">
                         <MudMenuItem @onclick="@(()=>ViewProfile(@context.Id))">@_localizer["Détails"]</MudMenuItem>
                         <MudMenuItem @onclick="@(() => InvokeModal(@context.Id))">@_localizer["Modifier"]</MudMenuItem>
                         <MudMenuItem @onclick="@(() => Delete(@context.Id))">@_localizer["Supprimer"]</MudMenuItem>

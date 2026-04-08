@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Blazored.FluentValidation;
 using BlazorHero.CleanArchitecture.Application.Features.DocumentTypes.Commands.AddEdit;
 using BlazorHero.CleanArchitecture.Client.Extensions;
@@ -15,7 +15,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Misc
         [Inject] private IDocumentTypeManager DocumentTypeManager { get; set; }
 
         [Parameter] public AddEditDocumentTypeCommand AddEditDocumentTypeModel { get; set; } = new();
-        [CascadingParameter] private MudDialogInstance MudDialog { get; set; }
+        [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
         [CascadingParameter] private HubConnection HubConnection { get; set; }
 
         private FluentValidationValidator _fluentValidationValidator;

@@ -1,4 +1,4 @@
-﻿using Blazored.FluentValidation;
+using Blazored.FluentValidation;
 
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
 using BlazorHero.CleanArchitecture.Client.Extensions;
@@ -82,13 +82,13 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
             };
 
             var titre = "RECU DE VENTE";
-            var dialog = DialogService.Show<DocumentView>(title: titre, parameters, new DialogOptions()
+            var dialog = await DialogService.ShowAsync<DocumentView>(title: titre, parameters, new DialogOptions()
             {
                 FullWidth = true,
                 MaxWidth = MaxWidth.ExtraLarge,
                 FullScreen = true,
                 CloseButton = true,
-                DisableBackdropClick = true,
+                BackdropClick = false,
                 NoHeader = false,
             });
             var result = await dialog.Result;

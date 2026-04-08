@@ -1,4 +1,4 @@
-﻿@namespace BlazorHero.CleanArchitecture.Client.Shared.Dialogs
+@namespace BlazorHero.CleanArchitecture.Client.Shared.Dialogs
 @inject Microsoft.Extensions.Localization.IStringLocalizer<DeleteConfirmation> localizer
 <MudDialog>
     <TitleContent>
@@ -16,7 +16,7 @@
     </DialogActions>
 </MudDialog>
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
 
     [Parameter] public string ContentText { get; set; }
 

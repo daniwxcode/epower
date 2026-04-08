@@ -53,7 +53,7 @@ namespace BlazorHero.CleanArchitecture.Client.Extensions
                     configuration.SnackbarConfiguration.VisibleStateDuration = 3000;
                     configuration.SnackbarConfiguration.ShowCloseIcon = false;
                 })
-                .AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies())
+                .AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()))
                 .AddScoped<ClientPreferenceManager>()
                 .AddScoped<BlazorHeroStateProvider>()
                 .AddScoped<AuthenticationStateProvider, BlazorHeroStateProvider>()

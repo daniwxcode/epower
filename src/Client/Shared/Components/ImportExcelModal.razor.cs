@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Threading.Tasks;
 using Blazored.FluentValidation;
@@ -13,7 +13,7 @@ namespace BlazorHero.CleanArchitecture.Client.Shared.Components
     public partial class ImportExcelModal
     {
         private IBrowserFile _file;
-        [CascadingParameter] private MudDialogInstance MudDialog { get; set; }
+        [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
         [Parameter] public UploadRequest UploadRequest { get; set; } = new();
         [Parameter] public string ModelName { get; set; }
         [Parameter] public Func<UploadRequest, Task<IResult<int>>> OnSaved { get; set; }

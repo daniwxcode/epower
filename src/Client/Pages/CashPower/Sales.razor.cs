@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BlazorHero.CleanArchitecture.Client.Pages.CashPower
@@ -47,7 +48,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.CashPower
                 await HubConnection.StartAsync();
             }
         }
-        private async Task<TableData<PayementResponseBase>> ServerReload(TableState state)
+        private async Task<TableData<PayementResponseBase>> ServerReload(TableState state, CancellationToken cancellationToken)
         {
             if (!string.IsNullOrWhiteSpace(_searchString))
             {

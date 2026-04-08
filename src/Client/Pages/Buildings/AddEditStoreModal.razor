@@ -24,7 +24,7 @@
                 @if (Model.Id != 0)
                 {
                     <MudItem xs="12" md="6">
-                        <MudTextField Disabled For="@(() => Model.Id)" @bind-Value="Model.Id" Label="@_localizer["Id"]" />
+                        <MudTextField T="int" Disabled For="@(() => Model.Id)" @bind-Value="Model.Id" Label="@_localizer["Id"]" />
                         </MudItem>
                 }
                 <MudItem xs="12">
