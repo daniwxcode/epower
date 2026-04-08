@@ -56,7 +56,6 @@ namespace BlazorHero.CleanArchitecture.Server
             services.AddExtendedAttributesUnitOfWork();
             services.AddSharedInfrastructure(_configuration);
             services.RegisterSwagger();
-            services.AddInfrastructureMappings();
             var catVendConfig = _configuration.GetSection("CatVendConfig").Get<CatVendConfig>();
             if (catVendConfig?.UseSimulator == true)
                 services.AddSingleton<ICeetService, CeetServiceSimulator>();

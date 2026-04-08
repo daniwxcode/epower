@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Repositories;
+using BlazorHero.CleanArchitecture.Application.Mappings;
 using BlazorHero.CleanArchitecture.Domain.Contracts;
 using BlazorHero.CleanArchitecture.Domain.Enums;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
@@ -62,20 +62,17 @@ namespace BlazorHero.CleanArchitecture.Application.Features.ExtendedAttributes.C
     internal class AddEditExtendedAttributeCommandHandler<TId, TEntityId, TEntity, TExtendedAttribute>
         : IRequestHandler<AddEditExtendedAttributeCommand<TId, TEntityId, TEntity, TExtendedAttribute>, Result<TId>>
             where TEntity : AuditableEntity<TEntityId>, IEntityWithExtendedAttributes<TExtendedAttribute>, IEntity<TEntityId>
-            where TExtendedAttribute : AuditableEntityExtendedAttribute<TId, TEntityId, TEntity>, IEntity<TId>
+            where TExtendedAttribute : AuditableEntityExtendedAttribute<TId, TEntityId, TEntity>, IEntity<TId>, new()
             where TId : IEquatable<TId>
     {
-        private readonly IMapper _mapper;
         private readonly IStringLocalizer<AddEditExtendedAttributeCommandLocalization> _localizer;
         private readonly IExtendedAttributeUnitOfWork<TId, TEntityId, TEntity> _unitOfWork;
 
         public AddEditExtendedAttributeCommandHandler(
             IExtendedAttributeUnitOfWork<TId, TEntityId, TEntity> unitOfWork,
-            IMapper mapper,
             IStringLocalizer<AddEditExtendedAttributeCommandLocalization> localizer)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
             _localizer = localizer;
         }
 
@@ -89,7 +86,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.ExtendedAttributes.C
 
             if (command.Id.Equals(default))
             {
-                var extendedAttribute = _mapper.Map<TExtendedAttribute>(command);
+                var extendedAttribute = command.ToExtendedAttribute();
                 await _unitOfWork.Repository<TExtendedAttribute>().AddAsync(extendedAttribute);
                 await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.Cache.GetAllEntityExtendedAttributesCacheKey(typeof(TEntity).Name));
 

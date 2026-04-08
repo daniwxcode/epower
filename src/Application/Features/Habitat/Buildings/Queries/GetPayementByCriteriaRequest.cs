@@ -1,25 +1,17 @@
 ﻿using BlazorHero.CleanArchitecture.Application.Extensions;
-using BlazorHero.CleanArchitecture.Application.Features.Documents.Queries.GetAll;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Enums;
-using BlazorHero.CleanArchitecture.Application.Features.Products.Queries.GetAllPaged;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Repositories;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Services.Identity;
-using BlazorHero.CleanArchitecture.Application.Specifications.Catalog;
 using BlazorHero.CleanArchitecture.Application.Specifications.Payements;
 using BlazorHero.CleanArchitecture.Domain.Entities.Bail;
-using BlazorHero.CleanArchitecture.Domain.Entities.Catalog;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
 
 using MediatR;
 
-using Microsoft.EntityFrameworkCore;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -55,17 +47,48 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Qu
             
             var repo = _unitOfWork.Repository<Payment>().Entities.OrderByDescending(_=>_.CreatedOn);
 
-            Expression<Func<Payment, PayementResponseBase>> expression =  e =>  e.GetPayementResponse(_userService).Result;
-
-            var payment = request.PaymentRequestCriteria switch
+            var paymentSpec = request.PaymentRequestCriteria switch
             {              
                 PaymentRequestCriteria.ByUser => new PaymentFilterSpecification(string.Empty,request.Criteria),
 
                 _ => new PaymentFilterSpecification(request.Criteria)
             };
-          var response = await repo.Specify(payment).Select(expression).ToPaginatedListAsync(request.PageNumber,request.PageSize);
-            return response;
-           
+
+            var paginatedPayments = await repo
+                .Specify(paymentSpec)
+                .Select(e => new
+                {
+                    e.Id,
+                    e.InternalReference,
+                    e.CreatedOn,
+                    e.Amount,
+                    e.BilledAmount,
+                    e.SerialNumber,
+                    e.CreatedBy
+                })
+                .ToPaginatedListAsync(request.PageNumber, request.PageSize);
+
+            var userIds = paginatedPayments.Data.Select(p => p.CreatedBy).Where(id => id != null).Distinct().ToList();
+            var usersResult = await _userService.GetAllAsync();
+            var usersLookup = usersResult.Succeeded
+                ? usersResult.Data
+                    .Where(u => userIds.Contains(u.Id))
+                    .ToDictionary(u => u.Id, u => u.UserFullName)
+                : new Dictionary<string, string>();
+
+            var mapped = paginatedPayments.Data
+                .Select(p => new PayementResponseBase(
+                    p.Id,
+                    p.InternalReference,
+                    p.CreatedOn,
+                    p.Amount,
+                    p.BilledAmount,
+                    p.SerialNumber,
+                    null,
+                    usersLookup.GetValueOrDefault(p.CreatedBy, "Inconnu")))
+                .ToList();
+
+            return PaginatedResult<PayementResponseBase>.Success(mapped, paginatedPayments.TotalCount, paginatedPayments.CurrentPage, request.PageSize);
         }
     }
 

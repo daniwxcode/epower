@@ -1,6 +1,6 @@
-﻿using AutoMapper;
-using BlazorHero.CleanArchitecture.Application.Interfaces.Repositories;
+﻿using BlazorHero.CleanArchitecture.Application.Interfaces.Repositories;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Services;
+using BlazorHero.CleanArchitecture.Application.Mappings;
 using BlazorHero.CleanArchitecture.Application.Requests;
 using BlazorHero.CleanArchitecture.Domain.Entities.Misc;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
@@ -30,15 +30,13 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Documents.Commands.A
 
     internal class AddEditDocumentCommandHandler : IRequestHandler<AddEditDocumentCommand, Result<int>>
     {
-        private readonly IMapper _mapper;
         private readonly IUnitOfWork<int> _unitOfWork;
         private readonly IUploadService _uploadService;
         private readonly IStringLocalizer<AddEditDocumentCommandHandler> _localizer;
 
-        public AddEditDocumentCommandHandler(IUnitOfWork<int> unitOfWork, IMapper mapper, IUploadService uploadService, IStringLocalizer<AddEditDocumentCommandHandler> localizer)
+        public AddEditDocumentCommandHandler(IUnitOfWork<int> unitOfWork, IUploadService uploadService, IStringLocalizer<AddEditDocumentCommandHandler> localizer)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
             _uploadService = uploadService;
             _localizer = localizer;
         }
@@ -53,7 +51,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Documents.Commands.A
 
             if (command.Id == 0)
             {
-                var doc = _mapper.Map<Document>(command);
+                var doc = command.ToDocument();
                 if (uploadRequest != null)
                 {
                     doc.URL = _uploadService.UploadAsync(uploadRequest);

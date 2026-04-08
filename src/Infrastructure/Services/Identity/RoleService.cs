@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using BlazorHero.CleanArchitecture.Application.Interfaces.Services.Identity;
+﻿using BlazorHero.CleanArchitecture.Application.Interfaces.Services.Identity;
 using BlazorHero.CleanArchitecture.Application.Requests.Identity;
 using BlazorHero.CleanArchitecture.Application.Responses.Identity;
 using BlazorHero.CleanArchitecture.Infrastructure.Helpers;
+using BlazorHero.CleanArchitecture.Infrastructure.Mappings;
 using BlazorHero.CleanArchitecture.Infrastructure.Models.Identity;
 using BlazorHero.CleanArchitecture.Shared.Constants.Role;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
@@ -25,18 +25,15 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services.Identity
         private readonly IRoleClaimService _roleClaimService;
         private readonly IStringLocalizer<RoleService> _localizer;
         private readonly ICurrentUserService _currentUserService;
-        private readonly IMapper _mapper;
 
         public RoleService(
             RoleManager<BlazorHeroRole> roleManager,
-            IMapper mapper,
             UserManager<BlazorHeroUser> userManager,
             IRoleClaimService roleClaimService,
             IStringLocalizer<RoleService> localizer,
             ICurrentUserService currentUserService)
         {
             _roleManager = roleManager;
-            _mapper = mapper;
             _userManager = userManager;
             _roleClaimService = roleClaimService;
             _localizer = localizer;
@@ -76,7 +73,7 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services.Identity
         public async Task<Result<List<RoleResponse>>> GetAllAsync()
         {
             var roles = await _roleManager.Roles.ToListAsync();
-            var rolesResponse = _mapper.Map<List<RoleResponse>>(roles);
+            var rolesResponse = roles.ToRoleResponseList();
             return await Result<List<RoleResponse>>.SuccessAsync(rolesResponse);
         }
 
@@ -139,7 +136,7 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services.Identity
         public async Task<Result<RoleResponse>> GetByIdAsync(string id)
         {
             var roles = await _roleManager.Roles.SingleOrDefaultAsync(x => x.Id == id);
-            var rolesResponse = _mapper.Map<RoleResponse>(roles);
+            var rolesResponse = roles?.ToRoleResponse();
             return await Result<RoleResponse>.SuccessAsync(rolesResponse);
         }
 

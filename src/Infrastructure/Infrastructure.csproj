@@ -19,7 +19,6 @@
     <None Remove="Persistence\**" />
   </ItemGroup>-->
 	<ItemGroup>
-		<PackageReference Include="AutoMapper" Version="16.1.1" />
 		<PackageReference Include="Blazored.LocalStorage" Version="4.1.5" />
 		<PackageReference Include="EPPlus" Version="8.5.1" />
 		<PackageReference Include="Flurl" Version="4.0.0" />

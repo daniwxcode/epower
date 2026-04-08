@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Repositories;
+using BlazorHero.CleanArchitecture.Application.Mappings;
 using BlazorHero.CleanArchitecture.Domain.Entities.Misc;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
@@ -24,14 +24,12 @@ namespace BlazorHero.CleanArchitecture.Application.Features.DocumentTypes.Comman
 
     internal class AddEditDocumentTypeCommandHandler : IRequestHandler<AddEditDocumentTypeCommand, Result<int>>
     {
-        private readonly IMapper _mapper;
         private readonly IStringLocalizer<AddEditDocumentTypeCommandHandler> _localizer;
         private readonly IUnitOfWork<int> _unitOfWork;
 
-        public AddEditDocumentTypeCommandHandler(IUnitOfWork<int> unitOfWork, IMapper mapper, IStringLocalizer<AddEditDocumentTypeCommandHandler> localizer)
+        public AddEditDocumentTypeCommandHandler(IUnitOfWork<int> unitOfWork, IStringLocalizer<AddEditDocumentTypeCommandHandler> localizer)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
             _localizer = localizer;
         }
 
@@ -45,7 +43,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.DocumentTypes.Comman
 
             if (command.Id == 0)
             {
-                var documentType = _mapper.Map<DocumentType>(command);
+                var documentType = command.ToDocumentType();
                 await _unitOfWork.Repository<DocumentType>().AddAsync(documentType);
                 await _unitOfWork.CommitAndRemoveCache(cancellationToken, ApplicationConstants.Cache.GetAllDocumentTypesCacheKey);
                 return await Result<int>.SuccessAsync(documentType.Id, _localizer["Document Type Saved"]);

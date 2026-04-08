@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Repositories;
+using BlazorHero.CleanArchitecture.Application.Mappings;
 using BlazorHero.CleanArchitecture.Domain.Contracts;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
@@ -35,13 +35,11 @@ namespace BlazorHero.CleanArchitecture.Application.Features.ExtendedAttributes.Q
             where TId : IEquatable<TId>
     {
         private readonly IUnitOfWork<TId> _unitOfWork;
-        private readonly IMapper _mapper;
         private readonly IAppCache _cache;
 
-        public GetAllExtendedAttributesByEntityIdQueryHandler(IUnitOfWork<TId> unitOfWork, IMapper mapper, IAppCache cache)
+        public GetAllExtendedAttributesByEntityIdQueryHandler(IUnitOfWork<TId> unitOfWork, IAppCache cache)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
             _cache = cache;
         }
 
@@ -49,7 +47,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.ExtendedAttributes.Q
         {
             Func<Task<List<TExtendedAttribute>>> getAllExtendedAttributesByEntityId = () => _unitOfWork.Repository<TExtendedAttribute>().Entities.Where(x => x.EntityId.Equals(request.EntityId)).ToListAsync(cancellationToken);
             var extendedAttributeList = await _cache.GetOrAddAsync(ApplicationConstants.Cache.GetAllEntityExtendedAttributesByEntityIdCacheKey(typeof(TEntity).Name, request.EntityId), getAllExtendedAttributesByEntityId);
-            var mappedExtendedAttributes = _mapper.Map<List<GetAllExtendedAttributesByEntityIdResponse<TId, TEntityId>>>(extendedAttributeList);
+            var mappedExtendedAttributes = extendedAttributeList.Cast<AuditableEntityExtendedAttribute<TId, TEntityId, TEntity>>().ToGetAllByEntityIdResponseList<TId, TEntityId, TEntity>();
             return await Result<List<GetAllExtendedAttributesByEntityIdResponse<TId, TEntityId>>>.SuccessAsync(mappedExtendedAttributes);
         }
     }

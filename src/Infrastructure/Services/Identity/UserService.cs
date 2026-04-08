@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using AutoMapper;
 using BlazorHero.CleanArchitecture.Application.Exceptions;
 using BlazorHero.CleanArchitecture.Application.Extensions;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Services;
@@ -13,6 +12,7 @@ using BlazorHero.CleanArchitecture.Application.Interfaces.Services.Identity;
 using BlazorHero.CleanArchitecture.Application.Requests.Identity;
 using BlazorHero.CleanArchitecture.Application.Requests.Mail;
 using BlazorHero.CleanArchitecture.Application.Responses.Identity;
+using BlazorHero.CleanArchitecture.Infrastructure.Mappings;
 using BlazorHero.CleanArchitecture.Infrastructure.Models.Identity;
 using BlazorHero.CleanArchitecture.Infrastructure.Specifications;
 using BlazorHero.CleanArchitecture.Shared.Constants.Role;
@@ -33,11 +33,9 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services.Identity
         private readonly IStringLocalizer<UserService> _localizer;
         private readonly IExcelService _excelService;
         private readonly ICurrentUserService _currentUserService;
-        private readonly IMapper _mapper;
 
         public UserService(
             UserManager<BlazorHeroUser> userManager,
-            IMapper mapper,
             RoleManager<BlazorHeroRole> roleManager,
             IMailService mailService,
             IStringLocalizer<UserService> localizer,
@@ -45,7 +43,6 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services.Identity
             ICurrentUserService currentUserService)
         {
             _userManager = userManager;
-            _mapper = mapper;
             _roleManager = roleManager;
             _mailService = mailService;
             _localizer = localizer;
@@ -56,7 +53,7 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services.Identity
         public async Task<Result<List<UserResponse>>> GetAllAsync()
         {
             var users = await _userManager.Users.ToListAsync();
-            var result = _mapper.Map<List<UserResponse>>(users);
+            var result = users.ToUserResponseList();
             return await Result<List<UserResponse>>.SuccessAsync(result);
         }
 
@@ -134,7 +131,7 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services.Identity
         public async Task<IResult<UserResponse>> GetAsync(string userId)
         {
             var user = await _userManager.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
-            var result = _mapper.Map<UserResponse>(user);
+            var result = user.ToUserResponse();
             return await Result<UserResponse>.SuccessAsync(result);
         }
 

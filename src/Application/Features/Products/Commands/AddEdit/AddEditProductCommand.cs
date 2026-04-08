@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using AutoMapper;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Repositories;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Services;
+using BlazorHero.CleanArchitecture.Application.Mappings;
 using BlazorHero.CleanArchitecture.Application.Requests;
 using BlazorHero.CleanArchitecture.Domain.Entities.Catalog;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
@@ -33,15 +33,13 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Products.Commands.Ad
 
     internal class AddEditProductCommandHandler : IRequestHandler<AddEditProductCommand, Result<int>>
     {
-        private readonly IMapper _mapper;
         private readonly IUnitOfWork<int> _unitOfWork;
         private readonly IUploadService _uploadService;
         private readonly IStringLocalizer<AddEditProductCommandHandler> _localizer;
 
-        public AddEditProductCommandHandler(IUnitOfWork<int> unitOfWork, IMapper mapper, IUploadService uploadService, IStringLocalizer<AddEditProductCommandHandler> localizer)
+        public AddEditProductCommandHandler(IUnitOfWork<int> unitOfWork, IUploadService uploadService, IStringLocalizer<AddEditProductCommandHandler> localizer)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
             _uploadService = uploadService;
             _localizer = localizer;
         }
@@ -62,7 +60,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Products.Commands.Ad
 
             if (command.Id == 0)
             {
-                var product = _mapper.Map<Product>(command);
+                var product = command.ToProduct();
                 if (uploadRequest != null)
                 {
                     product.ImageDataURL = _uploadService.UploadAsync(uploadRequest);

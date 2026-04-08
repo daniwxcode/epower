@@ -1,83 +1,240 @@
 ﻿@page "/dashboard"
 @attribute [Authorize(Policy = Permissions.Dashboards.View)]
 @inject Microsoft.Extensions.Localization.IStringLocalizer<Dashboard> _localizer
+@using System.Globalization
 
-<HeroTitle Title="@_localizer["Dashboard"]"/>
+<HeroTitle Title="@_localizer["Dashboard"]" />
+
 @if (!_loaded)
 {
-    <Overlay MudOverlayIsVisible=@(!_loaded) />
+    <Overlay MudOverlayIsVisible="@(!_loaded)" />
 }
 else
 {
-    <MudGrid>
+    @* ── Section 1: Today's KPIs ── *@
+    <MudText Typo="Typo.h6" Class="mb-2">
+        <MudIcon Icon="@Icons.Material.Filled.Today" Class="mr-1" /> Aujourd'hui — @DateTime.Now.ToString("dddd dd MMMM yyyy", _frCulture)
+    </MudText>
+
+    <MudGrid Spacing="3" Class="mb-4">
         <MudItem xs="12" sm="6" md="3">
-            <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-                <MudIcon Icon="@Icons.Material.Filled.Business" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
-                <div>
-                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Immeubles"]</MudText>
-                    <MudText Typo="Typo.h5">@Model.BuildingCount</MudText>
-                </div>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6" md="3">
-            <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-                <MudIcon Icon="@Icons.Material.Filled.Storefront" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
-                <div>
-                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Boutiques"]</MudText>
-                    <MudText @bind-Value="@Model.StoreCount" Typo="Typo.h5">@Model.StoreCount</MudText>
-                </div>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6" md="3">
-            <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-                <MudIcon Icon="@Icons.Material.Filled.ElectricalServices" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
-                <div>
-                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Compteurs"]</MudText>
-                    <MudText @bind-Value="@Model.MeterCount" Typo="Typo.h5">@Model.MeterCount</MudText>
-                </div>
+            <MudPaper Elevation="3" Class="pa-4 rounded-lg" Style="border-left: 4px solid var(--mud-palette-success);">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                    <MudAvatar Color="Color.Success" Variant="Variant.Filled" Size="Size.Large">
+                        <MudIcon Icon="@Icons.Material.Filled.TrendingUp" />
+                    </MudAvatar>
+                    <div>
+                        <MudText Typo="Typo.caption" Class="mud-text-secondary">Ventes du jour</MudText>
+                        <MudText Typo="Typo.h5" Class="fw-bold">@Model.TodaySalesCount</MudText>
+                    </div>
+                </MudStack>
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
-            <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-                <MudIcon Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Secondary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
-                <div>
-                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Ventes"]</MudText>
-                    <MudText @bind-Value="@Model.SalesCount" Typo="Typo.h5">@Model.SalesCount</MudText>
-                </div>
+            <MudPaper Elevation="3" Class="pa-4 rounded-lg" Style="border-left: 4px solid var(--mud-palette-primary);">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                    <MudAvatar Color="Color.Primary" Variant="Variant.Filled" Size="Size.Large">
+                        <MudIcon Icon="@Icons.Material.Filled.Payments" />
+                    </MudAvatar>
+                    <div>
+                        <MudText Typo="Typo.caption" Class="mud-text-secondary">CA du jour</MudText>
+                        <MudText Typo="Typo.h5" Class="fw-bold">@Model.TodaySalesSum.ToString("N0", _frCulture) <span style="font-size:0.6em">F</span></MudText>
+                    </div>
+                </MudStack>
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
-            <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-                <MudIcon Icon="@Icons.Material.Filled.Money" Color="Color.Error" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
-                <div>
-                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Total des Ventes"]</MudText>
-                    <MudText @bind-Value="@Model.SalesSum" Typo="Typo.h5">@Model.SalesSum</MudText>
-                </div>
+            <MudPaper Elevation="3" Class="pa-4 rounded-lg" Style="border-left: 4px solid var(--mud-palette-warning);">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                    <MudAvatar Color="Color.Warning" Variant="Variant.Filled" Size="Size.Large">
+                        <MudIcon Icon="@Icons.Material.Filled.AccountBalanceWallet" />
+                    </MudAvatar>
+                    <div>
+                        <MudText Typo="Typo.caption" Class="mud-text-secondary">Frais du jour</MudText>
+                        <MudText Typo="Typo.h5" Class="fw-bold">@Model.TodayFeesSum.ToString("N0", _frCulture) <span style="font-size:0.6em">F</span></MudText>
+                    </div>
+                </MudStack>
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
-            <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-                <MudIcon Icon="@Icons.Material.Filled.Face" Color="Color.Success" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
-                <div>
-                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Utilisateurs"]</MudText>
-                    <MudText Typo="Typo.h5">@Model.UserCount</MudText>
-                </div>
+            <MudPaper Elevation="3" Class="pa-4 rounded-lg" Style="border-left: 4px solid var(--mud-palette-info);">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                    <MudAvatar Color="Color.Info" Variant="Variant.Filled" Size="Size.Large">
+                        <MudIcon Icon="@Icons.Material.Filled.CalendarMonth" />
+                    </MudAvatar>
+                    <div>
+                        <MudText Typo="Typo.caption" Class="mud-text-secondary">CA du mois</MudText>
+                        <MudText Typo="Typo.h5" Class="fw-bold">@Model.MonthSalesSum.ToString("N0", _frCulture) <span style="font-size:0.6em">F</span></MudText>
+                    </div>
+                </MudStack>
             </MudPaper>
         </MudItem>
-        <MudItem xs="12" sm="6" md="3">
-            <MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
-                <MudIcon Icon="@Icons.Material.Filled.Groups" Color="Color.Warning" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
-                <div>
-                    <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@_localizer["Profils"]</MudText>
-                    <MudText Typo="Typo.h5">@Model.RoleCount</MudText>
-                </div>
+    </MudGrid>
+
+    @* ── Section 2: Global KPIs ── *@
+    <MudText Typo="Typo.h6" Class="mb-2">
+        <MudIcon Icon="@Icons.Material.Filled.Analytics" Class="mr-1" /> Vue globale
+    </MudText>
+
+    <MudGrid Spacing="3" Class="mb-4">
+        <MudItem xs="6" sm="4" md="2">
+            <MudPaper Elevation="2" Class="pa-3 rounded-lg text-center">
+                <MudIcon Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" />
+                <MudText Typo="Typo.h6" Class="fw-bold">@Model.SalesCount</MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">Ventes totales</MudText>
             </MudPaper>
         </MudItem>
-        <MudItem xs="12">
-            <MudPaper Elevation="25" Class="pa-4" Style="height:400px;">
-                <MudChart ChartType="ChartType.Bar" ChartSeries="@_dataEnterBarChartSeries" XAxisLabels="@_dataEnterBarChartXAxisLabels.Select(a => _localizer[a].Value).ToArray()" Width="100%" Height="300px"></MudChart>
+        <MudItem xs="6" sm="4" md="2">
+            <MudPaper Elevation="2" Class="pa-3 rounded-lg text-center">
+                <MudIcon Icon="@Icons.Material.Filled.Money" Color="Color.Success" />
+                <MudText Typo="Typo.h6" Class="fw-bold">@Model.SalesSum.ToString("N0", _frCulture)</MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">CA total (F)</MudText>
             </MudPaper>
         </MudItem>
-       
+        <MudItem xs="6" sm="4" md="2">
+            <MudPaper Elevation="2" Class="pa-3 rounded-lg text-center">
+                <MudIcon Icon="@Icons.Material.Filled.Business" Color="Color.Secondary" />
+                <MudText Typo="Typo.h6" Class="fw-bold">@Model.BuildingCount</MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">Immeubles</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" sm="4" md="2">
+            <MudPaper Elevation="2" Class="pa-3 rounded-lg text-center">
+                <MudIcon Icon="@Icons.Material.Filled.Storefront" Color="Color.Warning" />
+                <MudText Typo="Typo.h6" Class="fw-bold">@Model.StoreCount</MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">Boutiques</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" sm="4" md="2">
+            <MudPaper Elevation="2" Class="pa-3 rounded-lg text-center">
+                <MudIcon Icon="@Icons.Material.Filled.ElectricalServices" Color="Color.Info" />
+                <MudText Typo="Typo.h6" Class="fw-bold">@Model.MeterCount</MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">Compteurs</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6" sm="4" md="2">
+            <MudPaper Elevation="2" Class="pa-3 rounded-lg text-center">
+                <MudIcon Icon="@Icons.Material.Filled.People" Color="Color.Tertiary" />
+                <MudText Typo="Typo.h6" Class="fw-bold">@Model.UserCount</MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">Utilisateurs</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    @* ── Section 3: Charts ── *@
+    <MudGrid Spacing="3" Class="mb-4">
+        @* Monthly Revenue Bar Chart *@
+        <MudItem xs="12" md="8">
+            <MudPaper Elevation="3" Class="pa-4 rounded-lg">
+                <MudText Typo="Typo.subtitle1" Class="mb-2 fw-bold">
+                    <MudIcon Icon="@Icons.Material.Filled.BarChart" Class="mr-1" /> Chiffre d'affaires mensuel — @DateTime.Now.Year
+                </MudText>
+                <MudChart ChartType="ChartType.Bar"
+                          ChartSeries="@_revenueBarSeries"
+                          XAxisLabels="@_monthLabels"
+                          Width="100%" Height="320px" />
+            </MudPaper>
+        </MudItem>
+
+        @* Daily Trend Line Chart *@
+        <MudItem xs="12" md="4">
+            <MudPaper Elevation="3" Class="pa-4 rounded-lg">
+                <MudText Typo="Typo.subtitle1" Class="mb-2 fw-bold">
+                    <MudIcon Icon="@Icons.Material.Filled.ShowChart" Class="mr-1" /> Tendance 30 jours
+                </MudText>
+                <MudChart ChartType="ChartType.Line"
+                          ChartSeries="@_dailyTrendSeries"
+                          XAxisLabels="@_dailyLabels"
+                          Width="100%" Height="320px" />
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    @* ── Section 4: Cashier Performance ── *@
+    <MudGrid Spacing="3" Class="mb-4">
+        <MudItem xs="12" md="8">
+            <MudPaper Elevation="3" Class="pa-4 rounded-lg">
+                <MudText Typo="Typo.subtitle1" Class="mb-3 fw-bold">
+                    <MudIcon Icon="@Icons.Material.Filled.Group" Class="mr-1" /> Performance des caissiers
+                </MudText>
+                <MudTable Items="@Model.CashierSales" Dense="true" Hover="true" Bordered="true" Striped="true"
+                          Breakpoint="Breakpoint.Sm" FixedHeader="true" Style="max-height: 400px; overflow-y: auto;">
+                    <HeaderContent>
+                        <MudTh>Caissier</MudTh>
+                        <MudTh Style="text-align:right">Ventes</MudTh>
+                        <MudTh Style="text-align:right">Montant total</MudTh>
+                        <MudTh Style="text-align:right">Frais</MudTh>
+                        <MudTh Style="text-align:right">Aujourd'hui</MudTh>
+                        <MudTh Style="text-align:right">CA du jour</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Caissier">
+                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                                <MudAvatar Size="Size.Small" Color="Color.Primary">@context.FullName[0]</MudAvatar>
+                                <MudText Typo="Typo.body2">@context.FullName</MudText>
+                            </MudStack>
+                        </MudTd>
+                        <MudTd DataLabel="Ventes" Style="text-align:right">
+                            <MudChip T="string" Size="Size.Small" Color="Color.Default">@context.SalesCount</MudChip>
+                        </MudTd>
+                        <MudTd DataLabel="Montant" Style="text-align:right">
+                            <b>@context.SalesAmount.ToString("N0", _frCulture) F</b>
+                        </MudTd>
+                        <MudTd DataLabel="Frais" Style="text-align:right">
+                            @context.FeesAmount.ToString("N0", _frCulture) F
+                        </MudTd>
+                        <MudTd DataLabel="Aujourd'hui" Style="text-align:right">
+                            <MudChip T="string" Size="Size.Small" Color="@(context.TodaySalesCount > 0 ? Color.Success : Color.Default)">@context.TodaySalesCount</MudChip>
+                        </MudTd>
+                        <MudTd DataLabel="CA jour" Style="text-align:right">
+                            <b>@context.TodaySalesAmount.ToString("N0", _frCulture) F</b>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudPaper>
+        </MudItem>
+
+        @* Top Meters *@
+        <MudItem xs="12" md="4">
+            <MudPaper Elevation="3" Class="pa-4 rounded-lg">
+                <MudText Typo="Typo.subtitle1" Class="mb-3 fw-bold">
+                    <MudIcon Icon="@Icons.Material.Filled.ElectricalServices" Class="mr-1" /> Top 5 compteurs
+                </MudText>
+                <MudSimpleTable Dense="true" Hover="true" Bordered="true" Striped="true">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Compteur</th>
+                            <th style="text-align:right">Ventes</th>
+                            <th style="text-align:right">Montant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{ var rank = 0; }
+                        @foreach (var meter in Model.TopMeters)
+                        {
+                            rank++;
+                            <tr>
+                                <td>
+                                    @if (rank <= 3)
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.EmojiEvents"
+                                                 Color="@(rank == 1 ? Color.Warning : rank == 2 ? Color.Default : Color.Dark)"
+                                                 Size="Size.Small" />
+                                    }
+                                    else
+                                    {
+                                        @rank
+                                    }
+                                </td>
+                                <td><MudText Typo="Typo.body2" Style="font-family:monospace;">@meter.SerialNumber</MudText></td>
+                                <td style="text-align:right">@meter.SalesCount</td>
+                                <td style="text-align:right"><b>@meter.TotalAmount.ToString("N0", _frCulture) F</b></td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            </MudPaper>
+        </MudItem>
     </MudGrid>
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using AutoMapper;
 using BlazorHero.CleanArchitecture.Application.Requests.Identity;
 using BlazorHero.CleanArchitecture.Application.Responses.Identity;
 using BlazorHero.CleanArchitecture.Client.Extensions;
@@ -9,8 +8,6 @@ using BlazorHero.CleanArchitecture.Client.Infrastructure.Mappings;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using MudBlazor;
 using System.Threading.Tasks;
 using BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Identity.Roles;
@@ -30,7 +27,6 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Identity
 
         private PermissionResponse _model;
         private Dictionary<string, List<RoleClaimResponse>> GroupedRoleClaims { get; } = new();
-        private IMapper _mapper;
         private RoleClaimResponse _roleClaims = new();
         private RoleClaimResponse _selectedItem = new();
         private string _searchString = "";
@@ -60,7 +56,6 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Identity
 
         private async Task GetRolePermissionsAsync()
         {
-            _mapper = new MapperConfiguration(c => { c.AddProfile<RoleProfile>(); }, NullLoggerFactory.Instance).CreateMapper();
             var roleId = Id;
             var result = await RoleManager.GetPermissionsAsync(roleId);
             if (result.Succeeded)
@@ -95,7 +90,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Identity
 
         private async Task SaveAsync()
         {
-            var request = _mapper.Map<PermissionResponse, PermissionRequest>(_model);
+            var request = _model.ToPermissionRequest();
             var result = await RoleManager.UpdatePermissionsAsync(request);
             if (result.Succeeded)
             {

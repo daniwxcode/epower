@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Repositories;
+using BlazorHero.CleanArchitecture.Application.Mappings;
 using BlazorHero.CleanArchitecture.Domain.Contracts;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
@@ -30,13 +31,11 @@ namespace BlazorHero.CleanArchitecture.Application.Features.ExtendedAttributes.Q
             where TId : IEquatable<TId>
     {
         private readonly IUnitOfWork<TId> _unitOfWork;
-        private readonly IMapper _mapper;
         private readonly IAppCache _cache;
 
-        public GetAllExtendedAttributesQueryHandler(IUnitOfWork<TId> unitOfWork, IMapper mapper, IAppCache cache)
+        public GetAllExtendedAttributesQueryHandler(IUnitOfWork<TId> unitOfWork, IAppCache cache)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
             _cache = cache;
         }
 
@@ -44,7 +43,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.ExtendedAttributes.Q
         {
             Func<Task<List<TExtendedAttribute>>> getAllExtendedAttributes = () => _unitOfWork.Repository<TExtendedAttribute>().GetAllAsync();
             var extendedAttributeList = await _cache.GetOrAddAsync(ApplicationConstants.Cache.GetAllEntityExtendedAttributesCacheKey(typeof(TEntity).Name), getAllExtendedAttributes);
-            var mappedExtendedAttributes = _mapper.Map<List<GetAllExtendedAttributesResponse<TId, TEntityId>>>(extendedAttributeList);
+            var mappedExtendedAttributes = extendedAttributeList.Cast<AuditableEntityExtendedAttribute<TId, TEntityId, TEntity>>().ToGetAllResponseList<TId, TEntityId, TEntity>();
             return await Result<List<GetAllExtendedAttributesResponse<TId, TEntityId>>>.SuccessAsync(mappedExtendedAttributes);
         }
     }
