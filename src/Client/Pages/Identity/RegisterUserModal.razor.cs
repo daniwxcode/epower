@@ -1,4 +1,5 @@
 using BlazorHero.CleanArchitecture.Application.Requests.Identity;
+using BlazorHero.CleanArchitecture.Shared.Constants.User;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Threading.Tasks;
@@ -10,7 +11,13 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Identity
     {
         private FluentValidationValidator _fluentValidationValidator;
         private bool Validated => _fluentValidationValidator.Validate(options => { options.IncludeAllRuleSets(); });
-        private readonly RegisterRequest _registerUserModel = new();
+        private readonly RegisterRequest _registerUserModel = new()
+        {
+            Password = UserConstants.DefaultPassword,
+            ConfirmPassword = UserConstants.DefaultPassword,
+            ActivateUser = true,
+            AutoConfirmEmail = true
+        };
         [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
 
         private void Cancel()
@@ -32,26 +39,6 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Identity
                 {
                     _snackBar.Add(message, Severity.Error);
                 }
-            }
-        }
-
-        private bool _passwordVisibility;
-        private InputType _passwordInput = InputType.Password;
-        private string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
-
-        private void TogglePasswordVisibility()
-        {
-            if (_passwordVisibility)
-            {
-                _passwordVisibility = false;
-                _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
-                _passwordInput = InputType.Password;
-            }
-            else
-            {
-                _passwordVisibility = true;
-                _passwordInputIcon = Icons.Material.Filled.Visibility;
-                _passwordInput = InputType.Text;
             }
         }
     }

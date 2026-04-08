@@ -44,13 +44,13 @@ namespace BlazorHero.CleanArchitecture.Server
             services.AddBackGroundService();
             services.AddSerialization();
             services.AddDatabase(_configuration);
-            services.AddServerStorage(); //TODO - should implement ServerStorageProvider to work correctly!
+            services.AddServerStorage();
             services.AddScoped<ServerPreferenceManager>();
             services.AddServerLocalization();
             services.AddIdentity();
             services.AddJwtAuthentication(services.GetApplicationSettings(_configuration));
             services.AddSignalR();
-            services.AddApplicationLayer();
+            services.AddApplicationLayer(_configuration["MediatR:LicenseKey"]);
             services.AddApplicationServices();
             services.AddRepositories();
             services.AddExtendedAttributesUnitOfWork();

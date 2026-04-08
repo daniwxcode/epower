@@ -118,5 +118,31 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Identity
             if (email == "mukesh@blazorhero.com") _snackBar.Add(_localizer["Not Allowed."], Severity.Error);
             else _navigationManager.NavigateTo($"/identity/user-roles/{userId}");
         }
+
+        private async Task AdminResetPasswordAsync(string userId, string userName)
+        {
+            var parameters = new DialogParameters
+            {
+                ["ContentText"] = $"Réinitialiser le mot de passe de « {userName} » au mot de passe par défaut ?"
+            };
+            var dialog = await _dialogService.ShowAsync<Shared.Dialogs.DeleteConfirmation>(
+                "Réinitialiser le mot de passe", parameters,
+                new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true });
+            var confirmResult = await dialog.Result;
+            if (confirmResult.Canceled) return;
+
+            var result = await _userManager.AdminResetPasswordAsync(userId);
+            if (result.Succeeded)
+            {
+                _snackBar.Add(result.Messages[0], Severity.Success);
+            }
+            else
+            {
+                foreach (var message in result.Messages)
+                {
+                    _snackBar.Add(message, Severity.Error);
+                }
+            }
+        }
     }
 }

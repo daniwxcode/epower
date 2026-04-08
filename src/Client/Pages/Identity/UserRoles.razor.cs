@@ -1,7 +1,10 @@
 ﻿using System;
 using BlazorHero.CleanArchitecture.Application.Requests.Identity;
 using BlazorHero.CleanArchitecture.Application.Responses.Identity;
+using BlazorHero.CleanArchitecture.Client.Extensions;
+using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using MudBlazor;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -13,6 +16,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Identity
 {
     public partial class UserRoles
     {
+        [CascadingParameter] private HubConnection HubConnection { get; set; }
         [Parameter] public string Id { get; set; }
         [Parameter] public string Title { get; set; }
         [Parameter] public string Description { get; set; }
@@ -28,6 +32,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Identity
         private bool _canEditUsers;
         private bool _canSearchRoles;
         private bool _loaded;
+        private bool _processing;
 
         protected override async Task OnInitializedAsync()
         {
@@ -50,27 +55,42 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Identity
             }
 
             _loaded = true;
+            HubConnection = HubConnection.TryInitialize(_navigationManager, _localStorage);
+            if (HubConnection.State == HubConnectionState.Disconnected)
+            {
+                await HubConnection.StartAsync();
+            }
         }
 
         private async Task SaveAsync()
         {
-            var request = new UpdateUserRolesRequest()
+            if (_processing) return;
+            _processing = true;
+            try
             {
-                UserId = Id,
-                UserRoles = UserRolesList
-            };
-            var result = await _userManager.UpdateRolesAsync(request);
-            if (result.Succeeded)
-            {
-                _snackBar.Add(result.Messages[0], Severity.Success);
-                _navigationManager.NavigateTo("/identity/users");
-            }
-            else
-            {
-                foreach (var error in result.Messages)
+                var request = new UpdateUserRolesRequest()
                 {
-                    _snackBar.Add(error, Severity.Error);
+                    UserId = Id,
+                    UserRoles = UserRolesList
+                };
+                var result = await _userManager.UpdateRolesAsync(request);
+                if (result.Succeeded)
+                {
+                    _snackBar.Add(result.Messages[0], Severity.Success);
+                    await HubConnection.SendAsync(ApplicationConstants.SignalR.SendRegenerateTokens);
+                    _navigationManager.NavigateTo("/identity/users");
                 }
+                else
+                {
+                    foreach (var error in result.Messages)
+                    {
+                        _snackBar.Add(error, Severity.Error);
+                    }
+                }
+            }
+            finally
+            {
+                _processing = false;
             }
         }
 

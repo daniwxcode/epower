@@ -15,9 +15,6 @@ namespace BlazorHero.CleanArchitecture.Application.Validators.Requests.Identity
             RuleFor(request => request.Email)
                 .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage(x => localizer["Email is required"])
                 .EmailAddress().WithMessage(x => localizer["Email is not correct"]);
-            RuleFor(request => request.UserName)
-                .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage(x => localizer["UserName is required"])
-                .MinimumLength(6).WithMessage(localizer["UserName must be at least of length 6"]);
             RuleFor(request => request.Password)
                 .Must(x => !string.IsNullOrWhiteSpace(x)).WithMessage(x => localizer["Password is required!"])
                 .MinimumLength(8).WithMessage(localizer["Password must be at least of length 8"])

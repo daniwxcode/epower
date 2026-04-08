@@ -30,6 +30,17 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Models.Identity
         public bool IsActive { get; set; }
         public string RefreshToken { get; set; }
         public DateTime RefreshTokenExpiryTime { get; set; }
+
+        /// <summary>
+        /// Indique que l'utilisateur doit changer son mot de passe (première connexion ou réinitialisation admin).
+        /// </summary>
+        public bool MustChangePassword { get; set; } = true;
+
+        /// <summary>
+        /// Date du dernier changement de mot de passe (expiration à 3 mois).
+        /// </summary>
+        public DateTime? PasswordChangedOn { get; set; }
+
         public virtual ICollection<ChatHistory<BlazorHeroUser>> ChatHistoryFromUsers { get; set; }
         public virtual ICollection<ChatHistory<BlazorHeroUser>> ChatHistoryToUsers { get; set; }
 

@@ -16,6 +16,7 @@ using BlazorHero.CleanArchitecture.Infrastructure.Mappings;
 using BlazorHero.CleanArchitecture.Infrastructure.Models.Identity;
 using BlazorHero.CleanArchitecture.Infrastructure.Specifications;
 using BlazorHero.CleanArchitecture.Shared.Constants.Role;
+using BlazorHero.CleanArchitecture.Shared.Constants.User;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
 using Hangfire;
 using Microsoft.AspNetCore.Identity;
@@ -59,20 +60,18 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services.Identity
 
         public async Task<IResult> RegisterAsync(RegisterRequest request, string origin)
         {
-            var userWithSameUserName = await _userManager.FindByNameAsync(request.UserName);
-            if (userWithSameUserName != null)
-            {
-                return await Result.FailAsync(string.Format(_localizer["Username {0} is already taken."], request.UserName));
-            }
+            var userName = await GenerateUniqueUserNameAsync(request.FirstName, request.LastName, request.UserName);
             var user = new BlazorHeroUser
             {
                 Email = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                UserName = request.UserName,
+                UserName = userName,
                 PhoneNumber = request.PhoneNumber,
                 IsActive = request.ActivateUser,
-                EmailConfirmed = request.AutoConfirmEmail
+                EmailConfirmed = request.AutoConfirmEmail,
+                MustChangePassword = true,
+                PasswordChangedOn = null
             };
 
             if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
@@ -201,8 +200,18 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services.Identity
                 }
             }
 
-            var result = await _userManager.RemoveFromRolesAsync(user, roles);
-            result = await _userManager.AddToRolesAsync(user, selectedRoles.Select(y => y.RoleName));
+            var removeResult = await _userManager.RemoveFromRolesAsync(user, roles);
+            if (!removeResult.Succeeded)
+            {
+                return await Result.FailAsync(removeResult.Errors.Select(e => e.Description).ToList());
+            }
+
+            var addResult = await _userManager.AddToRolesAsync(user, selectedRoles.Select(y => y.RoleName));
+            if (!addResult.Succeeded)
+            {
+                return await Result.FailAsync(addResult.Errors.Select(e => e.Description).ToList());
+            }
+
             return await Result.SuccessAsync(_localizer["Roles Updated"]);
         }
 
@@ -297,6 +306,62 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services.Identity
                 });
 
             return result;
+        }
+
+        public async Task<IResult> AdminResetPasswordAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return await Result.FailAsync(_localizer["User Not Found."]);
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, UserConstants.DefaultPassword);
+            if (result.Succeeded)
+            {
+                user.MustChangePassword = true;
+                user.PasswordChangedOn = null;
+                await _userManager.UpdateAsync(user);
+                return await Result.SuccessAsync($"Mot de passe réinitialisé pour {user.UserName}. Nouveau mot de passe : {UserConstants.DefaultPassword}");
+            }
+
+            return await Result.FailAsync(result.Errors.Select(e => e.Description).ToList());
+        }
+
+        /// <summary>
+        /// Génère un username unique à partir des initiales prénom + nom (ex: pwoagou).
+        /// Si un username explicite est fourni, il est utilisé directement.
+        /// En cas de doublon, ajoute un suffixe numérique (ex: pwoagou2).
+        /// </summary>
+        private async Task<string> GenerateUniqueUserNameAsync(string firstName, string lastName, string explicitUserName)
+        {
+            string baseUserName;
+            if (!string.IsNullOrWhiteSpace(explicitUserName))
+            {
+                baseUserName = explicitUserName.Trim().ToLowerInvariant();
+            }
+            else
+            {
+                var first = (firstName ?? "u").Trim().ToLowerInvariant();
+                var last = (lastName ?? "").Trim().ToLowerInvariant();
+                baseUserName = first.Length > 0 && last.Length > 0
+                    ? $"{first[0]}{last}".Replace(" ", "")
+                    : first.Replace(" ", "");
+            }
+
+            if (baseUserName.Length < 3)
+                baseUserName = baseUserName.PadRight(3, 'x');
+
+            var candidate = baseUserName;
+            var suffix = 2;
+            while (await _userManager.FindByNameAsync(candidate) is not null)
+            {
+                candidate = $"{baseUserName}{suffix}";
+                suffix++;
+            }
+
+            return candidate;
         }
     }
 }

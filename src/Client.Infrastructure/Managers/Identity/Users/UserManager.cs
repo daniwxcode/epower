@@ -74,5 +74,11 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Identity.U
             var data = await response.Content.ReadAsStringAsync();
             return data;
         }
+
+        public async Task<IResult> AdminResetPasswordAsync(string userId)
+        {
+            var response = await _httpClient.PostAsync(Routes.UserEndpoints.AdminResetPassword(userId), null);
+            return await response.ToResult();
+        }
     }
 }

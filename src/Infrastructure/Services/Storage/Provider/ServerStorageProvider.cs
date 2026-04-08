@@ -1,129 +1,81 @@
-﻿using System;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using BlazorHero.CleanArchitecture.Application.Interfaces.Services;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Services.Storage.Provider;
 
 namespace BlazorHero.CleanArchitecture.Infrastructure.Services.Storage.Provider
 {
+    /// <summary>
+    /// Server-side in-memory storage provider.
+    /// Uses a static ConcurrentDictionary so data persists across scoped lifetimes
+    /// (lost only on application restart).
+    /// </summary>
     internal class ServerStorageProvider : IStorageProvider
     {
-        //TODO - replace on implementation (added for tests)
-        private Dictionary<string, string> _storage = new();
-
-        //private readonly IJSRuntime _jSRuntime;
-        //private readonly IJSInProcessRuntime _jSInProcessRuntime;
-        private readonly ICurrentUserService _currentUserService;
-
-        public ServerStorageProvider(ICurrentUserService currentUserService)
-        {
-            _currentUserService = currentUserService;
-            //_jSRuntime = jSRuntime;
-            //_jSInProcessRuntime = jSRuntime as IJSInProcessRuntime;
-        }
+        private static readonly ConcurrentDictionary<string, string> _storage = new();
 
         public ValueTask ClearAsync()
-            => throw new NotImplementedException();//_jSRuntime.InvokeVoidAsync("localStorage.clear");
+        {
+            _storage.Clear();
+            return ValueTask.CompletedTask;
+        }
 
         public ValueTask<string> GetItemAsync(string key)
         {
-            //TODO - replace on implementation (added for tests)--
-            if (_storage.ContainsKey(key)) 
-                return ValueTask.FromResult(_storage[key]);
-
-            return ValueTask.FromResult(string.Empty);
-            //----------------------------------------------------
-
-            //throw new NotImplementedException();
-            //return _jSRuntime.InvokeAsync<string>("localStorage.getItem", key);
+            _storage.TryGetValue(key, out var value);
+            return ValueTask.FromResult(value ?? string.Empty);
         }
 
         public ValueTask<string> KeyAsync(int index)
-            => throw new NotImplementedException();//_jSRuntime.InvokeAsync<string>("localStorage.key", index);
+        {
+            var keys = _storage.Keys.ToList();
+            return ValueTask.FromResult(index >= 0 && index < keys.Count ? keys[index] : null);
+        }
 
         public ValueTask<bool> ContainKeyAsync(string key)
-            => throw new NotImplementedException();//_jSRuntime.InvokeAsync<bool>("localStorage.hasOwnProperty", key);
+            => ValueTask.FromResult(_storage.ContainsKey(key));
 
         public ValueTask<int> LengthAsync()
-            => throw new NotImplementedException();//_jSRuntime.InvokeAsync<int>("eval", "localStorage.length");
+            => ValueTask.FromResult(_storage.Count);
 
         public ValueTask RemoveItemAsync(string key)
-            => throw new NotImplementedException();//_jSRuntime.InvokeVoidAsync("localStorage.removeItem", key);
+        {
+            _storage.TryRemove(key, out _);
+            return ValueTask.CompletedTask;
+        }
 
         public ValueTask SetItemAsync(string key, string data)
         {
-            //TODO - replace on implementation (added for tests)--
-            if (_storage.ContainsKey(key))
-            {
-                _storage[key] = data;
-            }
-            else
-            {
-                _storage.Add(key, data);
-            }
-
+            _storage[key] = data;
             return ValueTask.CompletedTask;
-            //----------------------------------------------------
-
-            //throw new NotImplementedException();
-            ////_jSRuntime.InvokeVoidAsync("localStorage.setItem", key, data);
         }
-
 
         public void Clear()
-        {
-            //CheckForInProcessRuntime();
-            //_jSInProcessRuntime.InvokeVoid("localStorage.clear");
-            throw new NotImplementedException();
-        }
+            => _storage.Clear();
 
         public string GetItem(string key)
         {
-            //CheckForInProcessRuntime();
-            //return _jSInProcessRuntime.Invoke<string>("localStorage.getItem", key);
-            throw new NotImplementedException();
+            _storage.TryGetValue(key, out var value);
+            return value ?? string.Empty;
         }
 
         public string Key(int index)
         {
-            //CheckForInProcessRuntime();
-            //return _jSInProcessRuntime.Invoke<string>("localStorage.key", index);
-            throw new NotImplementedException();
+            var keys = _storage.Keys.ToList();
+            return index >= 0 && index < keys.Count ? keys[index] : null;
         }
 
         public bool ContainKey(string key)
-        {
-            //CheckForInProcessRuntime();
-            //return _jSInProcessRuntime.Invoke<bool>("localStorage.hasOwnProperty", key);
-            throw new NotImplementedException();
-        }
+            => _storage.ContainsKey(key);
 
         public int Length()
-        {
-            //CheckForInProcessRuntime();
-            //return _jSInProcessRuntime.Invoke<int>("eval", "localStorage.length");
-            throw new NotImplementedException();
-        }
+            => _storage.Count;
 
         public void RemoveItem(string key)
-        {
-            //CheckForInProcessRuntime();
-            //_jSInProcessRuntime.InvokeVoidAsync("localStorage.removeItem", key);
-            throw new NotImplementedException();
-        }
+            => _storage.TryRemove(key, out _);
 
         public void SetItem(string key, string data)
-        {
-            //CheckForInProcessRuntime();
-            //_jSInProcessRuntime.InvokeVoid("localStorage.setItem", key, data);
-            throw new NotImplementedException();
-        }
-
-        private void CheckForInProcessRuntime()
-        {
-            //if (_jSInProcessRuntime == null)
-            //    throw new InvalidOperationException("IJSInProcessRuntime not available");
-            throw new NotImplementedException();
-        }
+            => _storage[key] = data;
     }
 }

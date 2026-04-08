@@ -130,6 +130,16 @@ namespace BlazorHero.CleanArchitecture.Client.Shared
             if (firstRender)
             {
                 await LoadDataAsync();
+
+                var state = await _stateProvider.GetAuthenticationStateAsync();
+                var mustChange = state.User.Claims
+                    .Any(c => c.Type == "MustChangePassword" && c.Value == "true");
+
+                if (mustChange && !_navigationManager.Uri.Contains("/account"))
+                {
+                    _snackBar.Add("Veuillez changer votre mot de passe.", Severity.Warning);
+                    _navigationManager.NavigateTo("/account");
+                }
             }
         }
 

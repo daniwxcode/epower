@@ -118,13 +118,20 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services.Identity
                 new(ClaimTypes.Email, user.Email),
                 new(ClaimTypes.Name, user.FirstName),
                 new(ClaimTypes.Surname, user.LastName),
-                new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty)
+                new(ClaimTypes.MobilePhone, user.PhoneNumber ?? string.Empty),
+                new("MustChangePassword", (user.MustChangePassword || IsPasswordExpired(user)).ToString().ToLowerInvariant())
             }
             .Union(userClaims)
             .Union(roleClaims)
             .Union(permissionClaims);
 
             return claims;
+        }
+
+        private static bool IsPasswordExpired(BlazorHeroUser user)
+        {
+            if (user.PasswordChangedOn is null) return true;
+            return user.PasswordChangedOn.Value.AddMonths(3) < DateTime.UtcNow;
         }
 
         private string GenerateRefreshToken()

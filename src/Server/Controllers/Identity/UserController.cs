@@ -143,5 +143,15 @@ namespace BlazorHero.CleanArchitecture.Server.Controllers.Identity
             var data = await _userService.ExportToExcelAsync(searchString);
             return Ok(data);
         }
+
+        /// <summary>
+        /// Admin reset password to default.
+        /// </summary>
+        [Authorize(Policy = Permissions.Users.Edit)]
+        [HttpPost("admin-reset-password/{userId}")]
+        public async Task<IActionResult> AdminResetPasswordAsync(string userId)
+        {
+            return Ok(await _userService.AdminResetPasswordAsync(userId));
+        }
     }
 }

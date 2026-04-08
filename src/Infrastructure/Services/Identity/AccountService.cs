@@ -4,6 +4,7 @@ using BlazorHero.CleanArchitecture.Infrastructure.Models.Identity;
 using BlazorHero.CleanArchitecture.Application.Requests.Identity;
 using BlazorHero.CleanArchitecture.Shared.Wrapper;
 using Microsoft.AspNetCore.Identity;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -42,8 +43,15 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services.Identity
                 user,
                 model.Password,
                 model.NewPassword);
+            if (identityResult.Succeeded)
+            {
+                user.MustChangePassword = false;
+                user.PasswordChangedOn = DateTime.UtcNow;
+                await _userManager.UpdateAsync(user);
+                return await Result.SuccessAsync();
+            }
             var errors = identityResult.Errors.Select(e => _localizer[e.Description].ToString()).ToList();
-            return identityResult.Succeeded ? await Result.SuccessAsync() : await Result.FailAsync(errors);
+            return await Result.FailAsync(errors);
         }
 
         public async Task<IResult> UpdateProfileAsync(UpdateProfileRequest request, string userId)

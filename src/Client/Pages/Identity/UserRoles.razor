@@ -16,7 +16,7 @@ else
             <div class="justify-center mud-text-align-center">
                 @if (_canEditUsers)
                 {
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="SaveAsync" ButtonType="ButtonType.Submit">@_localizer["Update User Roles"]</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="SaveAsync" Disabled="@_processing" ButtonType="ButtonType.Submit">@_localizer["Update User Roles"]</MudButton>
                 }
             </div>
             <MudSpacer />

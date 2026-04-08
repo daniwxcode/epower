@@ -16,10 +16,17 @@ namespace BlazorHero.CleanArchitecture.Application.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddApplicationLayer(this IServiceCollection services)
+        public static void AddApplicationLayer(this IServiceCollection services, string mediatRLicenseKey = null)
         {
             //services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+            services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+                if (!string.IsNullOrWhiteSpace(mediatRLicenseKey))
+                {
+                    cfg.LicenseKey = mediatRLicenseKey;
+                }
+            });
             //services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         }
 

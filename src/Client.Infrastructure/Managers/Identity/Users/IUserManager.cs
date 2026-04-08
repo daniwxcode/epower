@@ -25,5 +25,7 @@ namespace BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Identity.U
         Task<IResult> UpdateRolesAsync(UpdateUserRolesRequest request);
 
         Task<string> ExportToExcelAsync(string searchString = "");
+
+        Task<IResult> AdminResetPasswordAsync(string userId);
     }
 }

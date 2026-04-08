@@ -69,7 +69,9 @@ namespace BlazorHero.CleanArchitecture.Infrastructure
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
                     CreatedOn = DateTime.Now,
-                    IsActive = true
+                    IsActive = true,
+                    MustChangePassword = false,
+                    PasswordChangedOn = DateTime.UtcNow
                 };
                 var superUserInDb = await _userManager.FindByEmailAsync(superUser.Email);
                 if (superUserInDb == null)
@@ -117,7 +119,9 @@ namespace BlazorHero.CleanArchitecture.Infrastructure
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
                     CreatedOn = DateTime.Now,
-                    IsActive = true
+                    IsActive = true,
+                    MustChangePassword = false,
+                    PasswordChangedOn = DateTime.UtcNow
                 };
                 var basicUserInDb = await _userManager.FindByEmailAsync(basicUser.Email);
                 if (basicUserInDb == null)

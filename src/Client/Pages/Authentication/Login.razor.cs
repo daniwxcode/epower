@@ -2,6 +2,7 @@ using Blazored.FluentValidation;
 using BlazorHero.CleanArchitecture.Application.Requests.Identity;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -25,7 +26,19 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Authentication
         private async Task SubmitAsync()
         {
             var result = await _authenticationManager.Login(_tokenModel);
-            if (!result.Succeeded)
+            if (result.Succeeded)
+            {
+                var state = await _stateProvider.GetAuthenticationStateAsync();
+                var mustChange = state.User.Claims
+                    .Any(c => c.Type == "MustChangePassword" && c.Value == "true");
+
+                if (mustChange)
+                {
+                    _snackBar.Add("Veuillez changer votre mot de passe avant de continuer.", Severity.Warning);
+                    _navigationManager.NavigateTo("/account");
+                }
+            }
+            else
             {
                 foreach (var message in result.Messages)
                 {
@@ -38,7 +51,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Authentication
         private InputType _passwordInput = InputType.Password;
         private string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
 
-        void TogglePasswordVisibility()
+        private void TogglePasswordVisibility()
         {
             if (_passwordVisibility)
             {
@@ -52,18 +65,6 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.Authentication
                 _passwordInputIcon = Icons.Material.Filled.Visibility;
                 _passwordInput = InputType.Text;
             }
-        }
-
-        private void FillAdministratorCredentials()
-        {
-            _tokenModel.Email = "mukesh@blazorhero.com";
-            _tokenModel.Password = "123Pa$$word!";
-        }
-
-        private void FillBasicUserCredentials()
-        {
-            _tokenModel.Email = "john@blazorhero.com";
-            _tokenModel.Password = "123Pa$$word!";
         }
     }
 }

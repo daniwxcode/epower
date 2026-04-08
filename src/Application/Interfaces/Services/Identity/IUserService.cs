@@ -29,6 +29,11 @@ namespace BlazorHero.CleanArchitecture.Application.Interfaces.Services.Identity
 
         Task<IResult> ResetPasswordAsync(ResetPasswordRequest request);
 
+        /// <summary>
+        /// Réinitialise le mot de passe d'un utilisateur au mot de passe par défaut (admin).
+        /// </summary>
+        Task<IResult> AdminResetPasswordAsync(string userId);
+
         Task<string> ExportToExcelAsync(string searchString = "");
     }
 }
