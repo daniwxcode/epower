@@ -2,6 +2,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorHero.CleanArchitecture.Domain.Entities.Bail
 {
@@ -20,6 +21,13 @@ namespace BlazorHero.CleanArchitecture.Domain.Entities.Bail
         public string InternalReference { get; set; }
         public double Credits { get; set; } = 0;
 
+        /// <summary>
+        /// Session de caisse associée (null pour les ventes historiques).
+        /// </summary>
+        public int? CashShiftId { get; set; }
+
+        [ForeignKey(nameof(CashShiftId))]
+        public CashShift? CashShift { get; set; }
     }
 
 }

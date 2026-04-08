@@ -3,8 +3,35 @@
 @using System.Globalization
 @using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO
 @using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands
+@using BlazorHero.CleanArchitecture.Application.Features.Sellers.DTOs
 
 <Overlay MudOverlayIsVisible="@_loading" />
+
+@* ── Active shift banner ── *@
+@if (_activeShift is not null)
+{
+    <MudPaper Class="pa-3 mb-3 rounded-lg" Elevation="2" Style="background: var(--mud-palette-info-lighten); border-left: 4px solid var(--mud-palette-info);">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Wrap="Wrap.Wrap">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                <MudIcon Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Info" />
+                <div>
+                    <MudText Typo="Typo.body2"><b>Caisse active</b> — ouverte à @_activeShift.OpenedAt.ToString("HH:mm")</MudText>
+                </div>
+            </MudStack>
+            <MudStack Row="true" Spacing="4">
+                <MudChip T="string" Icon="@Icons.Material.Filled.ShoppingCart" Color="Color.Primary" Size="Size.Small">@_activeShift.SalesCount ventes</MudChip>
+                <MudChip T="string" Icon="@Icons.Material.Filled.TrendingUp" Color="Color.Success" Size="Size.Small">@_activeShift.SalesTotal.ToString("N0", new CultureInfo("fr-FR")) F</MudChip>
+                <MudChip T="string" Icon="@Icons.Material.Filled.Toll" Color="Color.Warning" Size="Size.Small">@_activeShift.FeesTotal.ToString("N0", new CultureInfo("fr-FR")) F frais</MudChip>
+            </MudStack>
+        </MudStack>
+    </MudPaper>
+}
+else
+{
+    <MudAlert Severity="Severity.Warning" Class="mb-3" Dense="true" Icon="@Icons.Material.Filled.Warning">
+        Aucune caisse ouverte. <MudLink Href="/my-shift" Typo="Typo.body2"><b>Ouvrir une caisse</b></MudLink> pour associer vos ventes à une session.
+    </MudAlert>
+}
 
 @* ── POS Header ── *@
 <MudPaper Class="pa-3 mb-4" Elevation="0" Style="background: transparent;">

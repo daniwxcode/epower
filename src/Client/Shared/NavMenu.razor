@@ -4,37 +4,89 @@
 <UserCard />
 <MudNavMenu>
     <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Home">@_localizer["Home"]</MudNavLink>
-    <MudNavLink Href="/pos" Icon="@Icons.Material.Outlined.PointOfSale">Point de Ventes</MudNavLink>
-    <MudListSubheader Class="mt-2 mb-n2">@_localizer["Personal"]</MudListSubheader>
+
+    @* ── TABLEAU DE BORD ── *@
     @if (_canViewDashboards)
     {
-        <MudNavLink Href="/dashboard" Icon="@Icons.Material.Outlined.Dashboard">
+        <MudDivider />
+        <MudListSubheader Class="mt-2 mb-n2">
+            <MudIcon Icon="@Icons.Material.Outlined.Dashboard" Size="Size.Small" Class="mr-1" />@_localizer["Tableau de bord"]
+        </MudListSubheader>
+        <MudNavLink Href="/dashboard" Icon="@Icons.Material.Outlined.BarChart">
             @_localizer["Dashboard"]
-        </MudNavLink>
-        <MudNavLink Href="/sales" Icon="@Icons.Material.Outlined.ShoppingBag">
-            @_localizer["Ventes"]
         </MudNavLink>
     }
 
-    <MudNavLink Href="/account" Icon="@Icons.Material.Outlined.SupervisorAccount">
-        @_localizer["Account"]
-    </MudNavLink>
-    <MudDivider></MudDivider>
-    <MudListSubheader Class="mt-2 mb-n2">@_localizer["Gestion Immobilière"]</MudListSubheader>
+    @* ── CASH POWER ── *@
+    @if (_canViewCashPower)
+    {
+        <MudDivider />
+        <MudListSubheader Class="mt-2 mb-n2">
+            <MudIcon Icon="@Icons.Material.Outlined.Bolt" Size="Size.Small" Class="mr-1" />@_localizer["Cash Power"]
+        </MudListSubheader>
+        <MudNavLink Href="/pos" Icon="@Icons.Material.Outlined.PointOfSale">
+            @_localizer["Point de Vente"]
+        </MudNavLink>
+        <MudNavLink Href="/sales" Icon="@Icons.Material.Outlined.ShoppingBag">
+            @_localizer["Historique Ventes"]
+        </MudNavLink>
+        @if (_canOpenShift)
+        {
+            <MudNavLink Href="/my-shift" Icon="@Icons.Material.Outlined.PointOfSale">
+                @_localizer["Ma Caisse"]
+            </MudNavLink>
+        }
+    }
 
-    <MudNavLink Href="/Buildings" Icon="@Icons.Material.Outlined.Business">
-        @_localizer["Immeubles"]
-    </MudNavLink>
-    <MudNavLink Href="/Stores" Icon="@Icons.Material.Outlined.Storefront">
-        @_localizer["Boutiques"]
-    </MudNavLink>
-    <MudNavLink Href="/Meters" Icon="@Icons.Material.Outlined.ElectricalServices">
-        @_localizer["Compteurs"]
-    </MudNavLink>
-    <MudDivider></MudDivider>
+    @* ── RECOUVREMENT ── *@
+    @if (_canViewAllShifts)
+    {
+        <MudDivider />
+        <MudListSubheader Class="mt-2 mb-n2">
+            <MudIcon Icon="@Icons.Material.Outlined.AccountBalanceWallet" Size="Size.Small" Class="mr-1" />@_localizer["Recouvrement"]
+        </MudListSubheader>
+        <MudNavLink Href="/cash-shifts" Icon="@Icons.Material.Outlined.Receipt">
+            @_localizer["Caisses"]
+        </MudNavLink>
+    }
+
+    @* ── GESTION IMMOBILIÈRE ── *@
+    @if (_canViewBuildings)
+    {
+        <MudDivider />
+        <MudListSubheader Class="mt-2 mb-n2">
+            <MudIcon Icon="@Icons.Material.Outlined.Apartment" Size="Size.Small" Class="mr-1" />@_localizer["Gestion Immobilière"]
+        </MudListSubheader>
+        <MudNavLink Href="/Buildings" Icon="@Icons.Material.Outlined.Business">
+            @_localizer["Immeubles"]
+        </MudNavLink>
+        <MudNavLink Href="/Stores" Icon="@Icons.Material.Outlined.Storefront">
+            @_localizer["Boutiques"]
+        </MudNavLink>
+        <MudNavLink Href="/Meters" Icon="@Icons.Material.Outlined.ElectricalServices">
+            @_localizer["Compteurs"]
+        </MudNavLink>
+    }
+
+    @* ── VENDEURS ── *@
+    @if (_canViewSellers)
+    {
+        <MudDivider />
+        <MudListSubheader Class="mt-2 mb-n2">
+            <MudIcon Icon="@Icons.Material.Outlined.Badge" Size="Size.Small" Class="mr-1" />@_localizer["Vendeurs"]
+        </MudListSubheader>
+        <MudNavLink Href="/sellers" Icon="@Icons.Material.Outlined.PeopleAlt">
+            @_localizer["Liste vendeurs"]
+        </MudNavLink>
+    }
+
+    @* ── ADMINISTRATION ── *@
     @if (_canViewUsers || _canViewRoles)
     {
-        <MudListSubheader Class="mt-2 mb-n2">@_localizer["Administrator"]</MudListSubheader>
+        <MudDivider />
+        <MudListSubheader Class="mt-2 mb-n2">
+            <MudIcon Icon="@Icons.Material.Outlined.AdminPanelSettings" Size="Size.Small" Class="mr-1" />@_localizer["Administration"]
+        </MudListSubheader>
         @if (_canViewUsers)
         {
             <MudNavLink Href="/identity/users" Icon="@Icons.Material.Outlined.Person">
@@ -43,39 +95,39 @@
         }
         @if (_canViewRoles)
         {
-            <MudNavLink Href="/identity/roles" Icon="@Icons.Material.Outlined.Person">@_localizer["Roles"]</MudNavLink>
+            <MudNavLink Href="/identity/roles" Icon="@Icons.Material.Outlined.Security">
+                @_localizer["Roles"]
+            </MudNavLink>
         }
     }
- 
 
+    <MudNavLink Href="/account" Icon="@Icons.Material.Outlined.SupervisorAccount" Class="mt-2">
+        @_localizer["Account"]
+    </MudNavLink>
 </MudNavMenu>
 
 @code {
     private ClaimsPrincipal _authenticationStateProviderUser;
 
-    private bool _canViewHangfire;
     private bool _canViewDashboards;
-    private bool _canViewDocuments;
-    private bool _canViewDocumentTypes;
-    private bool _canViewAuditTrails;
     private bool _canViewRoles;
     private bool _canViewUsers;
-    private bool _canViewChat;
-    private bool _canViewProducts;
-    private bool _canViewBrands;
+    private bool _canViewCashPower;
+    private bool _canViewBuildings;
+    private bool _canViewSellers;
+    private bool _canOpenShift;
+    private bool _canViewAllShifts;
 
     protected override async Task OnParametersSetAsync()
     {
         _authenticationStateProviderUser = await _stateProvider.GetAuthenticationStateProviderUserAsync();
-        _canViewHangfire = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Hangfire.View)).Succeeded;
         _canViewDashboards = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Dashboards.View)).Succeeded;
-        _canViewDocuments = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Documents.View)).Succeeded;
-        _canViewDocumentTypes = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.DocumentTypes.View)).Succeeded;
-        _canViewAuditTrails = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.AuditTrails.View)).Succeeded;
         _canViewRoles = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Roles.View)).Succeeded;
         _canViewUsers = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Users.View)).Succeeded;
-        _canViewChat = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Communication.Chat)).Succeeded;
-        _canViewProducts = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Products.View)).Succeeded;
-        _canViewBrands = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Brands.View)).Succeeded;
+        _canViewCashPower = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.CashPower.View)).Succeeded;
+        _canViewBuildings = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.BuildingParams.View)).Succeeded;
+        _canViewSellers = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.Sellers.View)).Succeeded;
+        _canOpenShift = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.CashShifts.Open)).Succeeded;
+        _canViewAllShifts = (await _authorizationService.AuthorizeAsync(_authenticationStateProviderUser, Permissions.CashShifts.ViewAll)).Succeeded;
     }
 }

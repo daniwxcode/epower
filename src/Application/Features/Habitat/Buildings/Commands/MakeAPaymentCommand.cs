@@ -74,6 +74,11 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
             var itemdb = db.Entities.FirstOrDefault(_ => _.InternalReference == request.Reference.ToString());
             if (itemdb != null)
                 return await Result<BuyCreditResponse>.FailAsync("Cette vente a déjà été effectuée (référence dupliquée).");
+
+            // Rattacher la vente à la caisse active du vendeur (si existante)
+            var activeShift = await _unitOfWork.Repository<CashShift>().Entities
+                .FirstOrDefaultAsync(cs => cs.Seller.UserId == _currentUserService.UserId && cs.Status == CashShiftStatus.Open, cancellationToken);
+
             var user = await _userService.GetAsync(_currentUserService.UserId);
             Meter dbMeter = null;
             if (request.SerialNumber != string.Empty && request.MeterId == 0)
@@ -113,6 +118,7 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                     MeterId = dbMeter.Id,
                     CreditCode = ceetvente.Code,
                     BilledAmount = request.DueValue,
+                    CashShiftId = activeShift?.Id,
                 };
                 await db.AddAsync(internalPayement);
                 await _unitOfWork.Commit(cancellationToken);
@@ -158,7 +164,8 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                 InternalReference = request.Reference.ToString(),
                 ExternalReference = venteExt.bill,
                 CreditCode = venteExt.Code,
-                BilledAmount = request.DueValue
+                BilledAmount = request.DueValue,
+                CashShiftId = activeShift?.Id,
             };
             await db.AddAsync(payment);
             await _unitOfWork.Commit(cancellationToken);

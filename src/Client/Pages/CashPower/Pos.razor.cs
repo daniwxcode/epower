@@ -1,7 +1,9 @@
 ﻿using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 using BlazorHero.CleanArchitecture.Application.Features.Habitat.Enums;
+using BlazorHero.CleanArchitecture.Application.Features.Sellers.DTOs;
 using BlazorHero.CleanArchitecture.Client.Extensions;
+using BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Sellers;
 using BlazorHero.CleanArchitecture.Shared.Constants.Application;
 
 using Microsoft.AspNetCore.Components;
@@ -22,6 +24,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.CashPower
     {
         [CascadingParameter] private HubConnection HubConnection { get; set; }
         [Inject] private IDialogService DialogService { get; set; }
+        [Inject] private ICashShiftManager CashShiftManager { get; set; }
 
         private static readonly CultureInfo _frCulture = CultureInfo.GetCultureInfo("fr-FR");
 
@@ -35,6 +38,9 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.CashPower
         private MeterResponseBase _foundMeter;
         private bool _searchPerformed;
         private List<ShopResponseBase> _allShops = [];
+
+        // Shift state
+        private ActiveShiftSummary _activeShift;
 
         // Sale state
         private decimal _amount;
@@ -59,8 +65,22 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.CashPower
                 await HubConnection.StartAsync();
             }
 
+            await LoadActiveShiftAsync();
             await LoadRecentSalesAsync();
             await LoadShopsAsync();
+        }
+
+        private async Task LoadActiveShiftAsync()
+        {
+            try
+            {
+                var response = await CashShiftManager.GetActiveShiftAsync();
+                _activeShift = response.Succeeded ? response.Data : null;
+            }
+            catch
+            {
+                _activeShift = null;
+            }
         }
 
         private void ClearError()
@@ -214,6 +234,7 @@ namespace BlazorHero.CleanArchitecture.Client.Pages.CashPower
                     _lastSale = response.Data;
                     _snackBar.Add(response.Messages[0], Severity.Success);
                     await LoadRecentSalesAsync();
+                    await LoadActiveShiftAsync();
                 }
                 else
                 {

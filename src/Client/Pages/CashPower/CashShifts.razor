@@ -1,0 +1,79 @@
+@page "/cash-shifts"
+@attribute [Authorize(Policy = Permissions.CashShifts.ViewAll)]
+@using BlazorHero.CleanArchitecture.Application.Features.Sellers.DTOs
+@using BlazorHero.CleanArchitecture.Application.Features.Sellers.Commands
+@using System.Globalization
+
+<HeroTitle Title="Caisses" Description="Suivi des sessions de caisse et recouvrement" />
+
+@if (!_loaded)
+{
+    <Overlay MudOverlayIsVisible="true" />
+}
+else
+{
+    @* ?? Filter ?? *@
+    <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4" Spacing="3">
+        <MudSwitch T="bool" Value="_openOnly" Label="Caisses ouvertes uniquement" Color="Color.Primary"
+                   ValueChanged="OnOpenOnlyChanged" />
+        <MudSpacer />
+        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Refresh"
+                   OnClick="LoadDataAsync">Actualiser</MudButton>
+    </MudStack>
+
+    <MudTable Items="_shifts" Hover="true" Elevation="25" Dense="true" Bordered="true" Striped="true"
+              Loading="@_loading">
+        <HeaderContent>
+            <MudTh>Vendeur</MudTh>
+            <MudTh>Ouverture</MudTh>
+            <MudTh>Clôture</MudTh>
+            <MudTh>Ventes</MudTh>
+            <MudTh>CA</MudTh>
+            <MudTh>Attendu</MudTh>
+            <MudTh>Solde déclaré</MudTh>
+            <MudTh>Écart</MudTh>
+            <MudTh>Statut</MudTh>
+            <MudTh Style="text-align:right">Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Vendeur">@context.SellerName</MudTd>
+            <MudTd DataLabel="Ouverture">@context.OpenedAt.ToString("dd/MM HH:mm")</MudTd>
+            <MudTd DataLabel="Clôture">@(context.ClosedAt?.ToString("dd/MM HH:mm") ?? "—")</MudTd>
+            <MudTd DataLabel="Ventes">@context.SalesCount</MudTd>
+            <MudTd DataLabel="CA">@context.SalesTotal.ToString("N0", _fr) F</MudTd>
+            <MudTd DataLabel="Attendu">@(context.ExpectedBalance?.ToString("N0", _fr) ?? "—") F</MudTd>
+            <MudTd DataLabel="Solde déclaré">@(context.ClosingBalance?.ToString("N0", _fr) ?? "—") F</MudTd>
+            <MudTd DataLabel="Écart">
+                @if (context.ExpectedBalance.HasValue && context.ClosingBalance.HasValue)
+                {
+                    var gap = context.ClosingBalance.Value - context.ExpectedBalance.Value;
+                    <MudChip T="string" Color="@(gap >= 0 ? Color.Success : Color.Error)" Size="Size.Small">
+                        @gap.ToString("N0", _fr) F
+                    </MudChip>
+                }
+                else
+                {
+                    <MudText>—</MudText>
+                }
+            </MudTd>
+            <MudTd DataLabel="Statut">
+                <MudChip T="string" Color="@(context.Status == "Open" ? Color.Warning : Color.Default)" Size="Size.Small">
+                    @(context.Status == "Open" ? "Ouverte" : "Clôturée")
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Actions" Style="text-align:right">
+                @if (context.Status == "Closed" && _canCreateRemittance)
+                {
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" Size="Size.Small"
+                               StartIcon="@Icons.Material.Filled.AttachMoney"
+                               OnClick="@(() => OpenRemittanceDialog(context))">
+                        Remise
+                    </MudButton>
+                }
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+}

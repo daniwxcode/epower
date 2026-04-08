@@ -1,0 +1,61 @@
+@page "/sellers"
+@attribute [Authorize(Policy = Permissions.Sellers.View)]
+@using BlazorHero.CleanArchitecture.Application.Features.Sellers.DTOs
+@using BlazorHero.CleanArchitecture.Application.Features.Sellers.Commands
+
+<HeroTitle Title="Vendeurs" Description="Gestion des vendeurs ambulants" />
+
+@if (!_loaded)
+{
+    <Overlay MudOverlayIsVisible="@(!_loaded)" />
+}
+else
+{
+    <MudTable Hover="true" Elevation="25" Items="_sellers" Dense="true" Bordered="true" Striped="true"
+              Filter="new Func<SellerResponse, bool>(Search)" Loading="@_loading">
+        <ToolBarContent>
+            <MudTextField @bind-Value="_searchString" Immediate="true" FullWidth="false"
+                          Placeholder="Rechercher un vendeur..."
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium" Class="mt-0 mb-3" />
+            <MudSpacer />
+            @if (_canCreate)
+            {
+                <MudButton DisableElevation Variant="Variant.Filled" Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Add" IconSize="Size.Small"
+                           OnClick="InvokeAddModal">
+                    Nouveau vendeur
+                </MudButton>
+            }
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Nom</MudTh>
+            <MudTh>Zone</MudTh>
+            <MudTh>Téléphone</MudTh>
+            <MudTh>Plafond</MudTh>
+            <MudTh>Statut</MudTh>
+            <MudTh Style="text-align:right">Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Nom">@context.FullName</MudTd>
+            <MudTd DataLabel="Zone">@(context.Zone ?? "—")</MudTd>
+            <MudTd DataLabel="Téléphone">@(context.PhoneNumber ?? "—")</MudTd>
+            <MudTd DataLabel="Plafond">@(context.MaxCreditLimit > 0 ? context.MaxCreditLimit.ToString("N0") + " F" : "Illimité")</MudTd>
+            <MudTd DataLabel="Statut">
+                <MudChip T="string" Color="@(context.IsActive ? Color.Success : Color.Error)" Size="Size.Small">
+                    @(context.IsActive ? "Actif" : "Inactif")
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Actions" Style="text-align:right">
+                @if (_canEdit)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small"
+                                   OnClick="@(() => InvokeEditModal(context))" />
+                }
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+}

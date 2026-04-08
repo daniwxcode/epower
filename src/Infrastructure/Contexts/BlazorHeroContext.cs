@@ -2,6 +2,7 @@
 using BlazorHero.CleanArchitecture.Application.Models.Chat;
 using BlazorHero.CleanArchitecture.Infrastructure.Models.Identity;
 using BlazorHero.CleanArchitecture.Domain.Contracts;
+using BlazorHero.CleanArchitecture.Domain.Entities.Bail;
 using BlazorHero.CleanArchitecture.Domain.Entities.Catalog;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -128,6 +129,11 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Contexts
             builder.Entity<IdentityUserToken<string>>(entity =>
             {
                 entity.ToTable("UserTokens", "Identity");
+            });
+
+            builder.Entity<Seller>(entity =>
+            {
+                entity.HasIndex(e => e.UserId).IsUnique();
             });
         }
     }

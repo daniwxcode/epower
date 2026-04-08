@@ -19,7 +19,8 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Contexts
         public DbSet<Payment> Payments { get; set; }
         public DbSet<InternalPayement> InternalPayements { get; set; }        
         public DbSet<RentalAgreement> RentalAgreements { get; set; }
-        
-
+        public DbSet<Seller> Sellers { get; set; }
+        public DbSet<CashShift> CashShifts { get; set; }
+        public DbSet<CashRemittance> CashRemittances { get; set; }
     }
 }

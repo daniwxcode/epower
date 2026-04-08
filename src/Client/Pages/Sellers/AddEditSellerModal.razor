@@ -1,0 +1,122 @@
+@using BlazorHero.CleanArchitecture.Application.Features.Sellers.Commands
+@using BlazorHero.CleanArchitecture.Application.Responses.Identity
+@using BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Identity.Users
+@using BlazorHero.CleanArchitecture.Client.Infrastructure.Managers.Sellers
+@using System.Threading
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form">
+            @if (Model.Id == 0)
+            {
+                <MudAutocomplete T="UserResponse"
+                                 Label="Utilisateur"
+                                 Placeholder="Rechercher un utilisateur..."
+                                 Value="_selectedUser"
+                                 SearchFunc="SearchUsersAsync"
+                                 ToStringFunc="@(u => u is null ? string.Empty : u.UserFullName)"
+                                 Variant="Variant.Outlined"
+                                 Dense="true"
+                                 ResetValueOnEmptyText="true"
+                                 CoerceText="true"
+                                 ValueChanged="OnUserSelected"
+                                 Required="true"
+                                 RequiredError="Veuillez sélectionner un utilisateur" />
+            }
+            else
+            {
+                <MudTextField Value="@_selectedUserName" Label="Utilisateur" ReadOnly="true" Variant="Variant.Outlined" />
+            }
+            <MudTextField @bind-Value="Model.Zone" Label="Zone / Secteur" Placeholder="ex: Lomé Centre"
+                          Variant="Variant.Outlined" Class="mt-3" />
+            <MudTextField @bind-Value="Model.PhoneNumber" Label="Téléphone" Placeholder="ex: 70123456"
+                          Variant="Variant.Outlined" Class="mt-3" />
+            <MudNumericField @bind-Value="Model.MaxCreditLimit" Label="Plafond crédit (0 = illimité)"
+                             Min="0" Variant="Variant.Outlined" Class="mt-3" />
+            <MudSwitch @bind-Value="Model.IsActive" Label="Actif" Color="Color.Success" Class="mt-3" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Annuler</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SubmitAsync">Enregistrer</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    [Inject] private ISellerManager SellerManager { get; set; }
+    [Inject] private IUserManager UserManager { get; set; }
+    [Inject] private ISnackbar Snackbar { get; set; }
+
+    [Parameter] public AddEditSellerCommand Model { get; set; } = new();
+
+    private MudForm _form;
+    private List<UserResponse> _users = [];
+    private UserResponse _selectedUser;
+    private string _selectedUserName = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await UserManager.GetAllAsync();
+        if (response.Succeeded)
+        {
+            _users = response.Data;
+        }
+
+        if (Model.Id > 0 && !string.IsNullOrEmpty(Model.UserId))
+        {
+            _selectedUser = _users.FirstOrDefault(u => u.Id == Model.UserId);
+            _selectedUserName = _selectedUser?.UserFullName ?? Model.UserId;
+        }
+    }
+
+    private Task<IEnumerable<UserResponse>> SearchUsersAsync(string value, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return Task.FromResult(_users.AsEnumerable());
+
+        var filtered = _users.Where(u =>
+            u.UserFullName.Contains(value, StringComparison.OrdinalIgnoreCase)
+            || u.Email.Contains(value, StringComparison.OrdinalIgnoreCase));
+
+        return Task.FromResult(filtered);
+    }
+
+    private void OnUserSelected(UserResponse user)
+    {
+        _selectedUser = user;
+        if (user is not null)
+        {
+            Model.UserId = user.Id;
+            Model.PhoneNumber ??= user.PhoneNumber;
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        await _form.Validate();
+        if (!_form.IsValid) return;
+
+        if (string.IsNullOrEmpty(Model.UserId))
+        {
+            Snackbar.Add("Veuillez sélectionner un utilisateur.", MudBlazor.Severity.Warning);
+            return;
+        }
+
+        var result = await SellerManager.AddEditSellerAsync(Model);
+        if (result.Succeeded)
+        {
+            Snackbar.Add(result.Messages[0], MudBlazor.Severity.Success);
+            MudDialog.Close(DialogResult.Ok(result.Data));
+        }
+        else
+        {
+            foreach (var msg in result.Messages)
+            {
+                Snackbar.Add(msg, MudBlazor.Severity.Error);
+            }
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

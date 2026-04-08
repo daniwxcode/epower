@@ -1,0 +1,91 @@
+@page "/my-shift"
+@attribute [Authorize(Policy = Permissions.CashShifts.Open)]
+@using BlazorHero.CleanArchitecture.Application.Features.Sellers.DTOs
+@using BlazorHero.CleanArchitecture.Application.Features.Sellers.Commands
+@using System.Globalization
+
+<HeroTitle Title="Ma Caisse" Description="Gérez votre session de caisse" />
+
+@if (_loading)
+{
+    <Overlay MudOverlayIsVisible="true" />
+}
+else if (_activeShift is null)
+{
+    @* ?? No active shift: Open one ?? *@
+    <MudGrid Justify="Justify.Center" Class="mt-8">
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="4" Class="pa-6 rounded-lg d-flex flex-column align-center">
+                <MudIcon Icon="@Icons.Material.Filled.LockOpen" Size="Size.Large" Color="Color.Primary" />
+                <MudText Typo="Typo.h6" Class="mt-3 mb-4">Ouvrir une caisse</MudText>
+
+                <MudNumericField @bind-Value="_openingBalance" Label="Fond de caisse (FCFA)"
+                                 Variant="Variant.Outlined" Min="0m" FullWidth="true" />
+
+                <MudButton Variant="Variant.Filled" Color="Color.Success" Class="mt-4" FullWidth="true"
+                           StartIcon="@Icons.Material.Filled.PlayArrow"
+                           OnClick="OpenShiftAsync">
+                    Ouvrir la caisse
+                </MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+}
+else
+{
+    @* ?? Active shift dashboard ?? *@
+    <MudAlert Severity="Severity.Info" Class="mb-4" Dense="true" Icon="@Icons.Material.Filled.AccessTime">
+        Caisse ouverte depuis <b>@_activeShift.OpenedAt.ToString("dd/MM/yyyy HH:mm")</b>
+    </MudAlert>
+
+    <MudGrid Spacing="3" Class="mb-4">
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="3" Class="pa-4 rounded-lg" Style="border-left: 4px solid var(--mud-palette-primary);">
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">Fond de caisse</MudText>
+                <MudText Typo="Typo.h5" Class="fw-bold">@_activeShift.OpeningBalance.ToString("N0", _fr) F</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="3" Class="pa-4 rounded-lg" Style="border-left: 4px solid var(--mud-palette-success);">
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">Ventes</MudText>
+                <MudText Typo="Typo.h5" Class="fw-bold">@_activeShift.SalesCount</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="3" Class="pa-4 rounded-lg" Style="border-left: 4px solid var(--mud-palette-warning);">
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">CA Session</MudText>
+                <MudText Typo="Typo.h5" Class="fw-bold">@_activeShift.SalesTotal.ToString("N0", _fr) F</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Elevation="3" Class="pa-4 rounded-lg" Style="border-left: 4px solid var(--mud-palette-info);">
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">Frais collectés</MudText>
+                <MudText Typo="Typo.h5" Class="fw-bold">@_activeShift.FeesTotal.ToString("N0", _fr) F</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+    @* ?? Close shift section ?? *@
+    <MudPaper Elevation="3" Class="pa-5 rounded-lg mt-4">
+        <MudText Typo="Typo.h6" Class="mb-3">
+            <MudIcon Icon="@Icons.Material.Filled.Lock" Class="mr-1" /> Clôturer la caisse
+        </MudText>
+        <MudGrid Spacing="3">
+            <MudItem xs="12" sm="6">
+                <MudNumericField @bind-Value="_closingBalance" Label="Montant en caisse (FCFA)"
+                                 Variant="Variant.Outlined" Min="0m" FullWidth="true" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudTextField @bind-Value="_closeNotes" Label="Notes (optionnel)"
+                              Variant="Variant.Outlined" Lines="2" FullWidth="true" />
+            </MudItem>
+            <MudItem xs="12">
+                <MudButton Variant="Variant.Filled" Color="Color.Error"
+                           StartIcon="@Icons.Material.Filled.Lock"
+                           OnClick="CloseShiftAsync" Disabled="@_closing">
+                    Clôturer la caisse
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+}

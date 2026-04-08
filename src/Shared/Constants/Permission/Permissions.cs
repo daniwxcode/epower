@@ -152,6 +152,36 @@ namespace BlazorHero.CleanArchitecture.Shared.Constants.Permission
             public const string View = "Permissions.Hangfire.View";
         }
 
+        [DisplayName("Sellers")]
+        [Description("Sellers Permissions")]
+        public static class Sellers
+        {
+            public const string View = "Permissions.Sellers.View";
+            public const string Create = "Permissions.Sellers.Create";
+            public const string Edit = "Permissions.Sellers.Edit";
+            public const string Deactivate = "Permissions.Sellers.Deactivate";
+        }
+
+        [DisplayName("CashShifts")]
+        [Description("CashShifts Permissions")]
+        public static class CashShifts
+        {
+            public const string ViewOwn = "Permissions.CashShifts.ViewOwn";
+            public const string ViewAll = "Permissions.CashShifts.ViewAll";
+            public const string Open = "Permissions.CashShifts.Open";
+            public const string Close = "Permissions.CashShifts.Close";
+        }
+
+        [DisplayName("Remittances")]
+        [Description("Remittances Permissions")]
+        public static class Remittances
+        {
+            public const string ViewOwn = "Permissions.Remittances.ViewOwn";
+            public const string ViewAll = "Permissions.Remittances.ViewAll";
+            public const string Create = "Permissions.Remittances.Create";
+            public const string Validate = "Permissions.Remittances.Validate";
+        }
+
         [DisplayName("Audit Trails")]
         [Description("Audit Trails Permissions")]
         public static class AuditTrails
