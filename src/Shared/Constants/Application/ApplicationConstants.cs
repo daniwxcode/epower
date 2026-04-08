@@ -8,8 +8,6 @@ namespace BlazorHero.CleanArchitecture.Shared.Constants.Application
         {
             public const string Root = "Files";
             public const string Receipt = "Bordereaux";
-            public static string Url(string origin, int id) =>
-                $"{origin}/bordereau/bordereau/Index/?Id={id}";
             public static string GetReceipt(int id) => System.IO.Path.Combine(Root, Receipt, id.ToString()+".pdf");
 
         }

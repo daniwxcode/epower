@@ -1,8 +1,294 @@
 ﻿@page "/pos"
+@attribute [Authorize()]
+@using System.Globalization
+@using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO
+@using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Commands
 
-<MudCard Elevation="2" Outlined="true">
-    <MudCardContent>              
-        <SellCreditForm> </SellCreditForm>
-    </MudCardContent>
-</MudCard>
+<Overlay MudOverlayIsVisible="@_loading" />
+
+@* ── POS Header ── *@
+<MudPaper Class="pa-3 mb-4" Elevation="0" Style="background: transparent;">
+    <MudGrid Justify="Justify.SpaceBetween" Class="align-center">
+        <MudItem xs="12" sm="6">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                <MudIcon Icon="@Icons.Material.Filled.PointOfSale" Size="Size.Large" Color="Color.Primary" />
+                <div>
+                    <MudText Typo="Typo.h5" Class="fw-bold">Point de Vente</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">Cash Power — Vente de crédit électrique</MudText>
+                </div>
+            </MudStack>
+        </MudItem>
+        <MudItem xs="12" sm="6" Class="d-flex justify-end align-center">
+            <MudChip T="string" Icon="@Icons.Material.Filled.CalendarToday" Color="Color.Default" Size="Size.Small">@DateTime.Now.ToString("dddd dd MMMM yyyy — HH:mm", new CultureInfo("fr-FR"))</MudChip>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@* ── Main POS Content ── *@
+
+@* ── Error Alert Panel ── *@
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <MudAlert Severity="Severity.Error"
+              Class="mb-4 rounded-lg"
+              ShowCloseIcon="true"
+              CloseIconClicked="ClearError"
+              Elevation="2">
+        @if (!string.IsNullOrEmpty(_errorTitle))
+        {
+            <MudText Typo="Typo.subtitle2"><b>@_errorTitle</b></MudText>
+        }
+        <MudText Typo="Typo.body2">@_errorMessage</MudText>
+    </MudAlert>
+}
+
+<MudGrid Spacing="4">
+
+    @* ── Left Column: Search + Amount ── *@
+    <MudItem xs="12" md="7" lg="8">
+        <MudStack Spacing="4">
+
+            @* ── Search Panel ── *@
+            <MudPaper Elevation="3" Class="pa-5 rounded-lg">
+                <MudText Typo="Typo.h6" Class="mb-3">
+                    <MudIcon Icon="@Icons.Material.Filled.Search" Class="mr-1" /> Identifier le compteur
+                </MudText>
+                <MudTabs Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pt-4" @bind-ActivePanelIndex="_searchTabIndex">
+                    <MudTabPanel Text="Par N° Compteur" Icon="@Icons.Material.Filled.ElectricalServices">
+                        <MudStack Spacing="2">
+                            <MudTextField @bind-Value="_serialSearch"
+                                          Label="Numéro de série du compteur"
+                                          Placeholder="Saisir le numéro de compteur..."
+                                          Variant="Variant.Outlined"
+                                          Adornment="Adornment.Start"
+                                          AdornmentIcon="@Icons.Material.Filled.ElectricalServices"
+                                          Immediate="true"
+                                          OnKeyDown="OnSerialKeyDown" />
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.Search"
+                                       OnClick="SearchBySerialAsync"
+                                       Disabled="@string.IsNullOrWhiteSpace(_serialSearch)"
+                                       FullWidth="true">
+                                Rechercher
+                            </MudButton>
+                        </MudStack>
+                    </MudTabPanel>
+                    <MudTabPanel Text="Par Boutique" Icon="@Icons.Material.Filled.Store">
+                        <MudStack Spacing="2">
+                        <MudAutocomplete T="ShopResponseBase"
+                                             Label="Rechercher une boutique"
+                                             Placeholder="Tapez le nom de la boutique..."
+                                             Value="_selectedShop"
+                                             SearchFunc="SearchShopsAsync"
+                                             ToStringFunc="@(s => s is null ? string.Empty : $"{s.Name} — {s.BuildingName}")"
+                                             Variant="Variant.Outlined"
+                                             Adornment="Adornment.Start"
+                                             AdornmentIcon="@Icons.Material.Filled.Store"
+                                             Dense="true"
+                                             ResetValueOnEmptyText="true"
+                                             CoerceText="true"
+                                             ValueChanged="OnShopSelected" />
+                        </MudStack>
+                    </MudTabPanel>
+                </MudTabs>
+
+                @* ── Found Meter Info Card ── *@
+                @if (_foundMeter is not null)
+                {
+                    <MudAlert Severity="Severity.Success" Class="mt-4" Dense="true" Icon="@Icons.Material.Filled.CheckCircle">
+                        <MudStack Row="true" Spacing="4" AlignItems="AlignItems.Center">
+                            <div>
+                                <MudText Typo="Typo.body2"><b>Compteur :</b> @_foundMeter.SerialNumber</MudText>
+                                <MudText Typo="Typo.body2"><b>Code :</b> @_foundMeter.code</MudText>
+                            </div>
+                            <MudChip T="string" Color="@(_foundMeter.IsActive ? Color.Success : Color.Error)" Size="Size.Small">
+                                @(_foundMeter.IsActive ? "Actif" : "Inactif")
+                            </MudChip>
+                        </MudStack>
+                    </MudAlert>
+                }
+                else if (_searchPerformed)
+                {
+                    <MudAlert Severity="Severity.Warning" Class="mt-4" Dense="true">
+                        Aucun compteur trouvé. Vous pouvez saisir le numéro manuellement.
+                    </MudAlert>
+                }
+            </MudPaper>
+
+            @* ── Amount Panel ── *@
+            <MudPaper Elevation="3" Class="pa-5 rounded-lg">
+                <MudText Typo="Typo.h6" Class="mb-3">
+                    <MudIcon Icon="@Icons.Material.Filled.Payments" Class="mr-1" /> Montant de la vente
+                </MudText>
+
+                <MoneyTextField T="decimal" @bind-Value="_amount" Min="0" Immediate="true" HideSpinButtons="true"
+                                Label="Montant" Placeholder="Saisir le montant..." />
+
+                @* ── Quick Amount Buttons ── *@
+                <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mt-3 mb-2">Montants rapides</MudText>
+                <MudStack Row="true" Spacing="2" Wrap="Wrap.Wrap">
+                    @foreach (var quick in _quickAmounts)
+                    {
+                        <MudButton Variant="@(_amount == quick ? Variant.Filled : Variant.Outlined)"
+                                   Color="@(_amount == quick ? Color.Primary : Color.Default)"
+                                   Size="Size.Small"
+                                   OnClick="@(() => _amount = quick)">
+                            @quick.ToString("N0", new CultureInfo("fr-FR")) F
+                        </MudButton>
+                    }
+                </MudStack>
+
+                @* ── Fee Summary ── *@
+                @if (_amount > 0)
+                {
+                    <MudDivider Class="my-3" />
+                    <MudSimpleTable Dense="true" Bordered="true" Striped="true" Class="rounded">
+                        <tbody>
+                            <tr>
+                                <td><MudText Typo="Typo.body2">Crédit</MudText></td>
+                                <td class="text-right"><MudText Typo="Typo.body2"><b>@_amount.ToString("N0", _frCulture) FCFA</b></MudText></td>
+                            </tr>
+                            <tr>
+                                <td><MudText Typo="Typo.body2">Frais</MudText></td>
+                                <td class="text-right"><MudText Typo="Typo.body2">@GetFees(_amount).ToString("N0", _frCulture) FCFA</MudText></td>
+                            </tr>
+                            <tr style="background-color: var(--mud-palette-primary-lighten); font-weight: bold;">
+                                <td><MudText Typo="Typo.body1"><b>Total à payer</b></MudText></td>
+                                <td class="text-right"><MudText Typo="Typo.body1" Color="Color.Primary"><b>@((_amount + GetFees(_amount)).ToString("N0", _frCulture)) FCFA</b></MudText></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                }
+
+                @* ── Submit Button ── *@
+                <MudButton Class="mt-4"
+                           Variant="Variant.Filled"
+                           Color="Color.Success"
+                           Size="Size.Large"
+                           StartIcon="@Icons.Material.Filled.ShoppingCart"
+                           FullWidth="true"
+                           Disabled="@(!CanSubmit)"
+                           OnClick="ConfirmAndPayAsync">
+                    Valider la vente — @((_amount + GetFees(_amount)).ToString("N0", _frCulture)) FCFA
+                </MudButton>
+            </MudPaper>
+        </MudStack>
+    </MudItem>
+
+    @* ── Right Column: Receipt + Recent Sales ── *@
+    <MudItem xs="12" md="5" lg="4">
+        <MudStack Spacing="4">
+
+            @* ── Receipt ── *@
+            @if (_lastSale is not null)
+            {
+                <MudPaper Elevation="4" Class="pa-5 rounded-lg" Style="border-top: 4px solid var(--mud-palette-success);">
+                    <MudStack Spacing="2">
+                        <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Success">
+                            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" /> Vente réussie !
+                        </MudText>
+                        <MudDivider />
+
+                        <MudText Align="Align.Center" Typo="Typo.subtitle2">HABITAT DU GOLF</MudText>
+                        <MudText Align="Align.Center" Typo="Typo.caption">(+228) 91378364 — Lomé, Togo</MudText>
+                        <MudText Align="Align.Center" Typo="Typo.caption">@_lastSale.date.ToString("dd/MM/yyyy HH:mm")</MudText>
+
+                        <MudDivider DividerType="DividerType.Inset" />
+
+                        <MudText Align="Align.Center" Typo="Typo.caption">Reçu N° @_lastSale.InternalReference</MudText>
+
+                        @* ── Code Display ── *@
+                        <MudPaper Class="pa-3 my-2 rounded-lg" Style="background: var(--mud-palette-background-gray); text-align: center;">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">CODE</MudText>
+                            <MudText Typo="Typo.h4" Color="Color.Primary" Style="font-family: monospace; letter-spacing: 4px;">
+                                @_lastSale.Code
+                            </MudText>
+                        </MudPaper>
+
+                        <MudSimpleTable Dense="true" Bordered="true" Class="rounded">
+                            <tbody>
+                                <tr>
+                                    <td>Compteur</td>
+                                    <td class="text-right"><b>@_lastSale.SerialNumber</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Montant</td>
+                                    <td class="text-right"><b>@_lastSale.Amount.ToString("N0", _frCulture) FCFA</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Frais</td>
+                                    <td class="text-right">@_lastSale.fees.ToString("N0", _frCulture) FCFA</td>
+                                </tr>
+                                <tr>
+                                    <td>kWh</td>
+                                    <td class="text-right"><b>@_lastSale.Credit</b></td>
+                                </tr>
+                            </tbody>
+                        </MudSimpleTable>
+
+                        <MudStack Row="true" Spacing="2" Class="mt-2">
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.Print"
+                                       FullWidth="true"
+                                       OnClick="PrintReceiptAsync">
+                                Imprimer
+                            </MudButton>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.AddCircle"
+                                       FullWidth="true"
+                                       OnClick="NewSale">
+                                Nouvelle vente
+                            </MudButton>
+                        </MudStack>
+                    </MudStack>
+                </MudPaper>
+            }
+            else
+            {
+                @* ── Placeholder when no sale yet ── *@
+                <MudPaper Elevation="1" Class="pa-5 rounded-lg d-flex flex-column align-center justify-center" Style="min-height: 300px; border: 2px dashed var(--mud-palette-lines-default);">
+                    <MudIcon Icon="@Icons.Material.Filled.Receipt" Size="Size.Large" Color="Color.Default" />
+                    <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mt-2">Le reçu apparaîtra ici après la vente</MudText>
+                </MudPaper>
+            }
+
+            @* ── Recent Sales ── *@
+            <MudPaper Elevation="2" Class="pa-4 rounded-lg">
+                <MudText Typo="Typo.h6" Class="mb-3">
+                    <MudIcon Icon="@Icons.Material.Filled.History" Class="mr-1" /> Dernières ventes
+                </MudText>
+                @if (_recentSales.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center" Class="py-4">
+                        Aucune vente récente
+                    </MudText>
+                }
+                else
+                {
+                    <MudList T="PayementResponseBase" Dense="true">
+                        @foreach (var sale in _recentSales)
+                        {
+                            <MudListItem Icon="@Icons.Material.Filled.Receipt" IconColor="Color.Primary">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                    <div>
+                                        <MudText Typo="Typo.body2"><b>@sale.MeterSerial</b></MudText>
+                                        <MudText Typo="Typo.caption">@sale.Date.ToString("dd/MM HH:mm") — @sale.Amount.ToString("N0", _frCulture) F</MudText>
+                                    </div>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Print"
+                                                   Size="Size.Small"
+                                                   Color="Color.Primary"
+                                                   OnClick="@(() => PrintSaleAsync(sale.Id))" />
+                                </MudStack>
+                            </MudListItem>
+                        }
+                    </MudList>
+                }
+            </MudPaper>
+        </MudStack>
+    </MudItem>
+</MudGrid>
+
 

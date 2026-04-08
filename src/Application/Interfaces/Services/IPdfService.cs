@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
+
 using System.Threading.Tasks;
 
 namespace BlazorHero.CleanArchitecture.Application.Interfaces.Services
 {
     public interface IPdfService
     {
-        Task GeneratePdf(string url, string fileName);
+        /// <summary>
+        /// Generates a PDF sales receipt for the given sale data.
+        /// </summary>
+        Task GenerateReceiptAsync(BuyCreditResponse sale, string fileName);
     }
 }

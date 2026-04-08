@@ -9,6 +9,12 @@ namespace BlazorHero.CleanArchitecture.Shared.Models
 
     public class CatVendConfig
     {
+        /// <summary>
+        /// When true, uses a local simulator instead of the real CATvend API.
+        /// Set to true for development, false for production deployment.
+        /// </summary>
+        public bool UseSimulator { get; set; }
+
         public string BaseUrl { get; set; }
         public string ConsumerCheck { get; set; }
         public string Vend { get; set; }

@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject Microsoft.Extensions.Localization.IStringLocalizer<MainLayout> _localizer
-
+<MudPopoverProvider />
 <MudRTLProvider RightToLeft="@_rightToLeft">
     <audio id="notification" src="/media/notification.mp3" />
     <MudThemeProvider Theme="_currentTheme" />

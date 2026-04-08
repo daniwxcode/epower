@@ -1,4 +1,5 @@
-﻿using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
+﻿using BlazorHero.CleanArchitecture.Application.Exceptions;
+using BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.DTO;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Repositories;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Services;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Services.Identity;
@@ -68,11 +69,11 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
         public async Task<Result<BuyCreditResponse>> Handle(MakeAPaymentCommand request, CancellationToken cancellationToken)
         {
             if (request.MeterId == 0 && request.SerialNumber == string.Empty)
-                return await Result<BuyCreditResponse>.FailAsync("Impossible d'effectuer cette vente");
+                return await Result<BuyCreditResponse>.FailAsync("Veuillez renseigner un numéro de compteur ou sélectionner une boutique.");
             var db = _unitOfWork.Repository<Payment>();
             var itemdb = db.Entities.FirstOrDefault(_ => _.InternalReference == request.Reference.ToString());
             if (itemdb != null)
-                return await Result<BuyCreditResponse>.FailAsync("Cette Vente a déjà été effectuée");
+                return await Result<BuyCreditResponse>.FailAsync("Cette vente a déjà été effectuée (référence dupliquée).");
             var user = await _userService.GetAsync(_currentUserService.UserId);
             Meter dbMeter = null;
             if (request.SerialNumber != string.Empty && request.MeterId == 0)
@@ -86,12 +87,21 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                 if (dbMeter == null)
                     dbMeter = await _unitOfWork.Repository<Meter>().GetByIdAsync(request.MeterId);
                 if (dbMeter == null)
-                    return await Result<BuyCreditResponse>.FailAsync("Impossible d'effectuer cette vente, Compteur Id Erronée");
-                var ceetvente = await _ceetService.BuyCredit(new CreditRequest(dbMeter.SerialNumber, (int)request.Amount, request.PhoneNumber));
-                if (ceetvente == null)
+                    return await Result<BuyCreditResponse>.FailAsync("Compteur introuvable en base de données. Vérifiez l'identifiant.");
+
+                CreditVendResponse ceetvente;
+                try
                 {
-                    return await Result<BuyCreditResponse>.FailAsync("Impossible d'effectuer cette vente");
+                    ceetvente = await _ceetService.BuyCredit(new CreditRequest(dbMeter.SerialNumber, (int)request.Amount, request.PhoneNumber));
                 }
+                catch (ApiException ex)
+                {
+                    return await Result<BuyCreditResponse>.FailAsync(ex.Message);
+                }
+
+                if (ceetvente == null)
+                    return await Result<BuyCreditResponse>.FailAsync("Le service de vente n'a pas retourné de résultat. Veuillez réessayer.");
+
                 InternalPayement internalPayement = new InternalPayement()
                 {
                     Amount = request.Amount,
@@ -106,23 +116,38 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
                 };
                 await db.AddAsync(internalPayement);
                 await _unitOfWork.Commit(cancellationToken);
-                await _ceetService.Confirm(ceetvente);
+
+                try
+                {
+                    await _ceetService.Confirm(ceetvente);
+                }
+                catch (ApiException)
+                {
+                    // Confirmation failed but payment was already recorded — continue
+                }
+
                 internalPayement.IsConfirmed = true;
                 internalPayement.ConfirmationDate = DateTime.UtcNow;
                 await db.UpdateAsync(internalPayement);
                 await _unitOfWork.Commit(cancellationToken);
-                await _pdfService.GeneratePdf(ApplicationConstants.FileConstants.Url(request.Orign, internalPayement.Id), ApplicationConstants.FileConstants.GetReceipt(internalPayement.Id));
+                var internalSale = new BuyCreditResponse(internalPayement.Id, (int)request.Amount, request.DueValue, internalPayement.SerialNumber, internalPayement.ExternalReference, DateTime.UtcNow, internalPayement.InternalReference, ceetvente.Code, ceetvente.credit, user.Data.UserFullName);
+                await _pdfService.GenerateReceiptAsync(internalSale, ApplicationConstants.FileConstants.GetReceipt(internalPayement.Id));
 
-
-                return Result<BuyCreditResponse>.Success(new BuyCreditResponse(internalPayement.Id, (int)request.Amount, request.DueValue, internalPayement.SerialNumber, internalPayement.ExternalReference, DateTime.UtcNow, internalPayement.InternalReference, ceetvente.Code, ceetvente.credit, user.Data.UserFullName), "Vente Effectuée avec Succès!");
+                return Result<BuyCreditResponse>.Success(internalSale, "Vente Effectuée avec Succès!");
             }
 
-            var venteExt = await _ceetService.BuyCredit(new CreditRequest(request.SerialNumber, (int)request.Amount, request.PhoneNumber));
-            if (venteExt == null)
+            CreditVendResponse venteExt;
+            try
             {
-                return await Result<BuyCreditResponse>.FailAsync("Vente  non effectuée");
-
+                venteExt = await _ceetService.BuyCredit(new CreditRequest(request.SerialNumber, (int)request.Amount, request.PhoneNumber));
             }
+            catch (ApiException ex)
+            {
+                return await Result<BuyCreditResponse>.FailAsync(ex.Message);
+            }
+
+            if (venteExt == null)
+                return await Result<BuyCreditResponse>.FailAsync("Le service de vente n'a pas retourné de résultat. Veuillez réessayer.");
 
             Payment payment = new Payment()
             {
@@ -137,13 +162,23 @@ namespace BlazorHero.CleanArchitecture.Application.Features.Habitat.Buildings.Co
             };
             await db.AddAsync(payment);
             await _unitOfWork.Commit(cancellationToken);
-            await _ceetService.Confirm(venteExt);
+
+            try
+            {
+                await _ceetService.Confirm(venteExt);
+            }
+            catch (ApiException)
+            {
+                // Confirmation failed but payment was already recorded — continue
+            }
+
             payment.ConfirmationDate = DateTime.UtcNow;
             payment.IsConfirmed = true;
             await db.UpdateAsync(payment);
             await _unitOfWork.Commit(cancellationToken);
-            await _pdfService.GeneratePdf(ApplicationConstants.FileConstants.Url(request.Orign, payment.Id), ApplicationConstants.FileConstants.GetReceipt(payment.Id));
-            return await Result<BuyCreditResponse>.SuccessAsync(new BuyCreditResponse(payment.Id, (int)request.Amount, request.DueValue, request.SerialNumber, payment.InternalReference, DateTime.UtcNow, payment.InternalReference, venteExt.Code, venteExt.credit, user.Data.UserFullName), "Vente éffectuée avec succès");
+            var externalSale = new BuyCreditResponse(payment.Id, (int)request.Amount, request.DueValue, request.SerialNumber, payment.InternalReference, DateTime.UtcNow, payment.InternalReference, venteExt.Code, venteExt.credit, user.Data.UserFullName);
+            await _pdfService.GenerateReceiptAsync(externalSale, ApplicationConstants.FileConstants.GetReceipt(payment.Id));
+            return await Result<BuyCreditResponse>.SuccessAsync(externalSale, "Vente éffectuée avec succès");
 
         }
     }

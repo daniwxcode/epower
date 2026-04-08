@@ -14,6 +14,7 @@ using Flurl.Http.Xml;
 using MediatR;
 
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 
 using System;
 using System.Collections.Generic;
@@ -55,56 +56,73 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services
     public class CeetService : ICeetService
     {
         private readonly CatVendConfig _config;
-        public CeetService(IOptions<CatVendConfig> config)
+        private readonly ILogger<CeetService> _logger;
+        public CeetService(IOptions<CatVendConfig> config, ILogger<CeetService> logger)
         {
             _config = config.Value;
+            _logger = logger;
         }
         public async Task<CreditVendResponse> BuyCredit(CreditRequest creditRequest)
         {
-            var _canBeSold = await ConsumerCheck(new(creditRequest.SerialNumber, creditRequest.Amount));
-            if (_canBeSold is null)
-                return null;
-            if (!_canBeSold.Status)
-                throw new ApiException($"Pas assez d'argent pour acheter: montant min: {_canBeSold.amount} FCFA");
-            EVendRequest eVendRequest = new EVendRequest()
+            try
             {
-                Amount = creditRequest.Amount,
-                Meter = creditRequest.SerialNumber,
-                Phone = "70705684",// creditRequest.PhoneNumber,
-                Unit = _config.Unit,
-                Username = _config.Username,
-                Password = _config.Password,
-                Validation_code = _config.ValidationCode
-            };
-            var call = await $"{_config.BaseUrl}{_config.Vend}"
-               .PostXmlAsync(eVendRequest);
-            checkResponse(call);
-            if (call.StatusCode == 200)
-            {
-                var xmlData = await call.GetStringAsync();
-                VendSuprimaResponse response = new VendSuprimaResponse();
-                XmlSerializer serializer = new XmlSerializer(typeof(VendSuprimaResponse));
-                using (TextReader reader = new StringReader(xmlData))
+                var _canBeSold = await ConsumerCheck(new(creditRequest.SerialNumber, creditRequest.Amount));
+                if (_canBeSold is null)
+                    throw new ApiException("Le service CATvend n'a pas pu vérifier le compteur. Veuillez réessayer.");
+                if (!_canBeSold.Status)
+                    throw new ApiException($"Montant insuffisant — minimum requis : {_canBeSold.amount} FCFA");
+                EVendRequest eVendRequest = new EVendRequest()
                 {
-                    response = (VendSuprimaResponse)serializer.Deserialize(reader);
-                    if (response.ThinClient.Vend.Success == 1)
+                    Amount = creditRequest.Amount,
+                    Meter = creditRequest.SerialNumber,
+                    Phone = "70705684",// creditRequest.PhoneNumber,
+                    Unit = _config.Unit,
+                    Username = _config.Username,
+                    Password = _config.Password,
+                    Validation_code = _config.ValidationCode
+                };
+                var call = await $"{_config.BaseUrl}{_config.Vend}"
+                   .PostXmlAsync(eVendRequest);
+                checkResponse(call);
+                if (call.StatusCode == 200)
+                {
+                    var xmlData = await call.GetStringAsync();
+                    VendSuprimaResponse response = new VendSuprimaResponse();
+                    XmlSerializer serializer = new XmlSerializer(typeof(VendSuprimaResponse));
+                    using (TextReader reader = new StringReader(xmlData))
                     {
-                        var token = response.ThinClient.Vend.Token;
-                        string pattern = @"(\d{4})(\d{4})(\d{4})(\d{4})(\d{4})";
-                        string replacement = "$1-$2-$3-$4-$5";
-                        string formatted = Regex.Replace(token.Tk60, pattern, replacement);
-                        if (double.TryParse(token.Tk50, NumberStyles.Any, CultureInfo.CurrentCulture, out double result))
+                        response = (VendSuprimaResponse)serializer.Deserialize(reader);
+                        if (response.ThinClient.Vend.Success == 1)
                         {
+                            var token = response.ThinClient.Vend.Token;
+                            string pattern = @"(\d{4})(\d{4})(\d{4})(\d{4})(\d{4})";
+                            string replacement = "$1-$2-$3-$4-$5";
+                            string formatted = Regex.Replace(token.Tk60, pattern, replacement);
+                            if (double.TryParse(token.Tk50, NumberStyles.Any, CultureInfo.CurrentCulture, out double result))
+                            {
 
-                            return new CreditVendResponse(true, formatted, result, token.Tk10, "Vente effectuée avec succès");
+                                return new CreditVendResponse(true, formatted, result, token.Tk10, "Vente effectuée avec succès");
+                            }
                         }
-
-
                     }
                 }
+
+                throw new ApiException("La réponse du serveur CATvend est invalide. Veuillez réessayer.");
             }
-            
-            return null;
+            catch (ApiException)
+            {
+                throw;
+            }
+            catch (FlurlHttpException ex)
+            {
+                _logger.LogError(ex, "Erreur de communication avec l'API CATvend — URL: {Url}", $"{_config.BaseUrl}{_config.Vend}");
+                throw new ApiException("Service CATvend injoignable. Vérifiez la connexion réseau ou contactez le support.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur inattendue lors de l'achat de crédit — Compteur: {Serial}", creditRequest.SerialNumber);
+                throw new ApiException($"Erreur inattendue lors de la vente : {ex.Message}");
+            }
         }
 
         private void checkResponse(IFlurlResponse call)
@@ -120,6 +138,8 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services
         }
         public async Task<ConsumerCheckResponse> ConsumerCheck(ConsumerCheckRequestData command)
         {
+            try
+            {
                 var request = new ConsumerCheckRequest()
                 {
                     Amount = command.amount,
@@ -149,7 +169,22 @@ namespace BlazorHero.CleanArchitecture.Infrastructure.Services
                         return new ConsumerCheckResponse(true, amount);
                     }
                 }
-                return null;           
+                return null;
+            }
+            catch (ApiException)
+            {
+                throw;
+            }
+            catch (FlurlHttpException ex)
+            {
+                _logger.LogError(ex, "Erreur de communication avec CATvend ConsumerCheck — Compteur: {Meter}", command.meter);
+                throw new ApiException("Service CATvend injoignable lors de la vérification du compteur.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur inattendue lors de ConsumerCheck — Compteur: {Meter}", command.meter);
+                throw new ApiException($"Erreur lors de la vérification du compteur : {ex.Message}");
+            }
         }
 
         public async Task Confirm(CreditVendResponse response)

@@ -17,6 +17,7 @@ using BlazorHero.CleanArchitecture.Server.Managers.Preferences;
 using Microsoft.Extensions.Localization;
 using BlazorHero.CleanArchitecture.Application.Interfaces.Services;
 using BlazorHero.CleanArchitecture.Infrastructure.Services;
+using BlazorHero.CleanArchitecture.Shared.Models;
 
 namespace BlazorHero.CleanArchitecture.Server
 {
@@ -56,7 +57,11 @@ namespace BlazorHero.CleanArchitecture.Server
             services.AddSharedInfrastructure(_configuration);
             services.RegisterSwagger();
             services.AddInfrastructureMappings();
-            services.AddSingleton<ICeetService, CeetService>();
+            var catVendConfig = _configuration.GetSection("CatVendConfig").Get<CatVendConfig>();
+            if (catVendConfig?.UseSimulator == true)
+                services.AddSingleton<ICeetService, CeetServiceSimulator>();
+            else
+                services.AddSingleton<ICeetService, CeetService>();
             services.AddHangfire(x => x.UseSqlServerStorage(_configuration.GetConnectionString("DefaultConnection")));
             services.AddHangfireServer();
             services.AddControllers().AddValidators();
