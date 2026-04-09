@@ -81,7 +81,7 @@ jobs:
 
         echo "==== CONNECTING TO VPS ===="
 
-        ssh -o StrictHostKeyChecking=no root@$VPS_HOST "
+        ssh -o StrictHostKeyChecking=no user@$VPS_HOST "
 
           set -e
 
