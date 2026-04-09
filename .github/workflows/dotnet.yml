@@ -1,8 +1,9 @@
-name: Deploy to VPS
+name: Deploy ePower to VPS
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 env:
   VPS_HOST: 80.248.77.205
@@ -15,58 +16,131 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
+
+    - name: Checkout repository
       uses: actions/checkout@v4
+
+    # -----------------------------
+    # Cache NuGet packages
+    # -----------------------------
+
+    - name: Cache NuGet
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    # -----------------------------
+    # Setup .NET
+    # -----------------------------
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '10.0.x'
+        dotnet-version: "10.0.x"
+
+    # -----------------------------
+    # Restore dependencies
+    # -----------------------------
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    # -----------------------------
+    # Build
+    # -----------------------------
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    # -----------------------------
+    # Publish
+    # -----------------------------
 
     - name: Publish
-      run: dotnet publish src/Server/Server.csproj -c Release -o publish
-      env:
-        ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONN }}
-        Playground__HmacSecret: ${{ secrets.HMAC_SECRET }}
-        Admin__RootUsername: ${{ secrets.ADMIN_ROOT_USER }}
-        Admin__RootPassword: ${{ secrets.ADMIN_ROOT_PASSWORD }}
+      run: dotnet publish src/Server/Server.csproj -c Release -o publish --no-build
+
+    # -----------------------------
+    # SSH configuration
+    # -----------------------------
 
     - name: Configure SSH
       uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Deploy to VPS over SSH
+    # -----------------------------
+    # Deploy
+    # -----------------------------
+
+    - name: Deploy to VPS
       run: |
         set -e
 
+        echo "==== CONNECTING TO VPS ===="
+
         ssh -o StrictHostKeyChecking=no root@$VPS_HOST "
+
           set -e
-          echo '=== e-Power deployment (GitHub Actions) ==='
-          echo '[1/4] Stopping service...'
+
+          echo '=== ePower Deployment ==='
+
+          echo '[1/6] Stopping service'
           systemctl stop $SERVICE_NAME 2>/dev/null || true
 
-          echo '[2/4] Backing up current version...'
+          echo '[2/6] Backup current version'
           if [ -d '$APP_PATH' ]; then
             rm -rf '$BACKUP_PATH'
             cp -a '$APP_PATH' '$BACKUP_PATH'
           fi
 
-          echo '[3/4] Preparing target directory...'
+          echo '[3/6] Cleaning target directory'
           mkdir -p '$APP_PATH'
           rm -rf '${APP_PATH:?}'/*
         "
 
-        echo '[3/4] Copying new files...'
+        echo "[4/6] Uploading new version"
+
         scp -r publish/* root@$VPS_HOST:$APP_PATH/
 
         ssh -o StrictHostKeyChecking=no root@$VPS_HOST "
+
           set -e
-          echo '[4/4] Setting permissions and restarting service...'
-          chown -R www-data:www-data '$APP_PATH' 2>/dev/null || true
+
+          echo '[5/6] Setting permissions'
+
+          chown -R www-data:www-data '$APP_PATH' || true
           chmod -R 755 '$APP_PATH'
+
+          echo '[6/6] Restarting service'
+
           systemctl daemon-reload
           systemctl start $SERVICE_NAME
-          systemctl enable $SERVICE_NAME 2>/dev/null || true
-          systemctl status $SERVICE_NAME --no-pager -l || true
+          systemctl enable $SERVICE_NAME || true
+
+          echo 'Checking service status...'
+
+          if systemctl is-active --quiet $SERVICE_NAME
+          then
+            echo 'Service started successfully'
+          else
+            echo 'Service failed to start, rolling back...'
+
+            systemctl stop $SERVICE_NAME || true
+
+            rm -rf '$APP_PATH'
+            mv '$BACKUP_PATH' '$APP_PATH'
+
+            systemctl start $SERVICE_NAME
+
+            echo 'Rollback completed'
+          fi
+
+          echo 'Service status:'
+          systemctl status $SERVICE_NAME --no-pager -l
+
+          echo 'Recent logs:'
+          journalctl -u $SERVICE_NAME -n 50 --no-pager
         "
