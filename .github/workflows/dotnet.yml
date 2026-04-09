@@ -76,6 +76,15 @@ jobs:
     # -----------------------------
 
     - name: Deploy to VPS
+      env:
+        DB_CONNECTION: ${{ secrets.DB_CONNECTION_STRING }}
+        APP_SECRET: ${{ secrets.APP_SECRET }}
+        MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+        MEDIATR_KEY: ${{ secrets.MEDIATR_LICENSE_KEY }}
+        CATVEND_VALIDATION: ${{ secrets.CATVEND_VALIDATION_CODE }}
+        CATVEND_UNIT: ${{ secrets.CATVEND_UNIT }}
+        CATVEND_USER: ${{ secrets.CATVEND_USERNAME }}
+        CATVEND_PASS: ${{ secrets.CATVEND_PASSWORD }}
       run: |
         set -e
 
@@ -87,60 +96,81 @@ jobs:
 
           echo '=== ePower Deployment ==='
 
-          echo '[1/6] Stopping service'
-          systemctl stop $SERVICE_NAME 2>/dev/null || true
+          echo '[1/7] Stopping service'
+          sudo systemctl stop $SERVICE_NAME 2>/dev/null || true
 
-          echo '[2/6] Backup current version'
+          echo '[2/7] Backup current version'
           if [ -d '$APP_PATH' ]; then
-            rm -rf '$BACKUP_PATH'
-            cp -a '$APP_PATH' '$BACKUP_PATH'
+            sudo rm -rf '$BACKUP_PATH'
+            sudo cp -a '$APP_PATH' '$BACKUP_PATH'
           fi
 
-          echo '[3/6] Cleaning target directory'
-          mkdir -p '$APP_PATH'
-          rm -rf '${APP_PATH:?}'/*
+          echo '[3/7] Cleaning target directory'
+          sudo mkdir -p '$APP_PATH'
+          sudo rm -rf '${APP_PATH:?}'/*
         "
 
-        echo "[4/6] Uploading new version"
+        echo "[4/7] Uploading new version"
 
-        scp -r publish/* root@$VPS_HOST:$APP_PATH/
+        scp -r publish/* user@$VPS_HOST:/tmp/epower-deploy/
 
-        ssh -o StrictHostKeyChecking=no root@$VPS_HOST "
+        echo "[5/7] Writing environment secrets"
+
+        ssh -o StrictHostKeyChecking=no user@$VPS_HOST "cat > /tmp/epower-env" <<ENVEOF
+        ConnectionStrings__DefaultConnection=${DB_CONNECTION}
+        AppConfiguration__Secret=${APP_SECRET}
+        MailConfiguration__Password=${MAIL_PASSWORD}
+        MediatR__LicenseKey=${MEDIATR_KEY}
+        CatVendConfig__ValidationCode=${CATVEND_VALIDATION}
+        CatVendConfig__Unit=${CATVEND_UNIT}
+        CatVendConfig__Username=${CATVEND_USER}
+        CatVendConfig__Password=${CATVEND_PASS}
+        ENVEOF
+
+        ssh -o StrictHostKeyChecking=no user@$VPS_HOST "
 
           set -e
 
-          echo '[5/6] Setting permissions'
+          echo '[6/7] Setting permissions'
 
-          chown -R www-data:www-data '$APP_PATH' || true
-          chmod -R 755 '$APP_PATH'
+          sudo mkdir -p /etc/epower
+          sudo mv /tmp/epower-env /etc/epower/env
+          sudo chmod 600 /etc/epower/env
+          sudo chown root:root /etc/epower/env
 
-          echo '[6/6] Restarting service'
+          sudo cp -r /tmp/epower-deploy/* '$APP_PATH'/
+          rm -rf /tmp/epower-deploy
 
-          systemctl daemon-reload
-          systemctl start $SERVICE_NAME
-          systemctl enable $SERVICE_NAME || true
+          sudo chown -R www-data:www-data '$APP_PATH' || true
+          sudo chmod -R 755 '$APP_PATH'
+
+          echo '[7/7] Restarting service'
+
+          sudo systemctl daemon-reload
+          sudo systemctl start $SERVICE_NAME
+          sudo systemctl enable $SERVICE_NAME || true
 
           echo 'Checking service status...'
 
-          if systemctl is-active --quiet $SERVICE_NAME
+          if sudo systemctl is-active --quiet $SERVICE_NAME
           then
             echo 'Service started successfully'
           else
             echo 'Service failed to start, rolling back...'
 
-            systemctl stop $SERVICE_NAME || true
+            sudo systemctl stop $SERVICE_NAME || true
 
-            rm -rf '$APP_PATH'
-            mv '$BACKUP_PATH' '$APP_PATH'
+            sudo rm -rf '$APP_PATH'
+            sudo mv '$BACKUP_PATH' '$APP_PATH'
 
-            systemctl start $SERVICE_NAME
+            sudo systemctl start $SERVICE_NAME
 
             echo 'Rollback completed'
           fi
 
           echo 'Service status:'
-          systemctl status $SERVICE_NAME --no-pager -l
+          sudo systemctl status $SERVICE_NAME --no-pager -l
 
           echo 'Recent logs:'
-          journalctl -u $SERVICE_NAME -n 50 --no-pager
+          sudo journalctl -u $SERVICE_NAME -n 50 --no-pager
         "
