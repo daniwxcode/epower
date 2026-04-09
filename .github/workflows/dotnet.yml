@@ -46,21 +46,21 @@ jobs:
     # -----------------------------
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore BlazorHero.CleanArchitecture.sln
 
     # -----------------------------
     # Build
     # -----------------------------
 
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build BlazorHero.CleanArchitecture.sln --configuration Release --no-restore
 
     # -----------------------------
     # Publish
     # -----------------------------
 
     - name: Publish
-      run: dotnet publish src/Server/Server.csproj -c Release -o publish --no-build
+      run: dotnet publish src/Server/Server.csproj -c Release -o publish
 
     # -----------------------------
     # SSH configuration
