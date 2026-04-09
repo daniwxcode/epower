@@ -1,28 +1,72 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
+name: Deploy to VPS
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
+
+env:
+  VPS_HOST: 62.171.155.200
+  APP_PATH: /var/www/vincipher
+  BACKUP_PATH: /var/www/vincipher-backup
+  SERVICE_NAME: vincipher
 
 jobs:
-  build:
-
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 10.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+        dotnet-version: '10.0.x'
+
+    - name: Publish
+      run: dotnet publish src/Server/Server.csproj -c Release -o publish
+      env:
+        ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONN }}
+        Playground__HmacSecret: ${{ secrets.HMAC_SECRET }}
+        Admin__RootUsername: ${{ secrets.ADMIN_ROOT_USER }}
+        Admin__RootPassword: ${{ secrets.ADMIN_ROOT_PASSWORD }}
+
+    - name: Configure SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Deploy to VPS over SSH
+      run: |
+        set -e
+
+        ssh -o StrictHostKeyChecking=no root@$VPS_HOST "
+          set -e
+          echo '=== e-Power deployment (GitHub Actions) ==='
+          echo '[1/4] Stopping service...'
+          systemctl stop $SERVICE_NAME 2>/dev/null || true
+
+          echo '[2/4] Backing up current version...'
+          if [ -d '$APP_PATH' ]; then
+            rm -rf '$BACKUP_PATH'
+            cp -a '$APP_PATH' '$BACKUP_PATH'
+          fi
+
+          echo '[3/4] Preparing target directory...'
+          mkdir -p '$APP_PATH'
+          rm -rf '${APP_PATH:?}'/*
+        "
+
+        echo '[3/4] Copying new files...'
+        scp -r publish/* root@$VPS_HOST:$APP_PATH/
+
+        ssh -o StrictHostKeyChecking=no root@$VPS_HOST "
+          set -e
+          echo '[4/4] Setting permissions and restarting service...'
+          chown -R www-data:www-data '$APP_PATH' 2>/dev/null || true
+          chmod -R 755 '$APP_PATH'
+          systemctl daemon-reload
+          systemctl start $SERVICE_NAME
+          systemctl enable $SERVICE_NAME 2>/dev/null || true
+          systemctl status $SERVICE_NAME --no-pager -l || true
+        "
